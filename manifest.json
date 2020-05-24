@@ -1,0 +1,12 @@
+{
+    "name":"Akita",
+    "version":"0.0.1",
+    "manifest_version": 2,
+    "description":"A browser extension that gives you insight into your involvement with web monetization.",
+    "permissions":[],
+    "browser_action": {
+      "default_icon": "icon.png",
+      "default_popup": "popup.html",
+      "default_title": "Akita"
+    }
+ }
