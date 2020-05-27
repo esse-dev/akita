@@ -1,21 +1,26 @@
 //test code
 // browser.notifications.create('hello!');
 
-const httpStatusOK = 200;
-let siteIsMonetized = isMonetizationPresent();
+main();
 
-console.log("siteIsMonetized: ", siteIsMonetized);
+/**
+ * Main function to initiate the application.
+ */
+async function main() {
+	const siteIsMonetized = await isMonetizationPresent();
+	console.log("siteIsMonetized: ", siteIsMonetized);
+}
 
 /**
  * Check for a monetization meta tag on the website and verify that
- * the payment point is valid (resolves).
+ * the payment pointer is valid (resolves to a valid SPSP endpoint).
  * 
  * TODO: use enum to indicate no meta tag, meta tag + valid endpoint,
  * meta tag + invalid endpoint.
  * 
  * @return If both monetization is present and the payment endpoint is valid.
  */
-function isMonetizationPresent() {
+async function isMonetizationPresent() {
 	const monetizationMeta = document.querySelector('meta[name="monetization"]');
 	let isMonetizationPresent = false;
 
@@ -24,7 +29,7 @@ function isMonetizationPresent() {
 	} else {
 		let paymentPointer = monetizationMeta.content;
 
-		if (isPaymentPointerValid(paymentPointer)) {
+		if (await isPaymentPointerValid(paymentPointer)) {
 			isMonetizationPresent = true;
 		}
 	}
@@ -38,16 +43,18 @@ function isMonetizationPresent() {
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
  * @return Whether or not the specified payment pointer is valid.
  */
-function isPaymentPointerValid(paymentPointer) {
+async function isPaymentPointerValid(paymentPointer) {
 	let isPaymentPointerValid = false;
 	const resolvedPaymentPointer = resolvePaymentPointer(paymentPointer);
 
 	if (resolvedPaymentPointer) {
 		console.log("resolvedPaymentPointer: ", resolvedPaymentPointer);
 
-		let response = httpGet(resolvedPaymentPointer, "Accept", "application/spsp4+json, application/spsp+json");
+		let response = await httpGet(resolvedPaymentPointer, "Accept", "application/spsp4+json, application/spsp+json");
 
 		if (response) {
+			const httpStatusOK = 200;
+
 			if (httpStatusOK === response.status) {
 				isPaymentPointerValid = true;
 			}
@@ -63,6 +70,8 @@ function isPaymentPointerValid(paymentPointer) {
  * Payment pointer format: "$" host path-abempty
  * Resolution format: "https://" host path-abempty
  * 
+ * SPSP Endpoint Specification: https://interledger.org/rfcs/0009-simple-payment-setup-protocol/#specification
+ * Payment pointer syntax resolution examples: https://paymentpointers.org/syntax-resolution/#examples
  * Refer to https://paymentpointers.org/ for resolution details.
  * 
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
@@ -84,7 +93,7 @@ function resolvePaymentPointer(paymentPointer) {
 			const wellKnownPath = ".well-known/pay";
 			const pathabemptyIndex = resolvedPaymentPointer.indexOf('/');
 
-			// If no custom path is specified, append /.well-known/pay to the endpoint
+			// If no custom path is specified, append /.well-known/pay to the endpoint, otherwise keep the path as is
 			if (-1 == pathabemptyIndex) {
 				// There is no path specified for the payment pointer; eg. $pointer.exampleILPwalletprovider.com
 				resolvedPaymentPointer.concat("/" + wellKnownPath);
@@ -96,8 +105,9 @@ function resolvePaymentPointer(paymentPointer) {
 				// eg. $pointer.exampleILPwalletprovider.com/customPath or $pointer.exampleILPwalletprovider.com/customPath/
 			}
 
-			const httpsUrl = "https://";
-			resolvedPaymentPointer = httpsUrl.concat(resolvedPaymentPointer);
+			// Payment pointers must resolve to an https URL, as per: https://tools.ietf.org/html/rfc7230#section-2.7.2
+			const httpsURL = "https://";
+			resolvedPaymentPointer = httpsURL.concat(resolvedPaymentPointer);
 		} else {
 			resolvedPaymentPointer = null;
 		}
@@ -107,35 +117,30 @@ function resolvePaymentPointer(paymentPointer) {
 }
 
 /**
- * Send an http request to the provided endpoint with a header if specified.
+ * Send an asynchronous http request to the provided endpoint with a header if specified.
  * 
  * TODO: add handling for multiple header values.
  * 
  * @param {string} endpoint The URL to make an http request against.
  * @param {string} headerName The name of the header.
  * @param {string} headerValue The value for the header.
- * @return The http request returned by the server.
+ * @return The http response returned by the server.
  */
-function httpGet(endpoint, headerName, headerValue) {
-	let httpRequest = null;
+async function httpGet(endpoint, headerName, headerValue) {
+	let response = null;
 	
 	if (endpoint) {
-		httpRequest = new XMLHttpRequest();
+		let requestHeaders = new Headers();
 
-		/**
-		 * TODO: make request asynchronous, add async handling
-		 * [Deprecation] Synchronous XMLHttpRequest on the main thread is deprecated because
-		 * of its detrimental effects to the end user's experience. 
-		 * For more help, check https://xhr.spec.whatwg.org/.
-		 */
-		httpRequest.open("GET", endpoint, false); // false for synchronous request;
-	
 		if (headerName && headerValue) {
-			httpRequest.setRequestHeader(headerName, headerValue);
+			requestHeaders.append(headerName, headerValue);
 		}
-		
-		httpRequest.send(null);
+
+		response = await fetch(endpoint, {
+			method: 'GET',
+			headers: requestHeaders
+		});
 	}
 
-    return httpRequest;
+    return response;
 }
