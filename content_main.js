@@ -1,5 +1,24 @@
-//test code
-// browser.notifications.create('hello!');
+
+/**
+ * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
+ * properties which are added by JavaScript, such as document.monetization!
+ * reference: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts#Content_script_environment
+ *            https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
+ * So we must inject some code into the JavaScript context of the current tab in order to
+ * access the document.monetization object. We inject code using a script element:
+ */
+const scriptEl = document.createElement('script');
+scriptEl.text = `
+	document.monetization.addEventListener('monetizationstart', (event) => {
+		document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
+	});
+
+	document.monetization.addEventListener('monetizationprogress', (event) => {
+		document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
+	});
+`;
+document.body.appendChild(scriptEl);
+
 
 main();
 
@@ -7,8 +26,23 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	const siteIsMonetized = await isMonetizationPresent();
-	console.log("siteIsMonetized: ", siteIsMonetized);
+	const {
+		isValid,
+		paymentPointer
+	} = await getAndValidatePaymentPointer();
+	console.log("isPaymentPointerValid: ", isValid);
+
+	// For TESTING purposes: output all stored data to the console:
+	loadAllData().then(result => console.log(JSON.stringify(result)))
+
+	storePaymentDataIntoAkitaFormat({ paymentPointer: paymentPointer });
+
+	document.addEventListener('akita_monetizationstart', (event) => {
+		storePaymentDataIntoAkitaFormat({ paymentPointer: paymentPointer });
+	});
+	document.addEventListener('akita_monetizationprogress', (event) => {
+		storePaymentDataIntoAkitaFormat(event.detail);
+	});
 }
 
 /**
@@ -18,30 +52,34 @@ async function main() {
  * TODO: use enum to indicate no meta tag, meta tag + valid endpoint,
  * meta tag + invalid endpoint.
  * 
- * @return If both monetization is present and the payment endpoint is valid.
+ * @return {Promise<{ isPaymentPointerValid: boolean, paymentPointer:string}>} 
+ * isPaymentPointerValid is true if both monetization is present and the payment endpoint is valid.
+ * paymentPointer is the paymentPointer if it is found in the monetization meta tag, otherwise null.
  */
-async function isMonetizationPresent() {
+async function getAndValidatePaymentPointer() {
 	const monetizationMeta = document.querySelector('meta[name="monetization"]');
-	let isMonetizationPresent = false;
+	let paymentPointer = (monetizationMeta) ? monetizationMeta.content : null;
+	let isValid = false;
 
 	if (null === monetizationMeta) {
 		/* No monetization meta tag provided */
 	} else {
-		let paymentPointer = monetizationMeta.content;
-
 		if (await isPaymentPointerValid(paymentPointer)) {
-			isMonetizationPresent = true;
+			isValid = true;
 		}
 	}
 
-	return isMonetizationPresent;
+	return {
+		isValid,
+		paymentPointer
+	};
 }
 
 /**
  * Check if a payment pointer is valid or not.
  * 
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
- * @return Whether or not the specified payment pointer is valid.
+ * @return {Promise<boolean>} Whether or not the specified payment pointer is valid.
  */
 async function isPaymentPointerValid(paymentPointer) {
 	let isPaymentPointerValid = false;
@@ -75,7 +113,7 @@ async function isPaymentPointerValid(paymentPointer) {
  * Refer to https://paymentpointers.org/ for resolution details.
  * 
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
- * @return The resolved payment pointer.
+ * @return {string} The resolved payment pointer.
  */
 function resolvePaymentPointer(paymentPointer) {
 	let resolvedPaymentPointer = null;
@@ -112,7 +150,7 @@ function resolvePaymentPointer(paymentPointer) {
 			resolvedPaymentPointer = null;
 		}
 	}
-	
+
 	return resolvedPaymentPointer;
 }
 
@@ -124,11 +162,11 @@ function resolvePaymentPointer(paymentPointer) {
  * @param {string} endpoint The URL to make an http request against.
  * @param {string} headerName The name of the header.
  * @param {string} headerValue The value for the header.
- * @return The http response returned by the server.
+ * @return {Promise<Response>} The http response returned by the server.
  */
 async function httpGet(endpoint, headerName, headerValue) {
 	let response = null;
-	
+
 	if (endpoint) {
 		let requestHeaders = new Headers();
 

@@ -1,19 +1,18 @@
 {
 	"name":"Akita",
-	"version":"0.0.1",
+	"version":"0.0.2",
 	"manifest_version": 2,
 	"description":"A browser extension that gives you insight into your involvement with web monetization.",
 	"permissions":[
 		"tabs",
 		"activeTab",
-		"<all_urls>"
+		"<all_urls>",
+		"storage"
 	],
-	"background": {
-	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
-			"js": ["popup.js"]
+			"js": ["WebMonetizationAsset.js", "AkitaPaymentPointerData.js", "AkitaOriginData.js", "storage.js", "content_main.js"]
 		}
 	],
 	"browser_action": {
