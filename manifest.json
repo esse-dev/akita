@@ -12,7 +12,13 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
-			"js": ["src/data/WebMonetizationAsset.js", "src/data/AkitaPaymentPointerData.js", "src/data/AkitaOriginData.js", "src/data/storage.js", "src/content_main.js"]
+			"js": [
+				"src/data/WebMonetizationAsset.js",
+				"src/data/AkitaPaymentPointerData.js",
+				"src/data/AkitaOriginData.js",
+				"src/data/storage.js",
+				"src/content_main.js"
+			]
 		}
 	],
 	"browser_action": {

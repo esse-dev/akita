@@ -182,5 +182,5 @@ async function httpGet(endpoint, headerName, headerValue) {
 		});
 	}
 
-    return response;
+	return response;
 }
