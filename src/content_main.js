@@ -9,7 +9,7 @@
  */
 const scriptEl = document.createElement('script');
 scriptEl.text = `
-	if (document.monetization) {
+	if (null === document.monetization) {
 		document.monetization.addEventListener('monetizationstart', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
 		});
