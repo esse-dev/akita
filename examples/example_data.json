@@ -1,4 +1,4 @@
-"Example of the Akita Format of storing data. Each element of the originDataList is a serialized AkitaOriginData object."
+// "Example of the Akita Format of storing data. Each element of the originDataList is a serialized AkitaOriginData object."
 
 {
    "originList":[

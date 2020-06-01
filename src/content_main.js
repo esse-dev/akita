@@ -9,13 +9,15 @@
  */
 const scriptEl = document.createElement('script');
 scriptEl.text = `
-	document.monetization.addEventListener('monetizationstart', (event) => {
-		document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
-	});
-
-	document.monetization.addEventListener('monetizationprogress', (event) => {
-		document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
-	});
+	if (document.monetization) {
+		document.monetization.addEventListener('monetizationstart', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
+		});
+	
+		document.monetization.addEventListener('monetizationprogress', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
+		});
+	}
 `;
 document.body.appendChild(scriptEl);
 
@@ -32,8 +34,8 @@ async function main() {
 	} = await getAndValidatePaymentPointer();
 	console.log("isPaymentPointerValid: ", isValid);
 
-	// For TESTING purposes: output all stored data to the console:
-	loadAllData().then(result => console.log(JSON.stringify(result)))
+	// For TESTING purposes: output all stored data to the console (not including current site)
+	loadAllData().then(result => console.log(JSON.stringify(result)));
 
 	storePaymentDataIntoAkitaFormat({ paymentPointer: paymentPointer });
 

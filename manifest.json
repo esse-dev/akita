@@ -12,12 +12,12 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
-			"js": ["WebMonetizationAsset.js", "AkitaPaymentPointerData.js", "AkitaOriginData.js", "storage.js", "content_main.js"]
+			"js": ["src/data/WebMonetizationAsset.js", "src/data/AkitaPaymentPointerData.js", "src/data/AkitaOriginData.js", "src/data/storage.js", "src/content_main.js"]
 		}
 	],
 	"browser_action": {
-		"default_icon": "icon.png",
-		"default_popup": "popup.html",
+		"default_icon": "assets/icon.png",
+		"default_popup": "src/popup/popup.html",
 		"default_title": "Akita"
 	}
 }
