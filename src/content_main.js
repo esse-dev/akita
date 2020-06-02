@@ -22,6 +22,7 @@ scriptEl.text = `
 document.body.appendChild(scriptEl);
 
 
+setExtensionIconMonetizationState(false);
 main();
 
 /**
@@ -32,7 +33,8 @@ async function main() {
 		isValid,
 		paymentPointer
 	} = await getAndValidatePaymentPointer();
-	console.log("isPaymentPointerValid: ", isValid);
+	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
+	setExtensionIconMonetizationState(isValid);
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
 	loadAllData().then(result => console.log(JSON.stringify(result)));
@@ -45,6 +47,18 @@ async function main() {
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storePaymentDataIntoAkitaFormat(event.detail);
 	});
+}
+
+/**
+ * Sends a message to background_script.js which changes the extension icon.
+ * Only background scripts have access to the extension icon API.
+ *
+ * @param {boolean} isMonetized Changes the browser icon to indicate whether the site is monetized or not.
+ *   If true, a pink $ badge is displayed. If false, just the dog face without the tongue is used as the icon.
+ */
+function setExtensionIconMonetizationState(isMonetized) {
+	const webBrowser = chrome ? chrome : browser;
+	webBrowser.runtime.sendMessage({ isMonetized });
 }
 
 /**
