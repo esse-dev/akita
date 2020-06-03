@@ -4,7 +4,7 @@
  */
 class AkitaPaymentPointerData {
 	paymentPointer = null;
-	// The type of sentAssetsMap is: Object<WebMonetizationAsset>
+	// The type of each entry in sentAssetsMap is: WebMonetizationAsset
 	sentAssetsMap = {};
 
 	constructor(paymentPointer) {

@@ -10,6 +10,12 @@
 		{
 			"origin":"https://dev.to",
 			"isMonetized":true,
+			"originVisitData":{
+				"timeSpentAtOrigin": 8731882,
+				"numberOfVisits": 3,
+				"dateOfFirstVisit": "2020-05-01",
+				"dateOfMostRecentVisit": "2020-06-02"
+			},
 			"paymentPointerMap":{
 				"$ilp.uphold.com/24HhrUGG7ekn":{
 					"paymentPointer":"$ilp.uphold.com/24HhrUGG7ekn",
@@ -26,6 +32,12 @@
 		{
 			"origin":"https://www.twitch.tv",
 			"isMonetized":true,
+			"originVisitData":{
+				"timeSpentAtOrigin": 4723893,
+				"numberOfVisits": 2,
+				"dateOfFirstVisit": "2020-05-15",
+				"dateOfMostRecentVisit": "2020-05-27"
+			},
 			"paymentPointerMap":{
 				"$spsp.coil.com/twitch/nasa":{
 					"paymentPointer":"$spsp.coil.com/twitch/nasa",
@@ -52,6 +64,12 @@
 		{
 			"origin":"https://sdog.netlify.app",
 			"isMonetized":true,
+			"originVisitData":{
+				"timeSpentAtOrigin": 4567890218492,
+				"numberOfVisits": 300,
+				"dateOfFirstVisit": "2020-01-01",
+				"dateOfMostRecentVisit": "2020-06-02"
+			},
 			"paymentPointerMap":{
 				"$ilp.uphold.com/DWhyhLRG7E4Q":{
 					"paymentPointer":"$ilp.uphold.com/DWhyhLRG7E4Q",

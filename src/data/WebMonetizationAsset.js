@@ -15,7 +15,9 @@ class WebMonetizationAsset {
 	assetScale = 0;
 	assetCode = null;
 
-	constructor(assetCode) {
+	constructor(amount, assetScale, assetCode) {
+		this.amount = amount;
+		this.assetScale = assetScale;
 		this.assetCode = assetCode;
 	}
 
@@ -28,10 +30,14 @@ class WebMonetizationAsset {
 	 * @return {WebMonetizationAsset} the input object as an instance of the WebMonetizationAsset class.
 	 */
 	static fromObject(webMonetizationAsset) {
-		const newThis = new WebMonetizationAsset(webMonetizationAsset.assetCode);
-		newThis.amount = webMonetizationAsset.amount;
-		newThis.assetScale = webMonetizationAsset.assetScale;
-		return newThis;
+		const newWebMonetizationAsset =
+			new WebMonetizationAsset(
+				webMonetizationAsset.amount,
+				webMonetizationAsset.assetScale,
+				webMonetizationAsset.assetCode
+			);
+
+		return newWebMonetizationAsset;
 	}
 
 	/**
