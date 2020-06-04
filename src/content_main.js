@@ -29,6 +29,10 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
+	await trackVisitToSite();
+	await trackTimeOnSite();
+
+	// TODO: check payment pointer periodically for existence and validity
 	const {
 		isValid,
 		paymentPointer
@@ -36,18 +40,21 @@ async function main() {
 	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
 	setExtensionIconMonetizationState(isValid);
 
-	// For TESTING purposes: output all stored data to the console (not including current site)
-	loadAllData().then(result => console.log(JSON.stringify(result)));
+	if (isValid && paymentPointer !== null) {
+		await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
+	}
 
-	storePaymentDataIntoAkitaFormat({ paymentPointer: paymentPointer });
-
-	document.addEventListener('akita_monetizationstart', (event) => {
-		storePaymentDataIntoAkitaFormat({ paymentPointer: paymentPointer });
-	});
 	document.addEventListener('akita_monetizationprogress', (event) => {
-		storePaymentDataIntoAkitaFormat(event.detail);
+		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
 	});
+
+	// For TESTING purposes: output all stored data to the console (not including current site)
+	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
 }
+
+/***********************************************************
+ * Extension Icon
+ ***********************************************************/
 
 /**
  * Sends a message to background_script.js which changes the extension icon.
@@ -60,6 +67,88 @@ function setExtensionIconMonetizationState(isMonetized) {
 	const webBrowser = chrome ? chrome : browser;
 	webBrowser.runtime.sendMessage({ isMonetized });
 }
+
+/***********************************************************
+ * Track Visits and Time Spent on Website
+ ***********************************************************/
+
+/**
+ * Track the current visit to the site (origin).
+ * No data needs to be passed in, since it is handled in AkitaOriginVisitData.
+ */
+async function trackVisitToSite() {
+	await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.ORIGIN_VISIT_DATA);
+}
+
+/**
+ * Calculate and store the time the user spends on the site.
+ * Call this function once at the beginning of website logic.
+ * 
+ * Use the Page Visibility API to check if the current webpage is visible or not.
+ * https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
+ * https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState
+ */
+async function trackTimeOnSite() {
+	let previousStoreTime = getCurrentTime();
+	let docHiddenTime = -1;
+	let docVisibleTime = -1;
+
+	document.addEventListener('visibilitychange', (event) => {
+		if (document.hidden) {
+			// The page is no longer visible
+			docHiddenTime = getCurrentTime();
+		} else {
+			// The page is now visible
+			docVisibleTime = getCurrentTime();
+		}
+	});
+
+	/**
+	 * NOTE: setInterval may not be called while the document is hidden (while visibility lost)
+	 * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified
+	 * 
+	 * Store the recent time spent every 2 seconds to ensure time spent on site is recorded
+	 * even if the user closes the site.
+	 */
+	setInterval(async () => {
+		const now = getCurrentTime();
+		
+		if (document.visibilityState === 'visible') {
+			if (docHiddenTime > previousStoreTime) {
+				// Adding time after visibility lost (document becomes hidden) and then gained (document is visible again)
+				// i.e. If the user navigates away from the site and then comes back
+				const timeFromPreviousStoreToDocHidden = docHiddenTime - previousStoreTime;
+				const timeSinceDocVisible = now - docVisibleTime;	
+				await storeRecentTimeSpent(timeFromPreviousStoreToDocHidden + timeSinceDocVisible);
+			} else {
+				// Adding time during regular interval (document visible)
+				await storeRecentTimeSpent(now - previousStoreTime);
+			}
+
+			previousStoreTime = now;
+		}
+	}, 2000); // 2 second interval
+}
+
+/**
+ * Get the current time based on the user's timezone.
+ */
+function getCurrentTime() {
+	return performance.now();
+}
+
+/**
+ * Store the recent time spent in the webpage session into AkitaFormat.
+ * 
+ * @param {Number} recentTimeSpent The recent time spent on the webpage.
+ */
+async function storeRecentTimeSpent(recentTimeSpent) {
+	await storeDataIntoAkitaFormat(recentTimeSpent, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
+}
+
+/***********************************************************
+ * Validate Payment Pointer
+ ***********************************************************/
 
 /**
  * Check for a monetization meta tag on the website and verify that

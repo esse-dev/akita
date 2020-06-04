@@ -1,3 +1,13 @@
+/**
+ * "enum" of available Akita data types as a convenience to
+ * storeDataIntoAkitaFormat().
+ */
+const AKITA_DATA_TYPE = {
+	'PAYMENT': 0,
+	'ORIGIN_VISIT_DATA': 1,
+	'ORIGIN_TIME_SPENT': 2
+};
+
 const ORIGIN_NAME_LIST_KEY = 'originList';
 let webBrowser = chrome ? chrome : browser;
 
@@ -6,27 +16,13 @@ let webBrowser = chrome ? chrome : browser;
  * special Akita format. Using this method ensures that the data in storage
  * maintains the Akita format structure. For an example of the Akita format
  * see ./example_data.json
- *
- * @param {{
- *	paymentPointer?: string,
- *	assetCode?: string,
- *	assetScale?: number,
- *	amount?: number
- * }} paymentData
- *	 This object may be created, or a Web Monetization event detail object can be used.
- *	 Pass in an object with just a paymentPointer to register a payment pointer for
- *	 the current website. Payment pointer should be validated first.
- *	 Additionally pass in assetCode, assetScale, and amount together to add to the
- *	 total amount sent to the current website.
- *
- *	 assetCode e.g. 'XRP', 'USD', 'CAD'
- *	 assetScale and amount e.g.
- *		 if assetCode is 'USD', amount is 235, assetScale is 3 then actual amount of
- *		 currency is 235 * 10**(-3) = $0.235 USD or twenty-three and one-half cents.
- *
- *	 reference: https://webmonetization.org/docs/api#example-event-object-3
+ * 
+ * @param {Object} data Data to store. May be null if no data included.
+ * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
  */
-async function storePaymentDataIntoAkitaFormat(paymentData) {
+async function storeDataIntoAkitaFormat(data, typeOfData) {
+	// TODO: ensure typeOfData is one of AKITA_DATA_TYPE
+
 	const origin = window.location.origin;
 	// Start getting originList asynchronously
 	const originListPromise = getOriginList();
@@ -38,10 +34,17 @@ async function storePaymentDataIntoAkitaFormat(paymentData) {
 	if (!originDataExists) {
 		originData = new AkitaOriginData(origin);
 	}
-	originData.updatePaymentData(paymentData);
+
+	if (AKITA_DATA_TYPE.PAYMENT === typeOfData) {
+		originData.updatePaymentData(data);
+	} else if (AKITA_DATA_TYPE.ORIGIN_VISIT_DATA === typeOfData) {
+		originData.updateVisitData();
+	} else if (AKITA_DATA_TYPE.ORIGIN_TIME_SPENT === typeOfData) {
+		originData.addTimeSpent(data);
+	}
 
 	// Overwrite or create the data for this origin in storage
-	storeOriginData(origin, originData);
+	await storeOriginData(origin, originData);
 
 	// If data does not already exist for this origin, then the origin must not
 	// be in the originList, so add it.
@@ -49,13 +52,9 @@ async function storePaymentDataIntoAkitaFormat(paymentData) {
 		const originList = await originListPromise;
 
 		originList.push(origin);
-		storeOriginList(originList);
+		await storeOriginList(originList);
 	}
 }
-
-
-
-
 
 // Helper functions.
 
@@ -118,7 +117,7 @@ async function loadAllData() {
 	};
 }
 
-/**.
+/**
  * @return {Promise<string[]>} asynchronously load from storage. Resolves to the list of all origins
  *	 which have data stored.
  **/
@@ -130,7 +129,7 @@ async function getOriginList() {
 		);
 	});
 }
-/**.
+/**
  * @param {string[]} originList a list of origins. Current origin can be obtained by window.location.origin.
  * @return {Promise<string[]>} asynchronously store (overwrite) data in storage. Resolves to the list which was stored.
  **/

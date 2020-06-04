@@ -18,6 +18,7 @@
 			"js": [
 				"src/data/WebMonetizationAsset.js",
 				"src/data/AkitaPaymentPointerData.js",
+				"src/data/AkitaOriginVisitData.js",
 				"src/data/AkitaOriginData.js",
 				"src/data/storage.js",
 				"src/content_main.js"

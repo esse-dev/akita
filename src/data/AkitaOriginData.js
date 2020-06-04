@@ -11,11 +11,15 @@
 class AkitaOriginData {
 	origin = null;
 	isMonetized = false;
-	// The type of paymentPointerMap is: Object<AkitaPaymentPointerData>
+	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
 	paymentPointerMap = {};
+
+	// The type of originVisitData is: AkitaOriginVisitData
+	originVisitData = null;
 
 	constructor(origin) {
 		this.origin = origin;
+		this.originVisitData = new AkitaOriginVisitData();
 	}
 
 	/**
@@ -36,6 +40,12 @@ class AkitaOriginData {
 			);
 		}
 
+		// Add deserialization for originVisitData
+		const originVisitDataDeserialized = AkitaOriginVisitData.fromObject(akitaOriginDataObject.originVisitData);
+		if (originVisitDataDeserialized !== null) {
+			newOriginData.originVisitData = originVisitDataDeserialized;
+		}
+
 		return newOriginData;
 	}
 
@@ -45,7 +55,7 @@ class AkitaOriginData {
 	 *	assetCode?: String,
 	 *	assetScale?: Number,
 	 *	amount?: Number
-	 * }} monetizationObject
+	 * }} paymentData
 	 *	 This object may be created, or a Web Monetization event detail object can be used.
 	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
 	 *	 the current website. Payment pointer should be validated first.
@@ -74,7 +84,21 @@ class AkitaOriginData {
 				this.paymentPointerMap[paymentPointer].addAsset(assetCode, Number(amount), Number(assetScale));
 			}
 		}
+	}
 
-		return this;
+	/**
+	 * Update visit data for the origin.
+	 */
+	updateVisitData() {
+		this.originVisitData.updateVisitData();
+	}
+
+	/**
+	 * Update time spent at the origin.
+	 * 
+	 * @param {Number} recentTimeSpent The time spent at the origin in a session.
+	 */
+	addTimeSpent(recentTimeSpent = 0) {
+		this.originVisitData.addTimeSpent(recentTimeSpent);
 	}
 }
