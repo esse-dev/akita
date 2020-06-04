@@ -3,6 +3,11 @@
 	"version":"0.0.2",
 	"manifest_version": 2,
 	"description":"A browser extension that gives you insight into your involvement with web monetization.",
+	"icons": {
+		"16": "assets/icon_16x16.png",
+		"48": "assets/icon_48x48.png",
+		"128": "assets/icon_128x128.png"
+	},
 	"permissions":[
 		"tabs",
 		"activeTab",
@@ -26,7 +31,7 @@
 		}
 	],
 	"browser_action": {
-		"default_icon": "assets/icon.png",
+		"default_icon": "assets/icon_64x64.png",
 		"default_popup": "src/popup/popup.html",
 		"default_title": "Akita"
 	}
