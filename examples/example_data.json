@@ -12,12 +12,84 @@
 		"totalVisits": 500,
 		"totalMonetizedVisits": 30,
 		"topOriginsList": [
-			"https://sdog.netlify.app"
-			"https://dev.to",
-			"https://www.twitch.tv"
+			{
+				"origin":"https://sdog.netlify.app",
+				"isCurrentlyMonetized":true,
+				"originVisitData":{
+					"timeSpentAtOrigin": 4567890218492,
+					"numberOfVisits": 300,
+					"dateOfFirstVisit": "2020-01-01",
+					"dateOfMostRecentVisit": "2020-06-02"
+				},
+				"paymentPointerMap":{
+					"$ilp.uphold.com/DWhyhLRG7E4Q":{
+						"paymentPointer":"$ilp.uphold.com/DWhyhLRG7E4Q",
+						"sentAssetsMap":{
+							"XRP":{
+								"amount":13502,
+								"assetScale":9,
+								"assetCode":"XRP"
+							}
+						}
+					}
+				}
+			},
+			{
+				"origin":"https://dev.to",
+				"isCurrentlyMonetized":true,
+				"originVisitData":{
+					"timeSpentAtOrigin": 8731882,
+					"numberOfVisits": 3,
+					"dateOfFirstVisit": "2020-05-01",
+					"dateOfMostRecentVisit": "2020-06-02"
+				},
+				"paymentPointerMap":{
+					"$ilp.uphold.com/24HhrUGG7ekn":{
+						"paymentPointer":"$ilp.uphold.com/24HhrUGG7ekn",
+						"sentAssetsMap":{
+							"XRP":{
+								"amount":16505,
+								"assetScale":9,
+								"assetCode":"XRP"
+							}
+						}
+					}
+				}
+			}
 		],
 		"needsSomeLoveList": [
-			"https://dev.to"
+			{
+				"origin":"https://www.twitch.tv",
+				"isCurrentlyMonetized":true,
+				"originVisitData":{
+					"timeSpentAtOrigin": 4723893,
+					"numberOfVisits": 2,
+					"dateOfFirstVisit": "2020-05-15",
+					"dateOfMostRecentVisit": "2020-05-27"
+				},
+				"paymentPointerMap":{
+					"$spsp.coil.com/twitch/nasa":{
+						"paymentPointer":"$spsp.coil.com/twitch/nasa",
+						"sentAssetsMap":{
+							"XRP":{
+								"amount":5351,
+								"assetScale":9,
+								"assetCode":"XRP"
+							}
+						}
+					},
+					"$spsp.coil.com/twitch/xqcow":{
+						"paymentPointer":"$spsp.coil.com/twitch/xqcow",
+						"sentAssetsMap":{
+							"XRP":{
+								"amount":11442,
+								"assetScale":9,
+								"assetCode":"XRP"
+							}
+						}
+					}
+				}
+			}
 		],
 		"totalSentAssetsMap": {
 			"XRP": {

@@ -12,7 +12,6 @@
  *   - list of top 5 origins by "needing some love" ()
  *   - map of totalSentAssets, with an entry for each currency
  */
-
 class AkitaOriginStats {
 	totalTimeSpent = 0;
 	totalMonetizedTimeSpent = 0;
@@ -144,9 +143,9 @@ class AkitaOriginStats {
 	 * 
 	 * @param {{
 	 *	paymentPointer: String,
-	 *	assetCode?: String,
+	 *	amount?: Number,
 	 *	assetScale?: Number,
-	 *	amount?: Number
+	 *	assetCode?: String
 	 * }} paymentData
 	 *	 This object may be created, or a Web Monetization event detail object can be used.
 	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
@@ -163,15 +162,14 @@ class AkitaOriginStats {
 	 */
 	updateAssetsMapWithAsset({
 		paymentPointer,
-		assetCode = null,
+		amount = null,
 		assetScale = null,
-		amount = null
+		assetCode = null
 	}) {
-		if (assetCode !== null && amount !== null && assetScale !== null) {
+		if (!isNaN(amount) && !isNaN(assetScale) && assetCode) {
 			if (!this.totalSentAssetsMap[assetCode]) {
 				this.totalSentAssetsMap[assetCode] = new WebMonetizationAsset(assetCode);
 			}
-
 			this.totalSentAssetsMap[assetCode].addAmount(amount, assetScale);
 		}
 	}

@@ -1,4 +1,3 @@
-
 /**
  * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
  * properties which are added by JavaScript, such as document.monetization!
@@ -38,11 +37,20 @@ async function main() {
 		isValid,
 		paymentPointer
 	} = await getAndValidatePaymentPointer();
+
 	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
 	setExtensionIconMonetizationState(isValid);
 
 	// paymentPointer will be null if it doesn't exist or is invalid
 	await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
+
+	// Test storing assets
+	// await storeDataIntoAkitaFormat({
+	// 	paymentPointer: paymentPointer,
+	// 	assetCode: "USD",
+	// 	assetScale: 9,
+	// 	amount: 123456
+	// }, AKITA_DATA_TYPE.PAYMENT);
 
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);

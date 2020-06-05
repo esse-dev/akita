@@ -35,15 +35,18 @@ class AkitaPaymentPointerData {
 	 *		if assetCode is 'USD', amount is 235, and assetScale is 3 then actual amount of
 	 *		currency is 235 * 10**(-3) = $0.235 USD or twenty-three and one-half cents.
 	 *
-	 * @param {String} assetCode the currency of the asset, such as 'USD', 'CAD', or 'XRP'.
 	 * @param {Number} amount the total amount of the currency, before scaling by assetScale.
 	 * @param {Number} assetScale multiply amount by 10 to the power of negative assetScale to
 	 * convert to actual currency value.
+	 * @param {String} assetCode the currency of the asset, such as 'USD', 'CAD', or 'XRP'.
+	 * 
 	 */
-	addAsset(assetCode, amount, assetScale) {
-		if (!this.sentAssetsMap[assetCode]) {
-			this.sentAssetsMap[assetCode] = new WebMonetizationAsset(assetCode);
+	addAsset(amount, assetScale, assetCode) {
+		if (assetCode && !isNaN(amount) && !isNaN(assetScale)) {
+			if (!this.sentAssetsMap[assetCode]) {
+				this.sentAssetsMap[assetCode] = new WebMonetizationAsset(assetCode);
+			}
+			this.sentAssetsMap[assetCode].addAmount(amount, assetScale);
 		}
-		this.sentAssetsMap[assetCode].addAmount(amount, assetScale);
 	}
 }

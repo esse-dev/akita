@@ -42,7 +42,7 @@ class AkitaOriginData {
 
 		// Add deserialization for originVisitData
 		const originVisitDataDeserialized = AkitaOriginVisitData.fromObject(akitaOriginDataObject.originVisitData);
-		if (originVisitDataDeserialized !== null) {
+		if (originVisitDataDeserialized) {
 			newOriginData.originVisitData = originVisitDataDeserialized;
 		}
 
@@ -52,9 +52,9 @@ class AkitaOriginData {
 	/**
 	 * @param {{
 	 *	paymentPointer: String,
-	 *	assetCode?: String,
+	 *	amount?: Number,
 	 *	assetScale?: Number,
-	 *	amount?: Number
+	 *	assetCode?: String
 	 * }} paymentData
 	 *	 This object may be created, or a Web Monetization event detail object can be used.
 	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
@@ -80,12 +80,12 @@ class AkitaOriginData {
 					this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
 				}
 
-				const assetCode = paymentData.assetCode;
-				const assetScale = paymentData.assetScale;
 				const amount = paymentData.amount;
+				const assetScale = paymentData.assetScale;
+				const assetCode = paymentData.assetCode;
 
-				if (assetCode !== null && amount !== null && assetScale !== null) {
-					this.paymentPointerMap[paymentPointer].addAsset(assetCode, Number(amount), Number(assetScale));
+				if (!isNaN(amount) && !isNaN(assetScale) && assetCode) {
+					this.paymentPointerMap[paymentPointer].addAsset(amount, assetScale, assetCode);
 				}
 			}
 		} else {

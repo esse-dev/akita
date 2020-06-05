@@ -79,9 +79,9 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
  * @param {AkitaOriginStats} originStats The origin stats to update.
  * @param {{
  *	paymentPointer: String,
- *	assetCode?: String,
+ *	amount?: Number,
  *	assetScale?: Number,
- *	amount?: Number
+ *	assetCode?: String
  * }} paymentData
  * 	 This object may be created, or a Web Monetization event detail object can be used.
  * 	 Pass in an object with just a paymentPointer to register a payment pointer for
