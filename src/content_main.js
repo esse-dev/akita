@@ -17,6 +17,10 @@ scriptEl.text = `
 		document.monetization.addEventListener('monetizationprogress', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
 		});
+
+		document.monetization.addEventListener('monetizationstop', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
+		});
 	}
 `;
 document.body.appendChild(scriptEl);
@@ -29,8 +33,6 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	await trackTimeOnSite();
-
 	// TODO: check payment pointer periodically for existence and validity
 	const {
 		isValid,
@@ -39,14 +41,17 @@ async function main() {
 	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
 	setExtensionIconMonetizationState(isValid);
 
-	if (isValid && paymentPointer !== null) {
-		await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
-	}
+	// paymentPointer will be null if it doesn't exist or is invalid
+	await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
 
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
 	});
+	document.addEventListener('akita_monetizationstop', (event) => {
+		storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
+	});
 
+	await trackTimeOnSite();
 	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
@@ -61,12 +66,12 @@ async function main() {
  * Sends a message to background_script.js which changes the extension icon.
  * Only background scripts have access to the extension icon API.
  *
- * @param {boolean} isMonetized Changes the browser icon to indicate whether the site is monetized or not.
+ * @param {boolean} isCurrentlyMonetized Changes the browser icon to indicate whether the site is monetized or not.
  *   If true, a pink $ badge is displayed. If false, just the dog face without the tongue is used as the icon.
  */
-function setExtensionIconMonetizationState(isMonetized) {
+function setExtensionIconMonetizationState(isCurrentlyMonetized) {
 	const webBrowser = chrome ? chrome : browser;
-	webBrowser.runtime.sendMessage({ isMonetized });
+	webBrowser.runtime.sendMessage({ isCurrentlyMonetized });
 }
 
 /***********************************************************

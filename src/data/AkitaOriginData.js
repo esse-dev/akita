@@ -10,7 +10,7 @@
  */
 class AkitaOriginData {
 	origin = null;
-	isMonetized = false;
+	isCurrentlyMonetized = false;
 	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
 	paymentPointerMap = {};
 
@@ -32,7 +32,7 @@ class AkitaOriginData {
 	 */
 	static fromObject(akitaOriginDataObject) {
 		const newOriginData = new AkitaOriginData(akitaOriginDataObject.origin);
-		newOriginData.isMonetized = akitaOriginDataObject.isMonetized;
+		newOriginData.isCurrentlyMonetized = akitaOriginDataObject.isCurrentlyMonetized;
 
 		for (const paymentPointer in akitaOriginDataObject.paymentPointerMap) {
 			newOriginData.paymentPointerMap[paymentPointer] = AkitaPaymentPointerData.fromObject(
@@ -69,20 +69,28 @@ class AkitaOriginData {
 	 *
 	 *	 reference: https://webmonetization.org/docs/api#example-event-object-3
 	 */
-	updatePaymentData({
-		paymentPointer,
-		assetCode = null,
-		assetScale = null,
-		amount = null
-	}) {
-		if (paymentPointer) {
-			this.isMonetized = true;
-			if (!this.paymentPointerMap[paymentPointer]) {
-				this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
+	updatePaymentData(paymentData) {
+		if (paymentData) {
+			const paymentPointer = paymentData.paymentPointer;
+			
+			if (paymentPointer) {
+				this.isCurrentlyMonetized = true;
+
+				if (!this.paymentPointerMap[paymentPointer]) {
+					this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
+				}
+
+				const assetCode = paymentData.assetCode;
+				const assetScale = paymentData.assetScale;
+				const amount = paymentData.amount;
+
+				if (assetCode !== null && amount !== null && assetScale !== null) {
+					this.paymentPointerMap[paymentPointer].addAsset(assetCode, Number(amount), Number(assetScale));
+				}
 			}
-			if (assetCode !== null && amount !== null && assetScale !== null) {
-				this.paymentPointerMap[paymentPointer].addAsset(assetCode, Number(amount), Number(assetScale));
-			}
+		} else {
+			// If paymentData is null then monetization is pending or was stopped
+			this.isCurrentlyMonetized = false;
 		}
 	}
 

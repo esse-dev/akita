@@ -43,25 +43,20 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 	if (!originStatsExists) {
 		originStats = new AkitaOriginStats();
 	}
-	let originStatsUpdated = false;
 
 	if (AKITA_DATA_TYPE.PAYMENT === typeOfData) {
-		originData.updatePaymentData(data);
+		updatePaymentData(originData, originStats, data);
 	} else if (AKITA_DATA_TYPE.ORIGIN_VISIT_DATA === typeOfData) {
 		updateVisitData(originData, originStats);
-		originStatsUpdated = true;
 	} else if (AKITA_DATA_TYPE.ORIGIN_TIME_SPENT === typeOfData) {
-		// data = recentTimeSpent at the origin
 		updateTimeSpent(originData, originStats, data);
-		originStatsUpdated = true;
 	}
 
 	// Overwrite or create the data for this origin in storage
 	await storeOriginData(origin, originData);
 
-	if (originStatsUpdated) {
-		await storeOriginStats(originStats);
-	}
+	// Overwrite or create origin stats in storage
+	await storeOriginStats(originStats);
 
 	// If data does not already exist for this origin, then the origin must not
 	// be in the originList, so add it.
@@ -78,6 +73,28 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
  ***********************************************************/
 
 /**
+ * Update payment data in originData and in originStats.
+ * 
+ * @param {AkitaOriginData} originData The origin data to update.
+ * @param {AkitaOriginStats} originStats The origin stats to update.
+ * @param {{
+ *	paymentPointer: String,
+ *	assetCode?: String,
+ *	assetScale?: Number,
+ *	amount?: Number
+ * }} paymentData
+ * 	 This object may be created, or a Web Monetization event detail object can be used.
+ * 	 Pass in an object with just a paymentPointer to register a payment pointer for
+ * 	 the current website. Payment pointer should be validated first.
+ * 	 Additionally pass in assetCode, assetScale, and amount together to add to the
+ * 	 total amount sent to the current website.
+ */
+function updatePaymentData(originData, originStats, paymentData) {
+	originData.updatePaymentData(paymentData);
+	originStats.updateAssetsMapWithAsset(paymentData);
+}
+
+/**
  * Update visit data in originData and in originStats.
  * 
  * @param {AkitaOriginData} originData The origin data to update.
@@ -85,7 +102,7 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
  */
 function updateVisitData(originData, originStats) {
 	originData.updateVisitData();
-	originStats.incrementVisits(isOriginMonetized(originData));
+	originStats.incrementVisits(originData.isCurrentlyMonetized);
 }
 
 /**
@@ -97,29 +114,7 @@ function updateVisitData(originData, originStats) {
  */
 function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
 	originData.addTimeSpent(recentTimeSpent);
-	originStats.updateTimeSpent(recentTimeSpent, isOriginMonetized(originData));
-}
-
-/**
- * Check if the origin is monetized by checking for a non-empty
- * payment pointer map.
- * 
- * ** NOTE ** This is a flawed approach because it doesn't check if
- * the monetization state has changed to non-monetized. This will
- * need to be updated to check if the monetization has been removed.
- * 
- * @param {AkitaOriginData} originData The originData to check.
- * @return {Boolean} Whether the origin is monetized or not.
- */
-function isOriginMonetized(originData) {
-	let isMonetized = true;
-
-	// Payment pointer map is empty for this origin
-	if (Object.keys(originData.paymentPointerMap).length === 0) {
-		isMonetized = false;
-	}
-
-	return isMonetized;
+	originStats.updateTimeSpent(recentTimeSpent, originData.isCurrentlyMonetized);
 }
 
 /***********************************************************

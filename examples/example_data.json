@@ -40,7 +40,7 @@
 	"originDataList":[
 		{
 			"origin":"https://dev.to",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 8731882,
 				"numberOfVisits": 3,
@@ -62,7 +62,7 @@
 		},
 		{
 			"origin":"https://www.twitch.tv",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4723893,
 				"numberOfVisits": 2,
@@ -94,7 +94,7 @@
 		},
 		{
 			"origin":"https://sdog.netlify.app",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4567890218492,
 				"numberOfVisits": 300,

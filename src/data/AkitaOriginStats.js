@@ -48,7 +48,7 @@ class AkitaOriginStats {
 		
 		for (const assetCode in akitaOriginStats.totalSentAssetsMap) {
 			newAkitaOriginStats.totalSentAssetsMap[assetCode] = WebMonetizationAsset.fromObject(
-				totalSentAssetsMap[assetCode]
+				akitaOriginStats.totalSentAssetsMap[assetCode]
 			);
 		}
 
@@ -64,10 +64,10 @@ class AkitaOriginStats {
 	 * the total time spent regardless.
 	 * 
 	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
-	 * @param {Boolean} originIsMonetized Whether the origin is monetized or not.
+	 * @param {Boolean} originisCurrentlyMonetized Whether the origin is monetized or not.
 	 */
-	updateTimeSpent(recentTimeSpent, originIsMonetized) {
-		if (originIsMonetized) {
+	updateTimeSpent(recentTimeSpent, originisCurrentlyMonetized) {
+		if (originisCurrentlyMonetized) {
 			this.updateTotalMonetizedTimeSpent(recentTimeSpent);
 		}
 		this.updateTotalTimeSpent(recentTimeSpent);	
@@ -99,10 +99,10 @@ class AkitaOriginStats {
 	 * Update the total visits to monetized origins if the origin is monetized,
 	 * and update the total visits to origins regardless.
 	 * 
-	 * @param {Boolean} originIsMonetized Whether the origin is monetized or not.
+	 * @param {Boolean} originisCurrentlyMonetized Whether the origin is monetized or not.
 	 */
-	incrementVisits(originIsMonetized) {
-		if (originIsMonetized) {
+	incrementVisits(originisCurrentlyMonetized) {
+		if (originisCurrentlyMonetized) {
 			this.incrementTotalMonetizedVisits();
 		}
 		this.incrementTotalVisits();
@@ -134,7 +134,45 @@ class AkitaOriginStats {
 		this.needsSomeLoveList = newNeedsSomeLoveList;
 	}
 
-	setTotalSentAssetsMap(newTotalSentAssetsMap) {
-		this.totalSentAssetsMap = newTotalSentAssetsMap;
+	/***********************************************************
+	 * Update Total Sent Assets Map
+	 ***********************************************************/
+
+	/**
+	 * Update the total sent assets map by adding the amount to an existing
+	 * asset (currency) or create a new asset in the total sent assets map.
+	 * 
+	 * @param {{
+	 *	paymentPointer: String,
+	 *	assetCode?: String,
+	 *	assetScale?: Number,
+	 *	amount?: Number
+	 * }} paymentData
+	 *	 This object may be created, or a Web Monetization event detail object can be used.
+	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
+	 *	 the current website. Payment pointer should be validated first.
+	 *	 Additionally pass in assetCode, assetScale, and amount together to add to the
+	 *	 total amount sent to the current website.
+	 *
+	 *	 assetCode e.g. 'XRP', 'USD', 'CAD'
+	 *	 assetScale and amount e.g.
+	 *		 if assetCode is 'USD', amount is 235, assetScale is 3 then actual amount of
+	 *		 currency is 235 * 10**(-3) = $0.235 USD or twenty-three and one-half cents.
+	 *
+	 *	 reference: https://webmonetization.org/docs/api#example-event-object-3
+	 */
+	updateAssetsMapWithAsset({
+		paymentPointer,
+		assetCode = null,
+		assetScale = null,
+		amount = null
+	}) {
+		if (assetCode !== null && amount !== null && assetScale !== null) {
+			if (!this.totalSentAssetsMap[assetCode]) {
+				this.totalSentAssetsMap[assetCode] = new WebMonetizationAsset(assetCode);
+			}
+
+			this.totalSentAssetsMap[assetCode].addAmount(amount, assetScale);
+		}
 	}
 }
