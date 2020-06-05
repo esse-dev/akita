@@ -29,7 +29,6 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	await trackVisitToSite();
 	await trackTimeOnSite();
 
 	// TODO: check payment pointer periodically for existence and validity
@@ -47,6 +46,8 @@ async function main() {
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
 	});
+
+	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
 	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
@@ -140,10 +141,14 @@ function getCurrentTime() {
 /**
  * Store the recent time spent in the webpage session into AkitaFormat.
  * 
- * @param {Number} recentTimeSpent The recent time spent on the webpage.
+ * @param {Number} recentTimeSpent The recent time spent on the webpage. This number is
+ * a Double, since performance.now() is used to construct this number.
  */
 async function storeRecentTimeSpent(recentTimeSpent) {
-	await storeDataIntoAkitaFormat(recentTimeSpent, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
+	// Round the number up so that it is a whole number.
+	const recentTimeSpentRounded = Math.ceil(recentTimeSpent);
+
+	await storeDataIntoAkitaFormat(recentTimeSpentRounded, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
 }
 
 /***********************************************************

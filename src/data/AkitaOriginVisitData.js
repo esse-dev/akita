@@ -41,11 +41,9 @@ class AkitaOriginVisitData {
 	 * Update the total time spent by adding the recent time to the total.
 	 * 
 	 * @param {Number} recentTimeSpentAtOrigin The new amount of time spent at the origin.
-	 *   This number is a Double, since performance.now() is used to construct this number.
 	 */
 	addTimeSpent(recentTimeSpentAtOrigin = 0) {
-		// Since recentTimeSpentAtOrigin is a double, we take the floor of the value.
-		this.timeSpentAtOrigin += Math.floor(recentTimeSpentAtOrigin);
+		this.timeSpentAtOrigin += recentTimeSpentAtOrigin;
 	}
 
 	/**

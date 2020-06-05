@@ -6,6 +6,37 @@
 		"https://www.twitch.tv",
 		"https://sdog.netlify.app"
 	],
+	"originStats": {
+		"totalTimeSpent": 1834971294872194719204821,
+		"totalMonetizedTimeSpent": 194719204821,
+		"totalVisits": 500,
+		"totalMonetizedVisits": 30,
+		"topOriginsList": [
+			"https://sdog.netlify.app"
+			"https://dev.to",
+			"https://www.twitch.tv"
+		],
+		"needsSomeLoveList": [
+			"https://dev.to"
+		],
+		"totalSentAssetsMap": {
+			"XRP": {
+				"amount": 74289471,
+				"assetScale":9,
+				"assetCode":"XRP"
+			},
+			"USD": {
+				"amount": 26862,
+				"assetScale":9,
+				"assetCode":"XRP"
+			},
+			"CAD": {
+				"amount": 324824,
+				"assetScale":9,
+				"assetCode":"XRP"
+			}
+		}
+	},
 	"originDataList":[
 		{
 			"origin":"https://dev.to",

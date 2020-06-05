@@ -96,7 +96,7 @@ class AkitaOriginData {
 	/**
 	 * Update time spent at the origin.
 	 * 
-	 * @param {Number} recentTimeSpent The time spent at the origin in a session.
+	 * @param {Number} recentTimeSpent The recent time spent at the origin.
 	 */
 	addTimeSpent(recentTimeSpent = 0) {
 		this.originVisitData.addTimeSpent(recentTimeSpent);
