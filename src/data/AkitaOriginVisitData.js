@@ -26,7 +26,7 @@ class AkitaOriginVisitData {
 	static fromObject(akitaOriginVisitDataObject) {
 		let newOriginVisitData = null;
 
-		if (akitaOriginVisitDataObject !== null) {
+		if (akitaOriginVisitDataObject) {
 			newOriginVisitData = new AkitaOriginVisitData();
 			newOriginVisitData.timeSpentAtOrigin = akitaOriginVisitDataObject.timeSpentAtOrigin;
 			newOriginVisitData.numberOfVisits = akitaOriginVisitDataObject.numberOfVisits;

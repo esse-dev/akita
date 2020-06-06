@@ -27,7 +27,8 @@
 				"src/data/AkitaOriginData.js",
 				"src/data/AkitaOriginStats.js",
 				"src/data/storage.js",
-				"src/content_main.js"
+				"src/content_main.js",
+				"src/main.js"
 			]
 		}
 	],

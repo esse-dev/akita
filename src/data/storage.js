@@ -10,6 +10,7 @@ const AKITA_DATA_TYPE = {
 
 const ORIGIN_NAME_LIST_KEY = 'originList';
 const ORIGIN_STATS_KEY = 'originStats';
+const ORIGIN_DATA_LIST_KEY = 'originDataList';
 let webBrowser = chrome ? chrome : browser;
 
 /**
@@ -163,6 +164,35 @@ async function storeOriginStats(originStats) {
  ***********************************************************/
 
 /**
+ * Get the entire list of origin data, 'originDataList' in example_data.json
+ * 
+ * @return {Promise<[AkitaOriginData]>} asynchronously load from storage.
+ *   Resolves to a list of all AkitaOriginData in storage.
+ */
+async function getOriginDataList() {
+	const originList = await getOriginList();
+
+	return new Promise((resolve, reject) => {
+		webBrowser.storage.local.get(
+			originList,
+			(storageObject) => {
+				if (storageObject) {
+					let originDataList = [];
+
+					for (const originData in storageObject) {
+						originDataList.push(AkitaOriginData.fromObject(storageObject[originData]));
+					}
+
+					resolve(originDataList);
+				} else {
+					resolve(null);
+				}
+			}
+		);
+	});
+}
+
+/**
  * @param {string} origin identify a website by origin.
  * @return {Promise<AkitaOriginData>} asynchronously load from storage. 
  *	 Resolves to the AkitaOriginData associated with the website.
@@ -225,7 +255,7 @@ async function loadAllData() {
 	return {
 		[ORIGIN_NAME_LIST_KEY]: originList,
 		[ORIGIN_STATS_KEY]: originStats,
-		originDataList: await Promise.all(promiseList)
+		[ORIGIN_DATA_LIST_KEY]: await Promise.all(promiseList)
 	};
 }
 
