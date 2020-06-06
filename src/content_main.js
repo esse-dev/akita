@@ -1,4 +1,3 @@
-
 /**
  * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
  * properties which are added by JavaScript, such as document.monetization!
@@ -17,6 +16,10 @@ scriptEl.text = `
 		document.monetization.addEventListener('monetizationprogress', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
 		});
+
+		document.monetization.addEventListener('monetizationstop', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
+		});
 	}
 `;
 document.body.appendChild(scriptEl);
@@ -29,24 +32,35 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	await trackVisitToSite();
-	await trackTimeOnSite();
-
 	// TODO: check payment pointer periodically for existence and validity
 	const {
 		isValid,
 		paymentPointer
 	} = await getAndValidatePaymentPointer();
+
 	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
 	setExtensionIconMonetizationState(isValid);
 
-	if (isValid && paymentPointer !== null) {
-		await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
-	}
+	// paymentPointer will be null if it doesn't exist or is invalid
+	await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
+
+	// Test storing assets
+	// await storeDataIntoAkitaFormat({
+	// 	paymentPointer: paymentPointer,
+	// 	assetCode: "USD",
+	// 	assetScale: 9,
+	// 	amount: 123456
+	// }, AKITA_DATA_TYPE.PAYMENT);
 
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
 	});
+	document.addEventListener('akita_monetizationstop', (event) => {
+		storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
+	});
+
+	await trackTimeOnSite();
+	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
 	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
@@ -60,12 +74,12 @@ async function main() {
  * Sends a message to background_script.js which changes the extension icon.
  * Only background scripts have access to the extension icon API.
  *
- * @param {boolean} isMonetized Changes the browser icon to indicate whether the site is monetized or not.
+ * @param {boolean} isCurrentlyMonetized Changes the browser icon to indicate whether the site is monetized or not.
  *   If true, a pink $ badge is displayed. If false, just the dog face without the tongue is used as the icon.
  */
-function setExtensionIconMonetizationState(isMonetized) {
+function setExtensionIconMonetizationState(isCurrentlyMonetized) {
 	const webBrowser = chrome ? chrome : browser;
-	webBrowser.runtime.sendMessage({ isMonetized });
+	webBrowser.runtime.sendMessage({ isCurrentlyMonetized });
 }
 
 /***********************************************************
@@ -140,10 +154,14 @@ function getCurrentTime() {
 /**
  * Store the recent time spent in the webpage session into AkitaFormat.
  * 
- * @param {Number} recentTimeSpent The recent time spent on the webpage.
+ * @param {Number} recentTimeSpent The recent time spent on the webpage. This number is
+ * a Double, since performance.now() is used to construct this number.
  */
 async function storeRecentTimeSpent(recentTimeSpent) {
-	await storeDataIntoAkitaFormat(recentTimeSpent, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
+	// Round the number up so that it is a whole number.
+	const recentTimeSpentRounded = Math.ceil(recentTimeSpent);
+
+	await storeDataIntoAkitaFormat(recentTimeSpentRounded, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
 }
 
 /***********************************************************

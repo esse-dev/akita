@@ -1,7 +1,7 @@
 ![Akita Icon](assets/icon_128x128.png)
 
 # Akita
-A browser extension that gives you insight into your involvement with web monetization.
+A browser extension that gives you insight into your involvement with Web Monetization.
 
 Akita shows you your top visited sites, how much time you’re spending on them, and whether those sites are monetized or not.
 
@@ -32,4 +32,4 @@ Naming projects can be pretty challenging. We spent a good chunk of time coming 
 
 The Akita is a Japanese dog breed known for its loyalty and dedication. It's also quite fluffy. We were drawn to "Akita" because of the values the breed represents, as those characteristics are what we want to embrace with our project. Through Akita and Web Monetization, we want to enable mutual loyalty and dedication between content creators/websites and their users.
 
-We were also very inspired by the story of [Hachikō](https://en.wikipedia.org/wiki/Hachik%C5%8D) - a dog of immense loyalty. Hachikō was an Akita who would meet with his owner every day at the train station. Even after his owner passed away, Hachikō continued to wait for his owner at the train station for more than 9 years. Hachikō continues to have a legacy in Japanese culture, with various statues and there was even an [American film](https://en.wikipedia.org/wiki/Hachi:_A_Dog%27s_Tale) based on him.
+We were also very inspired by the story of [Hachikō](https://en.wikipedia.org/wiki/Hachik%C5%8D) - a dog of immense loyalty. Hachikō was an Akita who would meet with his owner every day at the train station. Even after his owner passed away, Hachikō continued to wait for his owner at the train station for more than 9 years. Hachikō continues to have a legacy in Japanese culture, with various statues created in his memory - there was even an [American film](https://en.wikipedia.org/wiki/Hachi:_A_Dog%27s_Tale) based on him.

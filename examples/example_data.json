@@ -1,15 +1,38 @@
 "Example of the Akita Format of storing data. Each element of the originDataList is a serialized AkitaOriginData object."
 
 {
-	"originList":[
+	"originList": [
 		"https://dev.to",
 		"https://www.twitch.tv",
 		"https://sdog.netlify.app"
 	],
-	"originDataList":[
+	"originStats": {
+		"totalTimeSpent": 1834971294872194719204821,
+		"totalMonetizedTimeSpent": 194719204821,
+		"totalVisits": 500,
+		"totalMonetizedVisits": 30,
+		"totalSentAssetsMap": {
+			"XRP": {
+				"amount": 74289471,
+				"assetScale":9,
+				"assetCode":"XRP"
+			},
+			"USD": {
+				"amount": 26862,
+				"assetScale":9,
+				"assetCode":"XRP"
+			},
+			"CAD": {
+				"amount": 324824,
+				"assetScale":9,
+				"assetCode":"XRP"
+			}
+		}
+	},
+	"originDataList": [
 		{
 			"origin":"https://dev.to",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 8731882,
 				"numberOfVisits": 3,
@@ -31,7 +54,7 @@
 		},
 		{
 			"origin":"https://www.twitch.tv",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4723893,
 				"numberOfVisits": 2,
@@ -63,7 +86,7 @@
 		},
 		{
 			"origin":"https://sdog.netlify.app",
-			"isMonetized":true,
+			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4567890218492,
 				"numberOfVisits": 300,

@@ -15,9 +15,7 @@ class WebMonetizationAsset {
 	assetScale = 0;
 	assetCode = null;
 
-	constructor(amount, assetScale, assetCode) {
-		this.amount = amount;
-		this.assetScale = assetScale;
+	constructor(assetCode) {
 		this.assetCode = assetCode;
 	}
 
@@ -30,12 +28,10 @@ class WebMonetizationAsset {
 	 * @return {WebMonetizationAsset} the input object as an instance of the WebMonetizationAsset class.
 	 */
 	static fromObject(webMonetizationAsset) {
-		const newWebMonetizationAsset =
-			new WebMonetizationAsset(
-				webMonetizationAsset.amount,
-				webMonetizationAsset.assetScale,
-				webMonetizationAsset.assetCode
-			);
+		const newWebMonetizationAsset = new WebMonetizationAsset(webMonetizationAsset.assetCode);
+
+		newWebMonetizationAsset.amount = webMonetizationAsset.amount;
+		newWebMonetizationAsset.assetScale = webMonetizationAsset.assetScale;
 
 		return newWebMonetizationAsset;
 	}
@@ -49,11 +45,15 @@ class WebMonetizationAsset {
 	 * @param {Number} assetScale multiply amount by 10 to the power of negative assetScale to
 	 * convert to actual currency value.
 	 */
-	addAmount(amount, assetScale) {
+	addAmount(newAmount, newAssetScale) {
+		const amount = Number(newAmount);
+		const assetScale = Number(newAssetScale);
+
 		// Always convert to a smaller asset scale to avoid a fractional amount.
 		if (this.assetScale < assetScale) {
 			this.convertAmountToNewAssetScale(assetScale);
 		}
+
 		this.amount += amount;
 	}
 

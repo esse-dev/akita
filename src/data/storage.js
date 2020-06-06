@@ -9,6 +9,8 @@ const AKITA_DATA_TYPE = {
 };
 
 const ORIGIN_NAME_LIST_KEY = 'originList';
+const ORIGIN_STATS_KEY = 'originStats';
+const ORIGIN_DATA_LIST_KEY = 'originDataList';
 let webBrowser = chrome ? chrome : browser;
 
 /**
@@ -35,16 +37,27 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 		originData = new AkitaOriginData(origin);
 	}
 
+	// Get existing originStats or create it if it doesn't already exist
+	let originStats = await loadOriginStats();
+
+	const originStatsExists = originStats !== null;
+	if (!originStatsExists) {
+		originStats = new AkitaOriginStats();
+	}
+
 	if (AKITA_DATA_TYPE.PAYMENT === typeOfData) {
-		originData.updatePaymentData(data);
+		updatePaymentData(originData, originStats, data);
 	} else if (AKITA_DATA_TYPE.ORIGIN_VISIT_DATA === typeOfData) {
-		originData.updateVisitData();
+		updateVisitData(originData, originStats);
 	} else if (AKITA_DATA_TYPE.ORIGIN_TIME_SPENT === typeOfData) {
-		originData.addTimeSpent(data);
+		updateTimeSpent(originData, originStats, data);
 	}
 
 	// Overwrite or create the data for this origin in storage
 	await storeOriginData(origin, originData);
+
+	// Overwrite or create origin stats in storage
+	await storeOriginStats(originStats);
 
 	// If data does not already exist for this origin, then the origin must not
 	// be in the originList, so add it.
@@ -56,7 +69,132 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 	}
 }
 
-// Helper functions.
+/***********************************************************
+ * Helper Functions
+ ***********************************************************/
+
+/**
+ * Update payment data in originData and in originStats.
+ * 
+ * @param {AkitaOriginData} originData The origin data to update.
+ * @param {AkitaOriginStats} originStats The origin stats to update.
+ * @param {{
+ *	paymentPointer: String,
+ *	amount?: Number,
+ *	assetScale?: Number,
+ *	assetCode?: String
+ * }} paymentData
+ * 	 This object may be created, or a Web Monetization event detail object can be used.
+ * 	 Pass in an object with just a paymentPointer to register a payment pointer for
+ * 	 the current website. Payment pointer should be validated first.
+ * 	 Additionally pass in assetCode, assetScale, and amount together to add to the
+ * 	 total amount sent to the current website.
+ */
+function updatePaymentData(originData, originStats, paymentData) {
+	originData.updatePaymentData(paymentData);
+	originStats.updateAssetsMapWithAsset(paymentData);
+}
+
+/**
+ * Update visit data in originData and in originStats.
+ * 
+ * @param {AkitaOriginData} originData The origin data to update.
+ * @param {AkitaOriginStats} originStats The origin stats to update.
+ */
+function updateVisitData(originData, originStats) {
+	originData.updateVisitData();
+	originStats.incrementVisits(originData.isCurrentlyMonetized);
+}
+
+/**
+ * Update time spent in originData and in originStats.
+ * 
+ * @param {AkitaOriginData} originData The origin data to update.
+ * @param {AkitaOriginStats} originStats The origin stats to update.
+ * @param {Number} recentTimeSpent The recent time spent at the origin in milliseconds.
+ */
+function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
+	originData.addTimeSpent(recentTimeSpent);
+	originStats.updateTimeSpent(recentTimeSpent, originData.isCurrentlyMonetized);
+}
+
+/***********************************************************
+ * Load/Store Origin Stats
+ ***********************************************************/
+
+/**
+ * Load origin stats from storage.
+ * 
+ * @return {Promise<string[]>} asynchronously load from storage. Resolves to the origin stats.
+ **/
+async function loadOriginStats() {
+	return new Promise((resolve, reject) => {
+		webBrowser.storage.local.get(
+			ORIGIN_STATS_KEY,
+			(storageObject) => {
+				const loadedObject = storageObject[ORIGIN_STATS_KEY];
+				if (loadedObject) {
+					resolve(AkitaOriginStats.fromObject(loadedObject));
+				} else {
+					resolve(null);
+				}
+			}
+		);
+	});
+}
+
+/**
+ * Store origin stats to storage.
+ * 
+ * @param {AkitaOriginStats]} originStats an AkitaOriginStats object.
+ * @return {Promise<AkitaOriginStats>} asynchronously store (overwrite) data in storage. Resolves to the AkitaOriginStats object which was stored.
+ **/
+async function storeOriginStats(originStats) {
+	return new Promise((resolve, reject) => {
+
+		const storageSetterObject = {};
+		storageSetterObject[ORIGIN_STATS_KEY] = originStats;
+
+		webBrowser.storage.local.set(
+			storageSetterObject,
+			() => resolve(originStats)
+		);
+	});
+}
+
+
+/***********************************************************
+ * Load/Store Origin Data
+ ***********************************************************/
+
+/**
+ * Get the entire list of origin data, 'originDataList' in example_data.json
+ * 
+ * @return {Promise<[AkitaOriginData]>} asynchronously load from storage.
+ *   Resolves to a list of all AkitaOriginData in storage.
+ */
+async function getOriginDataList() {
+	const originList = await getOriginList();
+
+	return new Promise((resolve, reject) => {
+		webBrowser.storage.local.get(
+			originList,
+			(storageObject) => {
+				if (storageObject) {
+					let originDataList = [];
+
+					for (const originData in storageObject) {
+						originDataList.push(AkitaOriginData.fromObject(storageObject[originData]));
+					}
+
+					resolve(originDataList);
+				} else {
+					resolve(null);
+				}
+			}
+		);
+	});
+}
 
 /**
  * @param {string} origin identify a website by origin.
@@ -79,6 +217,7 @@ async function loadOriginData(origin) {
 		);
 	});
 }
+
 /**
  * @param {string} origin identify a website by origin.
  * @param {AkitaOriginData} akitaOriginData set (overwrite) AkitaOriginData associated with the website.
@@ -97,6 +236,10 @@ async function storeOriginData(origin, akitaOriginData) {
 	});
 }
 
+/***********************************************************
+ * Load All Data
+ ***********************************************************/
+
 /**
  * Asynchronously gets all AkitaOriginData in storage, as well as a list of all website origins
  * which have data stored.
@@ -106,6 +249,8 @@ async function storeOriginData(origin, akitaOriginData) {
 async function loadAllData() {
 	const originList = await getOriginList();
 
+	const originStats = await loadOriginStats();
+
 	const promiseList = [];
 	for (const origin of originList) {
 		promiseList.push(loadOriginData(origin));
@@ -113,9 +258,14 @@ async function loadAllData() {
 
 	return {
 		[ORIGIN_NAME_LIST_KEY]: originList,
-		originDataList: await Promise.all(promiseList)
+		[ORIGIN_STATS_KEY]: originStats,
+		[ORIGIN_DATA_LIST_KEY]: await Promise.all(promiseList)
 	};
 }
+
+/***********************************************************
+ * Load/Store Origin List
+ ***********************************************************/
 
 /**
  * @return {Promise<string[]>} asynchronously load from storage. Resolves to the list of all origins
@@ -129,6 +279,7 @@ async function getOriginList() {
 		);
 	});
 }
+
 /**
  * @param {string[]} originList a list of origins. Current origin can be obtained by window.location.origin.
  * @return {Promise<string[]>} asynchronously store (overwrite) data in storage. Resolves to the list which was stored.

@@ -10,7 +10,7 @@
  */
 class AkitaOriginData {
 	origin = null;
-	isMonetized = false;
+	isCurrentlyMonetized = false;
 	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
 	paymentPointerMap = {};
 
@@ -32,7 +32,7 @@ class AkitaOriginData {
 	 */
 	static fromObject(akitaOriginDataObject) {
 		const newOriginData = new AkitaOriginData(akitaOriginDataObject.origin);
-		newOriginData.isMonetized = akitaOriginDataObject.isMonetized;
+		newOriginData.isCurrentlyMonetized = akitaOriginDataObject.isCurrentlyMonetized;
 
 		for (const paymentPointer in akitaOriginDataObject.paymentPointerMap) {
 			newOriginData.paymentPointerMap[paymentPointer] = AkitaPaymentPointerData.fromObject(
@@ -42,7 +42,7 @@ class AkitaOriginData {
 
 		// Add deserialization for originVisitData
 		const originVisitDataDeserialized = AkitaOriginVisitData.fromObject(akitaOriginDataObject.originVisitData);
-		if (originVisitDataDeserialized !== null) {
+		if (originVisitDataDeserialized) {
 			newOriginData.originVisitData = originVisitDataDeserialized;
 		}
 
@@ -52,9 +52,9 @@ class AkitaOriginData {
 	/**
 	 * @param {{
 	 *	paymentPointer: String,
-	 *	assetCode?: String,
+	 *	amount?: Number,
 	 *	assetScale?: Number,
-	 *	amount?: Number
+	 *	assetCode?: String
 	 * }} paymentData
 	 *	 This object may be created, or a Web Monetization event detail object can be used.
 	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
@@ -69,20 +69,28 @@ class AkitaOriginData {
 	 *
 	 *	 reference: https://webmonetization.org/docs/api#example-event-object-3
 	 */
-	updatePaymentData({
-		paymentPointer,
-		assetCode = null,
-		assetScale = null,
-		amount = null
-	}) {
-		if (paymentPointer) {
-			this.isMonetized = true;
-			if (!this.paymentPointerMap[paymentPointer]) {
-				this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
+	updatePaymentData(paymentData) {
+		if (paymentData) {
+			const paymentPointer = paymentData.paymentPointer;
+			
+			if (paymentPointer) {
+				this.isCurrentlyMonetized = true;
+
+				if (!this.paymentPointerMap[paymentPointer]) {
+					this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
+				}
+
+				const amount = paymentData.amount;
+				const assetScale = paymentData.assetScale;
+				const assetCode = paymentData.assetCode;
+
+				if (!isNaN(amount) && !isNaN(assetScale) && assetCode) {
+					this.paymentPointerMap[paymentPointer].addAsset(amount, assetScale, assetCode);
+				}
 			}
-			if (assetCode !== null && amount !== null && assetScale !== null) {
-				this.paymentPointerMap[paymentPointer].addAsset(assetCode, Number(amount), Number(assetScale));
-			}
+		} else {
+			// If paymentData is null then monetization is pending or was stopped
+			this.isCurrentlyMonetized = false;
 		}
 	}
 
@@ -96,7 +104,7 @@ class AkitaOriginData {
 	/**
 	 * Update time spent at the origin.
 	 * 
-	 * @param {Number} recentTimeSpent The time spent at the origin in a session.
+	 * @param {Number} recentTimeSpent The recent time spent at the origin.
 	 */
 	addTimeSpent(recentTimeSpent = 0) {
 		this.originVisitData.addTimeSpent(recentTimeSpent);

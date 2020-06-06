@@ -6,7 +6,7 @@ const UNMONETIZED_ICON_PATH = '../assets/icon_unmonetized.png';
 // Listen to messages sent from Content Scripts via webBrowser.runtime.sendMessage
 webBrowser.runtime.onMessage.addListener(
     (request, sender, sendResponse) => {
-        if (request.isMonetized) {
+        if (request.isCurrentlyMonetized) {
             webBrowser.browserAction.setBadgeBackgroundColor({ color: '#EF5E92' });
             webBrowser.browserAction.setBadgeText({ text: '$' });
             webBrowser.browserAction.setIcon({
