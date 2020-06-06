@@ -8,19 +8,17 @@
  */
 const scriptEl = document.createElement('script');
 scriptEl.text = `
-	if (null === document.monetization) {
-		document.monetization.addEventListener('monetizationstart', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
-		});
-	
-		document.monetization.addEventListener('monetizationprogress', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
-		});
+	document.monetization.addEventListener('monetizationstart', (event) => {
+		document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
+	});
 
-		document.monetization.addEventListener('monetizationstop', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
-		});
-	}
+	document.monetization.addEventListener('monetizationprogress', (event) => {
+		document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
+	});
+
+	document.monetization.addEventListener('monetizationstop', (event) => {
+		document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
+	});
 `;
 document.body.appendChild(scriptEl);
 
@@ -55,9 +53,9 @@ async function main() {
 	document.addEventListener('akita_monetizationprogress', (event) => {
 		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
 	});
-	document.addEventListener('akita_monetizationstop', (event) => {
-		storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
-	});
+	//document.addEventListener('akita_monetizationstop', (event) => {
+	//	storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
+	//});
 
 	await trackTimeOnSite();
 	await trackVisitToSite();
@@ -107,13 +105,19 @@ async function trackTimeOnSite() {
 	let docHiddenTime = -1;
 	let docVisibleTime = -1;
 
-	document.addEventListener('visibilitychange', (event) => {
+	document.addEventListener('visibilitychange', async (event) => {
 		if (document.hidden) {
 			// The page is no longer visible
 			docHiddenTime = getCurrentTime();
 		} else {
 			// The page is now visible
 			docVisibleTime = getCurrentTime();
+
+			const {
+				isValid,
+				paymentPointer
+			} = await getAndValidatePaymentPointer();
+			setExtensionIconMonetizationState(isValid);
 		}
 	});
 

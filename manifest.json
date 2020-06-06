@@ -33,7 +33,7 @@
 		}
 	],
 	"browser_action": {
-		"default_icon": "assets/icon_64x64.png",
+		"default_icon": "assets/icon_unmonetized.png",
 		"default_popup": "src/popup/popup.html",
 		"default_title": "Akita"
 	}
