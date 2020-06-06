@@ -91,3 +91,28 @@ function ConvertMSToNiceTimeString(ms) {
     }
     return `${ms}ms`;
 }
+
+getStats();
+
+async function getStats() {
+	console.log("origin stats", await loadOriginStats());
+
+	const monetizedOriginDataList = await getMonetizedOriginDataList()
+	console.log("monetized origin data list", monetizedOriginDataList);
+	console.log("origin data list", await getOriginDataList());
+
+	for (const i in monetizedOriginDataList) {
+		const origin = monetizedOriginDataList[i].origin;
+		console.log("estimated payment to origin", origin, "$", await getEstimatedPaymentForOriginUSD(origin), "USD");
+	}
+
+	const originStats = await loadOriginStats();
+	console.log("origin stats", originStats);
+	console.log("percentage of monetized origin time spent", await getMonetizedTimeSpentPercent(originStats), "%");
+	console.log("percentage of monetized origin visits ", await getMonetizedVisitsPercent(originStats), "%");
+	
+	console.log("number of origins visited", await getNumberOfOriginsVisited());
+	console.log("number of monetized origins visited", await getNumberOfMonetizedOriginsVisited());
+	console.log("top origins by time spent", await getTopOriginsByTimeSpent());
+	console.log("top origins by love needed", await getTopOriginsThatNeedSomeLove());
+}
