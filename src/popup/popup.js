@@ -57,9 +57,9 @@ for (let i = 0; i < circleWeights.length; i++) {
     const circleWeight = circleWeights[i];
     const color = CIRCLE_COLORS[i];
 
+    circleEl.setAttribute('data-url', 'https://google.com');
     if (circleWeight > 40) {
-        circleEl.innerHTML = '10hrs<br>0.0005XRP<br>20 visits';
-        circleEl.setAttribute('data-url', 'https://google.com');
+        circleEl.innerHTML = `${10} hours<br>${0.0005}XRP<br>${20} visits`;
         circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
     }
 
@@ -67,6 +67,9 @@ for (let i = 0; i < circleWeights.length; i++) {
     circleEl.style.background = color;
     circleEl.style.height = circleWeight + 'px';
     circleEl.style.width = circleWeight + 'px';
+    circleEl.addEventListener("click", () => {
+        chrome.tabs.create({ url: 'https://google.com' });
+    }, false);
 
     circleContainer.appendChild(circleEl);
 }

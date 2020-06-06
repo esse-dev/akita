@@ -1,6 +1,6 @@
 
 const webBrowser = chrome ? chrome : browser;
-const MONETIZED_ICON_PATH = '../assets/icon.png';
+const MONETIZED_ICON_PATH = '../assets/icon_64x64.png';
 const UNMONETIZED_ICON_PATH = '../assets/icon_unmonetized.png';
 
 // Listen to messages sent from Content Scripts via webBrowser.runtime.sendMessage

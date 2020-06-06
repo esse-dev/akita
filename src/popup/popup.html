@@ -73,15 +73,19 @@
             color: white;
             content: attr(data-url);
             position: absolute;
+            font-size: 14px;
             top: 70px;
             left: 0px;
-            display: none;
+            opacity: 0;
+            transition: opacity 0.2s linear;
+            z-index: -10;
         }
         .circle:hover {
             border: 5px solid black;
         }
         .circle:hover::after {
-            display:inline-block;
+            opacity: 1;
+            z-index: 10;
         }
         #circle-container {
             height: 180px;
@@ -159,6 +163,11 @@
         </div>
         <div id="intro-exit" style="position: absolute; bottom: 16px; right: 21px; font-size: 18px; text-decoration-line: underline; opacity: 0.5; cursor: pointer;">skip</div>
     </section>
+    <div style="height: 100px; width: 100%; background: #F96060;"></div>
+    <div style="height: 100px; width: 100%; background: #42D2B8;"></div>
+    <div style="height: 100px; width: 100%; background: #92DEFF;"></div>
+    <div style="height: 100px; width: 100%; background: #FFF27B;"></div>
+    <div style="height: 100px; width: 100%; background: #9F88FC;"></div>
     <section id="data-story" style="padding: 15px;">
         <h1>Your Top Monetized Sites</h1>
         <div id="circle-container"></div>

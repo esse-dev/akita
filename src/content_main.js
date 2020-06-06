@@ -107,13 +107,19 @@ async function trackTimeOnSite() {
 	let docHiddenTime = -1;
 	let docVisibleTime = -1;
 
-	document.addEventListener('visibilitychange', (event) => {
+	document.addEventListener('visibilitychange', async (event) => {
 		if (document.hidden) {
 			// The page is no longer visible
 			docHiddenTime = getCurrentTime();
 		} else {
 			// The page is now visible
 			docVisibleTime = getCurrentTime();
+
+			const {
+				isValid,
+				paymentPointer
+			} = await getAndValidatePaymentPointer();
+			setExtensionIconMonetizationState(isValid);
 		}
 	});
 
