@@ -112,6 +112,43 @@ async function getTopOriginsThatNeedSomeLove(nTopOrigins) {
 	return topOriginsList;
 }
 
+/***********************************************************
+ * Payment Prediction
+ ***********************************************************/
+
+/**
+ * This stream rate is based on Coil's $0.36 USD/hour rate, as
+ * described in https://help.coil.com/accounts/membership-accounts#how-much-do-you-pay-out-to-creators
+ * 
+ * 0.36/hour = 0.0000001/millisecond
+ */
+const STREAM_RATE_PER_MILLISECOND = 0.0000001;
+
+/**
+ * Calculate the estimated payment to the site in USD.
+ * 
+ * @param {String} origin The origin of the site to estimate payment for.
+ * @return {Promise<Number>} The estimated payment to the site in USD.
+ */
+async function getEstimatedPaymentForOriginUSD(origin) {
+    const originData = await loadOriginData(origin);
+    let estimatedPayment = 0;
+
+    if (originData) {
+        const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
+        estimatedPayment = Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND).toFixed(2);
+    }
+
+    return estimatedPayment;
+}
+
+/***********************************************************
+ * Various data retrieval functions
+ ***********************************************************/
+
+// TODO: % monetized time/total time
+// TODO: % monetized visits/total visits
+
 /**
  * Get all the monetized originData objects in a list.
  * 
