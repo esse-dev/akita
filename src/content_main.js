@@ -61,7 +61,7 @@ async function main() {
 	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
-	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
+	//loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
 }
 
 /***********************************************************
@@ -213,7 +213,6 @@ async function isPaymentPointerValid(paymentPointer) {
 	const resolvedPaymentPointer = resolvePaymentPointer(paymentPointer);
 
 	if (resolvedPaymentPointer) {
-		console.log("resolvedPaymentPointer: ", resolvedPaymentPointer);
 
 		let response = await httpGet(resolvedPaymentPointer, "Accept", "application/spsp4+json, application/spsp+json");
 
@@ -246,8 +245,6 @@ function resolvePaymentPointer(paymentPointer) {
 	let resolvedPaymentPointer = null;
 
 	if (paymentPointer) {
-		console.log("raw paymentPointer: ", paymentPointer);
-
 		resolvedPaymentPointer = paymentPointer.trim();
 
 		// The first character of the payment pointer should be '$'

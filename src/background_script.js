@@ -22,3 +22,8 @@ webBrowser.runtime.onMessage.addListener(
         }
     }
 );
+
+//TODO: will be incorrect if user opens a tab in the background.
+webBrowser.tabs.onActivated.addListener(() => {
+    webBrowser.browserAction.setBadgeText({ text: '' }); // Hide the badge
+});

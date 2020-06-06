@@ -73,12 +73,15 @@
             color: white;
             content: attr(data-url);
             position: absolute;
-            font-size: 14px;
-            top: 70px;
+            font-size: 18px;
+            top: 257px;
+            height: 500px;
             left: 0px;
+            width: calc(100% - 40px);
             opacity: 0;
             transition: opacity 0.2s linear;
             z-index: -10;
+            word-break:normal;
         }
         .circle:hover {
             border: 5px solid black;
@@ -93,11 +96,6 @@
             display: flex;
             align-items: center;
         }
-        #info-popover {
-            margin: 20px;
-            background: black;
-            color: white;
-        }
 
         #sites-need-love a {
             margin-right: 10px;
@@ -108,16 +106,15 @@
             margin-bottom: 4px;
         }
     </style>
-    <link rel="stylesheet" href="../../library/chart.min.css">
 </head>
 <body>
     <section id="data-story" style="padding: 15px;">
         <h1>Your Top Monetized Sites</h1>
         <div id="circle-container"></div>
         <p id="info-container">
-            You spend <strong id="monetized-percent-data">15.2%</strong> of your time on monetized sites,
-            in total that is <strong id="monetized-time-data">13 hours</strong> on monetized sites.
-            You've streamed <strong id="monetized-sent-data">0.0078XRP</strong>.
+            You’ve spent <strong id="monetized-time-data" style="font-size: 18px;">13 hours</strong> on monetized sites,
+            which is <strong id="monetized-percent-data" style="font-size: 18px;">15.2%</strong> of your time online.
+            In total, <span id="monetized-sent-text" style="font-size: 18px;">you’ve streamed</span> <strong id="monetized-sent-data">0.0078XRP</strong>.
         </p>
         <p>
             <h1>These monetized sites could use ♥️</h1>
@@ -171,7 +168,7 @@
             <div class="carousel-cell">
                 <h2>What is a Web Monetization Provider?</h2>
                 <p>If you want to start supporting websites using Web Monetization, sign up with a provider. Once you've signed up and installed the provider, you can easily stream micropayments. Currently, there are only two providers—but more will come soon!</p>
-                <ul>
+                <ul style="list-style-type: none;">
                     <li><a href="https://www.pumabrowser.com/"><strong>Puma Browser</strong></a></li>
                     <li><a href="https://www.coil.com/"><strong>Coil</strong>
                         <p style="margin-top: 5px;">Start using Web Monetization for $5/month on Coil.</p></a>
@@ -179,7 +176,7 @@
                 </ul>
             </div>
             <div class="carousel-cell">
-                <h2>Learn More and Get Involved</h2>
+                <h2>Learn more & get involved</h2>
                 <p>Web Monetization is part of building a healthier internet. To learn more visit:</p>
                 <ul>
                     <li><a href="https://www.grantfortheweb.org/">Grant for the Web</a></li>
@@ -192,6 +189,14 @@
                     </a></li>
                 </ul>
                 <div style="font-size: 60px; text-align: right;">📚</div>
+            </div>
+            <div class="carousel-cell">
+                <h2>The Akita Icon</h2>
+                <p>If a website you visit has Web Monetization enabled, you will see:</p>
+                <img src="../../assets/demo_mon.png" width="100">
+                <p>Otherwise the Akita icon will look like:</p>
+                <img src="../../assets/demo_unmon.png" width="100">
+                <p>Now get out there and explore the web!</p>
             </div>
         </div>
         <div id="intro-exit" style="position: absolute; bottom: 16px; right: 21px; font-size: 18px; text-decoration-line: underline; opacity: 0.5; cursor: pointer;">skip</div>
