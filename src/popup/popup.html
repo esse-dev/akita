@@ -3,20 +3,190 @@
 <head>
     <link rel="manifest" href="/manifest.json">
     <title>test</title>
+    <link rel="stylesheet" type="text/css" href="../../library/flickity.css"/>
+    <meta charset="UTF-8">
     <style>
         .icon {
             height: 100px;
             width: 100px;
         }
+        html, body {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+            height: 550px;
+            width: 400px;
+            background: #E6E3D2;
+            overflow: hidden;
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        body {
+            border: 5px solid black;
+        }
+        h2 {
+            font-size: 40px;
+            line-height: 40px;
+            margin: 10px 0 10px;
+        }
+        p {
+            font-size: 18px;
+            line-height: 22px;
+            margin-bottom: 10px;
+        }
+        #data-story p {
+            margin: 5px 0;
+        }
+        ul {
+            margin-top: 0;
+            font-size: 18px;
+            line-height: 26px;
+        }
+        section {
+            height: 100%;
+            position: relative;
+        }
+
+        .circle {
+            border-radius: 100%;
+            height: 100px;
+            width: 100px;
+            margin: 5px;
+            padding: 5px;
+            float: left;
+            border: 0px solid black;
+            transition: border 0.1s ease-in-out;
+
+            word-break: break-all;
+
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            flex-direction: column;
+            text-align:center;
+
+            cursor: pointer;
+        }
+        .circle::after {
+            padding: 20px;
+            background: black;
+            color: white;
+            content: attr(data-url);
+            position: absolute;
+            top: 70px;
+            left: 0px;
+            display: none;
+        }
+        .circle:hover {
+            border: 5px solid black;
+        }
+        .circle:hover::after {
+            display:inline-block;
+        }
+        #circle-container {
+            height: 180px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        #info-popover {
+            margin: 20px;
+            background: black;
+            color: white;
+        }
+
     </style>
     <link rel="stylesheet" href="../../library/chart.min.css">
 </head>
 <body>
-    <object type="image/svg+xml" data="../../assets/icon.svg" class="icon">
-        Akita icon <!-- fallback -->
-    </object>
-    <canvas id="myChart" width="400" height="400"></canvas>
-    <script src="../../library/chart.min.js"></script>
+    <section id="intro-carousel">
+        <div data-flickity='{ "wrapAround": false }' id="flickity">
+            <div class="carousel-cell">
+                <object type="image/svg+xml"
+                    data="../../assets/icon.svg"
+                    style="height:170px;filter: drop-shadow(5px 5px 0px black);">
+                </object>
+                <h2>Welcome to Akita!</h2>
+                <p>Akita gives you insight into your involvement with Web Monetization by showing you Monetization information about the websites you visit.</p>
+                <p>Our goal with Akita is to increase Web Monetization understanding and awareness. Thank you! ~<a href="https://dev.to/dog-s">dog-s</a></p>
+            </div>
+            <div class="carousel-cell">
+                <object type="image/svg+xml"
+                    data="../../assets/disapointed_toaster.svg"
+                    style="height:170px;">
+                </object>
+                <h2>Tired of Ads?</h2>
+                <p>Ads might be annoying and come at the cost of your personal privacy, but they let you browse the web for free. With Web Monetization you can:</p>
+                <ul>
+                    <li>Access website content</li>
+                    <li>Avoid annoying ads altogether</li>
+                    <li>Keep your personal data private</li>
+                    <li>Support the website</li>
+                </ul>
+            </div>
+            <div class="carousel-cell">
+                <object type="image/svg+xml" data="../../assets/wm-icon-animated.svg"
+                    alt="Web Monetization Icon"
+                    style="height:170px;"></object>
+                <h2>What is <strong>Web Monetization?</strong></h2>
+                <p>Web Monetization allows you to stream micropayments (send tiny payments over time) directly to websites. Websites can detect these payments and turn off ads, as well as further enhance your website experience.</p>
+            </div>
+            <div class="carousel-cell">
+                <h2>What is a Web Monetization Provider?</h2>
+                <p>If you want to start supporting websites using Web Monetization, sign up with a provider. Once you've signed up and installed the provider, you can easily stream micropayments. Currently, there are only two providers—but more will come soon!</p>
+                <ul>
+                    <li><a href="https://www.pumabrowser.com/"><strong>Puma Browser</strong></a></li>
+                    <li><a href="https://www.coil.com/"><strong>Coil</strong>
+                        <p style="margin-top: 5px;">Start using Web Monetization for $5/month on Coil.</p></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="carousel-cell">
+                <h2>Learn More and Get Involved</h2>
+                <p>Web Monetization is part of building a healthier internet. To learn more visit:</p>
+                <ul>
+                    <li><a href="https://www.grantfortheweb.org/">Grant for the Web</a></li>
+                    <li><a href="https://webmonetization.org/">WebMonetization.org</a></li>
+                    <li><a href="https://www.w3.org/blog/2019/09/w3c-interview-coil-on-interledger-protocol-and-web-monetization/">
+                        Interview with Coil CEO Stefan Thomas
+                    </a></li>
+                    <li><a href="https://dev.to/dog-s/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb">
+                        Article: “How can you support websites without having to deal with annoying ads?”
+                    </a></li>
+                </ul>
+                <div style="font-size: 60px; text-align: right;">📚</div>
+            </div>
+        </div>
+        <div id="intro-exit" style="position: absolute; bottom: 16px; right: 21px; font-size: 18px; text-decoration-line: underline; opacity: 0.5; cursor: pointer;">skip</div>
+    </section>
+    <section id="data-story" style="padding: 15px;">
+        <h1>Your Top Monetized Sites</h1>
+        <div id="circle-container"></div>
+        <div id="info-popover"></div>
+        <p>
+            You've spent <strong>13</strong> hours on monetized sites.
+        </p>
+        <p>
+            You've streamed <strong>0.0078</strong>XRP in total.
+        </p>
+        <p>
+            You spend <strong>15.2</strong>% of your time on monetized sites.
+        </p>
+        <p>
+            Monetized sites that could use a little more ♥️:
+            dog1, dog2, dog3
+        </p>
+        <h1>Resources</h1>
+        <a href="https://www.grantfortheweb.org/">Grant for the Web</a> · 
+        <a href="https://webmonetization.org/">WebMonetization.org</a> · 
+        <a id="goto-intro" style="text-decoration: underline; cursor: pointer;"><object type="image/svg+xml"
+            data="../../assets/icon.svg"
+            style="height:18px; vertical-align: middle;">
+        </object>Welcome</a>
+    </section>
+
+
+    <script type="text/javascript" src="../../library/flickity.min.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>
