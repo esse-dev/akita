@@ -154,6 +154,8 @@ async function getEstimatedPaymentForOriginUSD(origin) {
  * @return {Promise<Number>} Resolves to the percent of monetized origin time spent.
  */
 async function getMonetizedTimeSpentPercent(originStats) {
+	if (!originStats) return 0;
+
 	const totalMonetizedTimeSpent = originStats.totalMonetizedTimeSpent;
 	const totalTimeSpent = originStats.totalTimeSpent;
 
@@ -168,6 +170,8 @@ async function getMonetizedTimeSpentPercent(originStats) {
  * @return {Promise<Number>} Resolves to the percent of monetized origin visits.
  */
 async function getMonetizedVisitsPercent(originStats) {
+	if (!originStats) return 0;
+
 	const totalMonetizedVisits = originStats.totalMonetizedVisits;
 	const totalVisits = originStats.totalVisits;
 

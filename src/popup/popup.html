@@ -99,10 +99,43 @@
             color: white;
         }
 
+        #sites-need-love a {
+            margin-right: 10px;
+        }
+
+        h1 {
+            margin-top: 30px;
+            margin-bottom: 4px;
+        }
     </style>
     <link rel="stylesheet" href="../../library/chart.min.css">
 </head>
 <body>
+    <section id="data-story" style="padding: 15px;">
+        <h1>Your Top Monetized Sites</h1>
+        <div id="circle-container"></div>
+        <p id="info-container">
+            You spend <strong id="monetized-percent-data">15.2%</strong> of your time on monetized sites,
+            in total that is <strong id="monetized-time-data">13 hours</strong> on monetized sites.
+            You've streamed <strong id="monetized-sent-data">0.0078XRP</strong>.
+        </p>
+        <p>
+            <h1>These monetized sites could use ♥️</h1>
+            <span id="sites-need-love"></span>
+        </p>
+        <h1>Resources</h1>
+        <a href="https://www.grantfortheweb.org/">Grant for the Web</a> · 
+        <a href="https://webmonetization.org/">WebMonetization.org</a> · 
+        <a id="goto-intro" style="text-decoration: underline; cursor: pointer;"><object type="image/svg+xml"
+            data="../../assets/icon.svg"
+            style="height:18px; vertical-align: middle;">
+        </object>Welcome</a>
+    </section>
+    <div style="height: 100px; width: 100%; background: #F96060;"></div>
+    <div style="height: 100px; width: 100%; background: #42D2B8;"></div>
+    <div style="height: 100px; width: 100%; background: #92DEFF;"></div>
+    <div style="height: 100px; width: 100%; background: #FFF27B;"></div>
+    <div style="height: 100px; width: 100%; background: #9F88FC;"></div>
     <section id="intro-carousel">
         <div data-flickity='{ "wrapAround": false }' id="flickity">
             <div class="carousel-cell">
@@ -162,36 +195,6 @@
             </div>
         </div>
         <div id="intro-exit" style="position: absolute; bottom: 16px; right: 21px; font-size: 18px; text-decoration-line: underline; opacity: 0.5; cursor: pointer;">skip</div>
-    </section>
-    <div style="height: 100px; width: 100%; background: #F96060;"></div>
-    <div style="height: 100px; width: 100%; background: #42D2B8;"></div>
-    <div style="height: 100px; width: 100%; background: #92DEFF;"></div>
-    <div style="height: 100px; width: 100%; background: #FFF27B;"></div>
-    <div style="height: 100px; width: 100%; background: #9F88FC;"></div>
-    <section id="data-story" style="padding: 15px;">
-        <h1>Your Top Monetized Sites</h1>
-        <div id="circle-container"></div>
-        <div id="info-popover"></div>
-        <p>
-            You've spent <strong>13</strong> hours on monetized sites.
-        </p>
-        <p>
-            You've streamed <strong>0.0078</strong>XRP in total.
-        </p>
-        <p>
-            You spend <strong>15.2</strong>% of your time on monetized sites.
-        </p>
-        <p>
-            Monetized sites that could use a little more ♥️:
-            dog1, dog2, dog3
-        </p>
-        <h1>Resources</h1>
-        <a href="https://www.grantfortheweb.org/">Grant for the Web</a> · 
-        <a href="https://webmonetization.org/">WebMonetization.org</a> · 
-        <a id="goto-intro" style="text-decoration: underline; cursor: pointer;"><object type="image/svg+xml"
-            data="../../assets/icon.svg"
-            style="height:18px; vertical-align: middle;">
-        </object>Welcome</a>
     </section>
 
     <script src="../data/WebMonetizationAsset.js"></script>
