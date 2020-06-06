@@ -123,6 +123,8 @@ function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
  ***********************************************************/
 
 /**
+ * Load origin stats from storage.
+ * 
  * @return {Promise<string[]>} asynchronously load from storage. Resolves to the origin stats.
  **/
 async function loadOriginStats() {
@@ -142,6 +144,8 @@ async function loadOriginStats() {
 }
 
 /**
+ * Store origin stats to storage.
+ * 
  * @param {AkitaOriginStats]} originStats an AkitaOriginStats object.
  * @return {Promise<AkitaOriginStats>} asynchronously store (overwrite) data in storage. Resolves to the AkitaOriginStats object which was stored.
  **/

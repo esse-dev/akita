@@ -128,3 +128,23 @@ async function getMonetizedOriginDataList() {
 
 	return monetizedOriginDataList;
 }
+
+/**
+ * Get the number of unique origins visited.
+ * 
+ * @return {Promise<Number>} Resolves to the number of unique origins visited.
+ */
+async function getNumberOfOriginsVisited() {
+    const originDataList = await getOriginDataList();
+    return originDataList ? originDataList.length : -1;
+}
+
+/**
+ * Get the number of unique monetized origins visited.
+ * 
+ * @return {Promise<Number>} Resolves to the number of unique monetized origins visited.
+ */
+async function getNumberOfMonetizedOriginsVisited() {
+    const originDataList = await getMonetizedOriginDataList();
+    return originDataList ? originDataList.length : -1;
+}
