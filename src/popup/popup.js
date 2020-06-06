@@ -64,7 +64,7 @@ async function getStats() {
             document.getElementById('monetized-sent-data').innerHTML = actualAmount.toFixed(3) + '<span style="font-size: 12px;">XRP</span>';
         } else {
             // ADD A CHANGE OF TEXT!
-            document.getElementById('monetized-sent-text').innerHTML = 'If you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
+            document.getElementById('monetized-sent-text').innerHTML = 'if you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
             document.getElementById('monetized-sent-data').innerHTML = '$' + await getEstimatedPaymentForOriginUSD(origin) + '<span style="font-size: 12px;">USD</span>';
         }
         const monetizedTimePercent = await getMonetizedTimeSpentPercent(originStats);
@@ -146,9 +146,10 @@ async function getStats() {
         }
 
         circleEl.setAttribute('data-url',
-            `You've spent ${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} on ${originData.origin},
-            visited ${visitData.numberOfVisits} times,
-            and sent ${totalSentXRP.toFixed(3)}XRP! Thanks for supporting monetized sites!`);
+            `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} spent here · 
+            ${originData.origin} · 
+            ${visitData.numberOfVisits} visits · 
+            ${totalSentXRP.toFixed(3)}XRP sent`);
         if (circleWeight > 40) {
             circleEl.innerHTML = `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} visits`;
             circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
