@@ -13,7 +13,7 @@ function switchSection() {
 
 new Flickity(document.getElementById('flickity'), {
     on: { change: (slideNumber) => {
-        if (slideNumber === 4) {
+        if (slideNumber === 5) {
             document.getElementById('intro-exit').innerHTML = 'done';
         } else {
             document.getElementById('intro-exit').innerHTML = 'skip';
@@ -54,27 +54,9 @@ function convertMSToNiceTimeString(ms) {
 
 getStats();
 async function getStats() {
-	console.log("origin stats", await loadOriginStats());
+    const originStats = await loadOriginStats();
 
-	const monetizedOriginDataList = await getMonetizedOriginDataList()
-	console.log("monetized origin data list", monetizedOriginDataList);
-	console.log("origin data list", await getOriginDataList());
-
-	for (const i in monetizedOriginDataList) {
-		const origin = monetizedOriginDataList[i].origin;
-		console.log("estimated payment to origin", origin, "$", await getEstimatedPaymentForOriginUSD(origin), "USD");
-	}
-
-	const originStats = await loadOriginStats();
-	console.log("origin stats", originStats);
-	console.log("percentage of monetized origin time spent", await getMonetizedTimeSpentPercent(originStats), "%");
-	console.log("percentage of monetized origin visits ", await getMonetizedVisitsPercent(originStats), "%");
-	
-	console.log("number of origins visited", await getNumberOfOriginsVisited());
-	console.log("number of monetized origins visited", await getNumberOfMonetizedOriginsVisited());
-	console.log("top origins by time spent", await getTopOriginsByTimeSpent());
-    console.log("top origins by love needed", );
-    if (originStats) {
+    if (originStats && originStats.totalTimeSpent > 0) {
         document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
         if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
             const sentXRP = originStats.totalSentAssetsMap.XRP;
@@ -82,6 +64,7 @@ async function getStats() {
             document.getElementById('monetized-sent-data').innerHTML = actualAmount.toFixed(3) + '<span style="font-size: 12px;">XRP</span>';
         } else {
             // ADD A CHANGE OF TEXT!
+            document.getElementById('monetized-sent-text').innerHTML = 'If you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
             document.getElementById('monetized-sent-data').innerHTML = '$' + await getEstimatedPaymentForOriginUSD(origin) + '<span style="font-size: 12px;">USD</span>';
         }
         const monetizedTimePercent = await getMonetizedTimeSpentPercent(originStats);
@@ -104,6 +87,8 @@ async function getStats() {
             linkEl.innerHTML = originData.origin;
 
             needLoveSitesEl.appendChild(linkEl);
+            const brEl = document.createElement('br');
+            needLoveSitesEl.appendChild(brEl);
         }
     } else {
         const el = document.createElement('span');
@@ -160,7 +145,10 @@ async function getStats() {
             }
         }
 
-        circleEl.setAttribute('data-url', originData.origin);
+        circleEl.setAttribute('data-url',
+            `You've spent ${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} on ${originData.origin},
+            visited ${visitData.numberOfVisits} times,
+            and sent ${totalSentXRP.toFixed(3)}XRP! Thanks for supporting monetized sites!`);
         if (circleWeight > 40) {
             circleEl.innerHTML = `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} visits`;
             circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
