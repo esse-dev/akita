@@ -131,23 +131,58 @@ const STREAM_RATE_PER_MILLISECOND = 0.0000001;
  * @return {Promise<Number>} The estimated payment to the site in USD.
  */
 async function getEstimatedPaymentForOriginUSD(origin) {
-    const originData = await loadOriginData(origin);
-    let estimatedPayment = 0;
+	const originData = await loadOriginData(origin);
+	let estimatedPayment = 0;
 
-    if (originData) {
-        const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
-        estimatedPayment = Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND).toFixed(2);
-    }
+	if (originData) {
+		const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
+		estimatedPayment = Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND).toFixed(2);
+	}
 
-    return estimatedPayment;
+	return estimatedPayment;
 }
 
 /***********************************************************
  * Various data retrieval functions
  ***********************************************************/
 
-// TODO: % monetized time/total time
-// TODO: % monetized visits/total visits
+/**
+ * Get the percentage of monetized origin time spent out of
+ * total origin time spent.
+ * 
+ * @param {AkitaOriginStats} originStats The origin stats object.
+ * @return {Promise<Number>} Resolves to the percent of monetized origin time spent.
+ */
+async function getMonetizedTimeSpentPercent(originStats) {
+	const totalMonetizedTimeSpent = originStats.totalMonetizedTimeSpent;
+	const totalTimeSpent = originStats.totalTimeSpent;
+
+	return toPercent(totalMonetizedTimeSpent / totalTimeSpent);
+}
+
+/**
+ * Get the percentage of monetized origin visits out of total
+ * origin visits.
+ * 
+ * @param {AkitaOriginStats} originStats The origin stats object.
+ * @return {Promise<Number>} Resolves to the percent of monetized origin visits.
+ */
+async function getMonetizedVisitsPercent(originStats) {
+	const totalMonetizedVisits = originStats.totalMonetizedVisits;
+	const totalVisits = originStats.totalVisits;
+
+	return toPercent(totalMonetizedVisits / totalVisits);
+}
+
+/**
+ * Convert a number to a percent with no decimal places.
+ * 
+ * @param {Number} number The number to convert into a percent.
+ * @return {Number} The number as a percent.
+ */
+function toPercent(number){
+	return Math.floor(100 * number);
+}
 
 /**
  * Get all the monetized originData objects in a list.
@@ -172,8 +207,8 @@ async function getMonetizedOriginDataList() {
  * @return {Promise<Number>} Resolves to the number of unique origins visited.
  */
 async function getNumberOfOriginsVisited() {
-    const originDataList = await getOriginDataList();
-    return originDataList ? originDataList.length : -1;
+	const originDataList = await getOriginDataList();
+	return originDataList ? originDataList.length : -1;
 }
 
 /**
@@ -182,6 +217,6 @@ async function getNumberOfOriginsVisited() {
  * @return {Promise<Number>} Resolves to the number of unique monetized origins visited.
  */
 async function getNumberOfMonetizedOriginsVisited() {
-    const originDataList = await getMonetizedOriginDataList();
-    return originDataList ? originDataList.length : -1;
+	const originDataList = await getMonetizedOriginDataList();
+	return originDataList ? originDataList.length : -1;
 }
