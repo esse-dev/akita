@@ -62,7 +62,7 @@ const NEEDS_LOVE_MAGIC_NUMBER = 1;
 async function getTopOriginsThatNeedSomeLove(nTopOrigins) {
 	let monetizedOriginDataList = await getMonetizedOriginDataList();
 	let topOriginsList = null;
-	let listSize = nTopOrigins - 1;
+	let listSize = nTopOrigins;
 
 	if (monetizedOriginDataList) {
 		if (monetizedOriginDataList.length > 1) {

@@ -2,55 +2,60 @@
 let otherSection = document.getElementById('intro-carousel');
 let currentSection =  document.getElementById('data-story');
 function switchSection() {
-    let swapTemp = otherSection;
-    otherSection = currentSection;
-    currentSection = swapTemp;
+	let swapTemp = otherSection;
+	otherSection = currentSection;
+	currentSection = swapTemp;
 
-    currentSection.scrollIntoView({
-        behavior: 'smooth'
-    });
+	currentSection.scrollIntoView({
+		behavior: 'smooth'
+	});
 }
 
 // Slideshow / carousel
 new Flickity(document.getElementById('flickity'), {
-    on: { change: (slideNumber) => {
-        if (slideNumber === 5) {
-            document.getElementById('intro-exit').innerHTML = 'done';
-        } else {
+	on: { change: (slideNumber) => {
+		if (slideNumber === 5) {
+			document.getElementById('intro-exit').innerHTML = 'done';
+			document.getElementById('intro-exit').style.color = '#EF5E92';
+			document.getElementById('intro-exit').style.opacity = 1;
+		} else {
             document.getElementById('intro-exit').innerHTML = 'skip';
-        }
-    }}
+            document.getElementById('intro-exit').style.color = '#000000';
+            document.getElementById('intro-exit').style.opacity = 0.5;
+		}
+	}}
 });
+
 // Only default to the tutorial screen on first load
 webBrowser.storage.local.get('seenTutorial', ({ seenTutorial }) => {
-    if (!seenTutorial) {
-        switchSection();
-        webBrowser.storage.local.set({ seenTutorial:true });
-    }
+	if (!seenTutorial) {
+		switchSection();
+		webBrowser.storage.local.set({ seenTutorial:true });
+	}
 })
 
 document.getElementById('intro-exit').addEventListener('click', switchSection);
 document.getElementById('goto-intro').addEventListener('click', switchSection);
 
 function convertMSToNiceTimeString(ms) {
-    let seconds = ms / 1000;
-    let days = seconds / (24 * 3600);
-    let hours = seconds / 3600;
-    let minutes = seconds / 60;
+	let seconds = ms / 1000;
+	let days = seconds / (24 * 3600);
+	let hours = seconds / 3600;
+	let minutes = seconds / 60;
 
-    if (days > 1) {
-        return `${days.toFixed(2)} days`;
-    }
-    if (hours > 1) {
-        return `${hours.toFixed(2)} hours`;
-    }
-    if (minutes > 1) {
-        return `${Math.round(minutes)} minutes`;
-    }
-    if (seconds > 1) {
-        return `${Math.round(seconds)} seconds`;
-    }
-    return `${ms}ms`;
+	if (days > 1) {
+		return `${days.toFixed(2)} days`;
+	}
+	if (hours > 1) {
+		return `${hours.toFixed(2)} hours`;
+	}
+	if (minutes > 1) {
+		return `${Math.round(minutes)} minutes`;
+	}
+	if (seconds > 1) {
+		return `${Math.round(seconds)} seconds`;
+	}
+	return `${ms}ms`;
 }
 
 getStats();
@@ -78,14 +83,16 @@ async function getStats() {
     } else {
         document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
     }
-    const needLoveOrigins = await getTopOriginsThatNeedSomeLove(4);
+    const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
     const needLoveSitesEl = document.getElementById('sites-need-love');
 
     if (needLoveOrigins.length > 0) {
         for (const originData of needLoveOrigins) {
             const linkEl = document.createElement('a');
             linkEl.href = originData.origin;
-            linkEl.innerHTML = originData.origin;
+
+            // strip 'https://' or 'http://' and 'www.' from the beginning of the origin
+            linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
 
             needLoveSitesEl.appendChild(linkEl);
             const brEl = document.createElement('br');
@@ -117,7 +124,7 @@ async function getStats() {
         circleWeights.push(timeSpent);
     }
 
-    //Circles
+    // Circles
     const square = {
         height: 155,
         width: 245

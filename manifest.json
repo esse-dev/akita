@@ -14,9 +14,9 @@
 		"<all_urls>",
 		"storage"
 	],
-    "background": {
-        "scripts": ["src/background_script.js"]
-    },
+	"background": {
+		"scripts": ["src/background_script.js"]
+	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
