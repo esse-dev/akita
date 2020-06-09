@@ -11,6 +11,7 @@ function switchSection() {
     });
 }
 
+// Slideshow / carousel
 new Flickity(document.getElementById('flickity'), {
     on: { change: (slideNumber) => {
         if (slideNumber === 5) {
@@ -20,7 +21,7 @@ new Flickity(document.getElementById('flickity'), {
         }
     }}
 });
-
+// Only default to the tutorial screen on first load
 webBrowser.storage.local.get('seenTutorial', ({ seenTutorial }) => {
     if (!seenTutorial) {
         switchSection();
@@ -56,14 +57,14 @@ getStats();
 async function getStats() {
     const originStats = await loadOriginStats();
 
-    if (originStats && originStats.totalTimeSpent > 0) {
+    if (originStats && originStats.totalVisits > 0) {
+
         document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
         if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
             const sentXRP = originStats.totalSentAssetsMap.XRP;
             const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
             document.getElementById('monetized-sent-data').innerHTML = actualAmount.toFixed(3) + '<span style="font-size: 12px;">XRP</span>';
         } else {
-            // ADD A CHANGE OF TEXT!
             document.getElementById('monetized-sent-text').innerHTML = 'if you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
             document.getElementById('monetized-sent-data').innerHTML = '$' + await getEstimatedPaymentForOriginUSD(origin) + '<span style="font-size: 12px;">USD</span>';
         }
@@ -97,7 +98,7 @@ async function getStats() {
         needLoveSitesEl.appendChild(el);
     }
 
-    // Make links clickable
+    // Make all links in extension popup clickable
     var links = document.getElementsByTagName("a");
 
     for (const link of Array.from(links)) {
@@ -108,6 +109,7 @@ async function getStats() {
         }
     }
 
+    // Top sites visualization
     const topOrigins = await getTopOriginsByTimeSpent(6);
     let circleWeights = [];
     for (const originData of topOrigins) {
@@ -155,7 +157,7 @@ async function getStats() {
             circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
         }
 
-        circleEl.className = 'circle'
+        circleEl.className = 'circle';
         circleEl.style.background = color;
         circleEl.style.height = circleWeight + 'px';
         circleEl.style.width = circleWeight + 'px';

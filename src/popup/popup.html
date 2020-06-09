@@ -80,15 +80,15 @@
             width: calc(100% - 40px);
             opacity: 0;
             transition: opacity 0.2s linear;
-            z-index: -10;
+            z-index: -1;
             word-break:normal;
         }
         .circle:hover {
-            border: 5px solid black;
+            border: 3px solid black;
         }
         .circle:hover::after {
             opacity: 1;
-            z-index: 10;
+            z-index: 1;
         }
         #circle-container {
             height: 180px;
@@ -108,8 +108,9 @@
     </style>
 </head>
 <body>
+    <!-- DATA VIS AREA -->
     <section id="data-story" style="padding: 15px;">
-        <h1>Your Top Monetized Sites</h1>
+        <h1 style="font-size: 25px; margin-top: 5px;">Your Top Monetized Sites</h1>
         <div id="circle-container"></div>
         <p id="info-container">
             You’ve spent <strong id="monetized-time-data" style="font-size: 18px;">13 hours</strong> on monetized sites,
@@ -133,6 +134,7 @@
     <div style="height: 100px; width: 100%; background: #92DEFF;"></div>
     <div style="height: 100px; width: 100%; background: #FFF27B;"></div>
     <div style="height: 100px; width: 100%; background: #9F88FC;"></div>
+    <!-- INTRO SLIDSHOW SECTION -->
     <section id="intro-carousel">
         <div data-flickity='{ "wrapAround": false }' id="flickity">
             <div class="carousel-cell">
@@ -168,7 +170,7 @@
             <div class="carousel-cell">
                 <h2>What is a Web Monetization Provider?</h2>
                 <p>If you want to start supporting websites using Web Monetization, sign up with a provider. Once you've signed up and installed the provider, you can easily stream micropayments. Currently, there are only two providers—but more will come soon!</p>
-                <ul style="list-style-type: none;">
+                <ul>
                     <li><a href="https://www.pumabrowser.com/"><strong>Puma Browser</strong></a></li>
                     <li><a href="https://www.coil.com/"><strong>Coil</strong>
                         <p style="margin-top: 5px;">Start using Web Monetization for $5/month on Coil.</p></a>
