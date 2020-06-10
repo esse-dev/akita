@@ -10,6 +10,7 @@
  */
 class AkitaOriginData {
 	origin = null;
+	faviconSource = null;
 	isCurrentlyMonetized = false;
 	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
 	paymentPointerMap = {};
@@ -32,6 +33,7 @@ class AkitaOriginData {
 	 */
 	static fromObject(akitaOriginDataObject) {
 		const newOriginData = new AkitaOriginData(akitaOriginDataObject.origin);
+		newOriginData.faviconSource = akitaOriginDataObject.faviconSource;
 		newOriginData.isCurrentlyMonetized = akitaOriginDataObject.isCurrentlyMonetized;
 
 		for (const paymentPointer in akitaOriginDataObject.paymentPointerMap) {
@@ -108,5 +110,14 @@ class AkitaOriginData {
 	 */
 	addTimeSpent(recentTimeSpent = 0) {
 		this.originVisitData.addTimeSpent(recentTimeSpent);
+	}
+
+	/**
+	 * Store the favicon source.
+	 * 
+	 * @param {String} faviconPath The url of the origin's favicon.
+	 */
+	storeOriginFavicon(faviconPath) {
+		this.faviconSource = faviconPath;
 	}
 }
