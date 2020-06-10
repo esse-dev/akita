@@ -5,7 +5,8 @@
 const AKITA_DATA_TYPE = {
 	'PAYMENT': 0,
 	'ORIGIN_VISIT_DATA': 1,
-	'ORIGIN_TIME_SPENT': 2
+	'ORIGIN_TIME_SPENT': 2,
+	'ORIGIN_FAVICON': 3
 };
 
 const ORIGIN_NAME_LIST_KEY = 'originList';
@@ -45,12 +46,21 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 		originStats = new AkitaOriginStats();
 	}
 
-	if (AKITA_DATA_TYPE.PAYMENT === typeOfData) {
-		updatePaymentData(originData, originStats, data);
-	} else if (AKITA_DATA_TYPE.ORIGIN_VISIT_DATA === typeOfData) {
-		updateVisitData(originData, originStats);
-	} else if (AKITA_DATA_TYPE.ORIGIN_TIME_SPENT === typeOfData) {
-		updateTimeSpent(originData, originStats, data);
+	switch (typeOfData) {
+		case AKITA_DATA_TYPE.PAYMENT:
+			updatePaymentData(originData, originStats, data);
+			break;
+		case AKITA_DATA_TYPE.ORIGIN_VISIT_DATA:
+			updateVisitData(originData, originStats);
+			break;
+		case AKITA_DATA_TYPE.ORIGIN_TIME_SPENT:
+			updateTimeSpent(originData, originStats, data);
+			break;
+		case AKITA_DATA_TYPE.ORIGIN_FAVICON:
+			await updateOriginFavicon(originData, data);
+			break;
+		default:
+			// console.log("invalid data type provided");
 	}
 
 	// Overwrite or create the data for this origin in storage
@@ -118,6 +128,40 @@ function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
 	originStats.updateTimeSpent(recentTimeSpent, originData.isCurrentlyMonetized);
 }
 
+async function updateOriginFavicon(originData, faviconData) {
+	let faviconPath = null;
+	let origin = originData.origin;
+
+	// Regex pattern for the start of the path
+	const pathStartPattern = /^(https?:\/\/)(www\.)?/i; // i = ignore case (case insensitive)
+
+	if (pathStartPattern.test(faviconData)) {
+		// The favicon path is an absolute path
+		faviconPath = faviconData;
+	} else {
+		// The favicon path is relative to the origin
+		if ((origin.charAt(origin.length) !== '/')
+			&& (faviconData.charAt(0) !== '/') 
+		) {
+			faviconPath = origin + "/" + faviconData;
+		} else {
+			faviconPath = origin + faviconData;
+		}
+	}
+
+	if (faviconPath) {
+		let response = await fetch(faviconPath);
+		
+		if (response) {
+			if (200 === response.status) {
+				originData.storeOriginFavicon(faviconPath);
+			} else {
+				originData.storeOriginFavicon("");
+			}
+		}
+	}
+}
+
 /***********************************************************
  * Load/Store Origin Stats
  ***********************************************************/
@@ -161,7 +205,6 @@ async function storeOriginStats(originStats) {
 		);
 	});
 }
-
 
 /***********************************************************
  * Load/Store Origin Data

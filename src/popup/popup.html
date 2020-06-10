@@ -1,120 +1,119 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="manifest" href="/manifest.json">
-    <title>test</title>
-    <link rel="stylesheet" type="text/css" href="../../library/flickity.css"/>
-    <link rel="stylesheet" type="text/css" href="./popup.css"/>
-    <meta charset="UTF-8">
+	<link rel="manifest" href="/manifest.json">
+	<title>test</title>
+	<link rel="stylesheet" type="text/css" href="../../library/flickity.css"/>
+	<link rel="stylesheet" type="text/css" href="popup.css"/>
+	<meta charset="UTF-8">
 </head>
 <body>
-    <!-- DATA VIS AREA -->
-    <section id="data-story" style="padding: 15px;">
-        <h1 style="font-size: 25px; margin-top: 5px;">Your Top Monetized Sites</h1>
-        <div id="circle-container"></div>
-        <div id="top-site-detail">hello</div>
-        <p id="info-container">
-            You’ve spent <strong id="monetized-time-data" style="font-size: 18px;">13 hours</strong> on monetized sites,
-            which is <strong id="monetized-percent-data" style="font-size: 18px;">15.2%</strong> of your time online.
-            In total, <span id="monetized-sent-text" style="font-size: 18px;">you’ve streamed</span> <strong id="monetized-sent-data">0.0078XRP</strong>.
-        </p>
-        <p>
-            <h1>These monetized sites could use ♥️</h1>
-            <span id="sites-need-love"></span>
-        </p>
-        <h1>Resources</h1>
-        <a href="https://www.grantfortheweb.org/">Grant for the Web</a> · 
-        <a href="https://webmonetization.org/">WebMonetization.org</a> · 
-        <a id="goto-intro" style="text-decoration: underline; cursor: pointer;"><object type="image/svg+xml"
-            data="../../assets/icon.svg"
-            style="height:18px; vertical-align: middle;">
-        </object>Welcome</a>
-    </section>
+	<!-- DATA VIS AREA -->
+	<section id="data-story" style="padding: 15px;">
+		<h1 style="font-size: 25px; margin-top: 5px;">Your Top Monetized Sites</h1>
+		<div id="circle-container"></div>
+		<div id="top-site-detail">hello</div>
+		<p id="info-container">
+			You’ve spent <strong id="monetized-time-data" style="font-size: 18px;">13 hours</strong> on monetized sites,
+			which is <strong id="monetized-percent-data" style="font-size: 18px;">15.2%</strong> of your time online.
+			In total, <span id="monetized-sent-text" style="font-size: 18px;">you’ve streamed</span> <strong id="monetized-sent-data">0.0078XRP</strong>.
+		</p>
+		<p>
+			<h1>These monetized sites could use ♥️</h1>
+			<span id="sites-need-love"></span>
+		</p>
+		<h1>Resources</h1>
+		<a href="https://www.grantfortheweb.org/">Grant for the Web</a> · 
+		<a href="https://webmonetization.org/">WebMonetization.org</a> · 
+		<a id="goto-intro" style="cursor: pointer;"><object type="image/svg+xml"
+			data="../../assets/icon.svg"
+			style="height:18px; vertical-align: middle;">
+		</object>Welcome</a>
+	</section>
 
-    <div style="height: 100px; width: 100%; background: #F96060;"></div>
-    <div style="height: 100px; width: 100%; background: #42D2B8;"></div>
-    <div style="height: 100px; width: 100%; background: #92DEFF;"></div>
-    <div style="height: 100px; width: 100%; background: #FFF27B;"></div>
-    <div style="height: 100px; width: 100%; background: #9F88FC;"></div>
+	<div style="height: 100px; width: 100%; background: #F96060;"></div>
+	<div style="height: 100px; width: 100%; background: #42D2B8;"></div>
+	<div style="height: 100px; width: 100%; background: #92DEFF;"></div>
+	<div style="height: 100px; width: 100%; background: #FFF27B;"></div>
+	<div style="height: 100px; width: 100%; background: #9F88FC;"></div>
 
-    <!-- INTRO SLIDSHOW SECTION -->
-    <section id="intro-carousel">
-        <div data-flickity='{ "wrapAround": false }' id="flickity">
-            <div class="carousel-cell">
-                <object type="image/svg+xml"
-                    data="../../assets/icon.svg"
-                    style="height:170px;filter: drop-shadow(5px 5px 0px black);">
-                </object>
-                <h2>Welcome to Akita!</h2>
-                <p>Akita gives you insight into your involvement with Web Monetization by showing you Monetization information about the websites you visit.</p>
-                <p>Our goal with Akita is to increase Web Monetization understanding and awareness. Thank you! ~<a href="https://dev.to/dog-s">dog-s</a></p>
-            </div>
-            <div class="carousel-cell">
-                <object type="image/svg+xml"
-                    data="../../assets/disapointed_toaster.svg"
-                    style="height:170px;">
-                </object>
-                <h2>Tired of Ads?</h2>
-                <p>Ads might be annoying and come at the cost of your personal privacy, but they let you browse the web for free. With Web Monetization you can:</p>
-                <ul>
-                    <li>Access website content</li>
-                    <li>Avoid annoying ads altogether</li>
-                    <li>Keep your personal data private</li>
-                    <li>Support the website</li>
-                </ul>
-            </div>
-            <div class="carousel-cell">
-                <object type="image/svg+xml" data="../../assets/wm-icon-animated.svg"
-                    alt="Web Monetization Icon"
-                    style="height:170px;"></object>
-                <h2>What is <strong>Web Monetization?</strong></h2>
-                <p>Web Monetization allows you to stream micropayments (send tiny payments over time) directly to websites. Websites can detect these payments and turn off ads, as well as further enhance your website experience.</p>
-            </div>
-            <div class="carousel-cell">
-                <h2>What is a Web Monetization Provider?</h2>
-                <p>If you want to start supporting websites using Web Monetization, sign up with a provider. Once you've signed up and installed the provider, you can easily stream micropayments. Currently, there are only two providers—but more will come soon!</p>
-                <ul>
-                    <li><a href="https://www.pumabrowser.com/"><strong>Puma Browser</strong></a></li>
-                    <li><a href="https://www.coil.com/"><strong>Coil</strong>
-                        <p style="margin-top: 5px;">Start using Web Monetization for $5/month on Coil.</p></a>
-                    </li>
-                </ul>
-            </div>
-            <div class="carousel-cell">
-                <h2>Learn more & get involved</h2>
-                <p>Web Monetization is part of building a healthier internet. To learn more visit:</p>
-                <ul>
-                    <li><a href="https://www.grantfortheweb.org/">Grant for the Web</a></li>
-                    <li><a href="https://webmonetization.org/">WebMonetization.org</a></li>
-                    <li><a href="https://www.w3.org/blog/2019/09/w3c-interview-coil-on-interledger-protocol-and-web-monetization/">
-                        Interview with Coil CEO Stefan Thomas
-                    </a></li>
-                    <li><a href="https://dev.to/dog-s/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb">
-                        Article: “How can you support websites without having to deal with annoying ads?”
-                    </a></li>
-                </ul>
-                <div style="font-size: 60px; text-align: right;">📚</div>
-            </div>
-            <div class="carousel-cell">
-                <h2>The Akita Icon</h2>
-                <p>If a website you visit has Web Monetization enabled, you will see:</p>
-                <img src="../../assets/demo_mon.png" width="100">
-                <p>Otherwise the Akita icon will look like:</p>
-                <img src="../../assets/demo_unmon.png" width="100">
-                <p>Now get out there and explore the web!</p>
-            </div>
-        </div>
-        <div id="intro-exit">skip</div>
-    </section>
+	<!-- INTRO SLIDSHOW SECTION -->
+	<section id="intro-carousel">
+		<div data-flickity='{ "wrapAround": false }' id="flickity">
+			<div class="carousel-cell">
+				<object type="image/svg+xml"
+					data="../../assets/icon.svg"
+					style="height:170px;filter: drop-shadow(5px 5px 0px black);">
+				</object>
+				<h2>Welcome to Akita!</h2>
+				<p>Akita gives you insight into your involvement with Web Monetization by showing you Monetization information about the websites you visit.</p>
+				<p>Our goal with Akita is to increase Web Monetization understanding and awareness. Thank you! ~<a href="https://dev.to/dog-s">dog-s</a></p>
+			</div>
+			<div class="carousel-cell">
+				<object type="image/svg+xml"
+					data="../../assets/disapointed_toaster.svg"
+					style="height:170px;">
+				</object>
+				<h2>Tired of Ads?</h2>
+				<p>Ads might be annoying and come at the cost of your personal privacy, but they let you browse the web for free. With Web Monetization you can:</p>
+				<ul class="tutorial-list-ul">
+					<li>Access website content</li>
+					<li>Avoid annoying ads altogether</li>
+					<li>Keep your personal data private</li>
+					<li>Support the website</li>
+				</ul>
+			</div>
+			<div class="carousel-cell">
+				<object type="image/svg+xml" data="../../assets/wm-icon-animated.svg"
+					alt="Web Monetization Icon"
+					style="height:170px;"></object>
+				<h2>What is <strong>Web Monetization?</strong></h2>
+				<p>Web Monetization allows you to stream micropayments (send tiny payments over time) directly to websites. Websites can detect these payments and turn off ads, as well as further enhance your website experience.</p>
+			</div>
+			<div class="carousel-cell">
+				<h2>What is a Web Monetization Provider?</h2>
+				<p>If you want to start supporting websites using Web Monetization, sign up with a provider. Once you've signed up and installed the provider, you can easily stream micropayments. Currently, there are only two providers—but more will come soon!</p>
+				<ul class="tutorial-list-ul">
+					<li><a href="https://www.coil.com/"><strong>Coil</strong></a>
+						<p style="display: inline;">- Start using Web Monetization for $5/month.</p>
+					</li>
+					<li><a href="https://www.pumabrowser.com/"><strong>Puma Browser</strong></a>
+						<p style="display: inline;">- A mobile browser with Web Monetization built in!</p>
+					</li>
+				</ul>
+			</div>
+			<div class="carousel-cell">
+				<h2>Learn more & get involved</h2>
+				<p>Web Monetization is part of building a healthier internet. To learn more visit:</p>
+				<div class="link-grid">
+					<a href="https://www.grantfortheweb.org/" title="$100M Fund For a Better Internet" style="background: #F96060;">Grant for the Web</a>
+					<a href="https://webmonetization.org/" title="Web Monetization JavaScript API" style="background: #92DEFF;">Web Monetization Website</a>
+					<a href="https://www.w3.org/blog/2019/09/w3c-interview-coil-on-interledger-protocol-and-web-monetization/" title="The thinking behind Interledger, Coil, Web Monetization" style="background: #FFB763;">Interview with Coil CEO Stefan Thomas</a>
+					<a href="https://webmonetization.guide/" title="Guide for developers and creators" style="background: #42D2B8;">Web Monetization Guide</a>
+					<a href="https://coil.com/creator/how-to-monetize" title="Monetize your work" style="background: #9F88FC;">Monetize your own website or creative content with Coil</a>
+					<a href="https://dev.to/dog-s/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb" title="Why does Web Monetization matter?" style="background: #FFF27B;">How can you support websites without having to deal with annoying ads?</a>
+				</div>
+			</div>
+			<div class="carousel-cell">
+				<h2>The Akita Icon</h2>
+				<p>If a website you visit has Web Monetization enabled, you will see:</p>
+				<img src="../../assets/demo_mon.png" width="100">
+				<p>Otherwise the Akita icon will look like:</p>
+				<img src="../../assets/demo_unmon.png" width="100">
+				<p>Now get out there and explore the web!</p>
+			</div>
+		</div>
+		<div id="intro-exit">skip</div>
+	</section>
 
-    <script src="../data/WebMonetizationAsset.js"></script>
-    <script src="../data/AkitaPaymentPointerData.js"></script>
-    <script src="../data/AkitaOriginVisitData.js"></script>
-    <script src="../data/AkitaOriginData.js"></script>
-    <script src="../data/AkitaOriginStats.js"></script>
-    <script src="../data/storage.js"></script>
-    <script src="../main.js"></script>
-    <script type="text/javascript" src="../../library/flickity.min.js"></script>
-    <script src="popup.js"></script>
+	<script src="../data/WebMonetizationAsset.js"></script>
+	<script src="../data/AkitaPaymentPointerData.js"></script>
+	<script src="../data/AkitaOriginVisitData.js"></script>
+	<script src="../data/AkitaOriginData.js"></script>
+	<script src="../data/AkitaOriginStats.js"></script>
+	<script src="../data/storage.js"></script>
+	<script src="../main.js"></script>
+	<script type="text/javascript" src="../../library/flickity.min.js"></script>
+	<script src="popup.js"></script>
 </body>
 </html>

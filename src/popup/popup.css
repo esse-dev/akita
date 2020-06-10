@@ -1,109 +1,168 @@
 .icon {
-  height: 100px;
-  width: 100px;
+	height: 100px;
+	width: 100px;
 }
+
 html, body {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  height: 550px;
-  width: 400px;
-  background: #E6E3D2;
-  overflow: hidden;
-  font-family: sans-serif;
-  font-size: 14px;
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+	height: 550px;
+	width: 400px;
+	background: #E6E3D2;
+	overflow: hidden;
+	font-family: sans-serif;
+	font-size: 14px;
 }
+
 body {
-  border: 5px solid black;
+	border: 5px solid black;
 }
+
 h2 {
-  font-size: 40px;
-  line-height: 40px;
-  margin: 10px 0 10px;
+	font-size: 40px;
+	line-height: 40px;
+	margin: 10px 0 10px;
 }
+
 p {
-  font-size: 18px;
-  line-height: 22px;
-  margin-bottom: 10px;
+	font-size: 18px;
+	line-height: 22px;
+	margin-bottom: 10px;
 }
+
+a {
+	color: #C47233;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #E3853C;
+	text-decoration: underline;
+}
+
 #data-story p {
-  margin: 5px 0;
+	margin: 5px 0;
 }
+
 ul {
-  margin-top: 0;
-  font-size: 18px;
-  line-height: 26px;
-}
-section {
-  height: 100%;
-  position: relative;
-}
-
-.circle {
-  border-radius: 100%;
-  height: 100px;
-  width: 100px;
-  margin: 5px;
-  padding: 5px;
-  float: left;
-  border: 0px solid black;
-  transition: border 0.1s ease-in-out;
-
-  word-break: break-all;
-
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  text-align:center;
-
-  cursor: pointer;
-}
-.circle:hover {
-  border: 3px solid black;
-}
-.circle:hover::after {
-  opacity: 1;
-  z-index: 1;
-}
-#circle-container {
-  height: 180px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-}
-#top-site-detail {
-  padding: 20px;
-  border-top: 4px solid black;
-  background: #E6E3D2;
-  position: absolute;
-  font-size: 18px;
-  top: 237px;
-  height: 500px;
-  left: 0px;
-  width: calc(100% - 40px);
-
-  opacity: 0;
-  transition: opacity 0.2s linear;
-  z-index: -1;
-}
-
-
-#sites-need-love a {
-  margin-right: 10px;
-}
-
-#intro-exit {
-  position: absolute;
-  bottom: 16px;
-  right: 21px;
-  font-size: 18px;
-  text-decoration-line: underline;
-  opacity: 0.5;
-  cursor: pointer;
+	margin-top: 0;
+	font-size: 18px;
+	line-height: 26px;
 }
 
 h1 {
-  margin-top: 30px;
-  margin-bottom: 4px;
+	margin-top: 30px;
+	margin-bottom: 4px;
 }
+
+.tutorial-list-ul {
+	list-style: none;
+	padding-left: 25px;
+}
+ 
+.tutorial-list-ul li:before {
+	font-weight: bold;
+	content: "+";
+	padding-right: 5px;
+}
+
+.link-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.5rem;
+	grid-auto-rows: minmax(80px, auto);
+}
+
+.link-grid > a {
+	font-size: 15px;
+	padding: 0.5rem;
+	border-radius: 1rem;
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+	overflow-wrap: break-word;
+	color: black;
+	opacity: 0.8;
+	border: 3px solid transparent;
+	transition: border 0.6s;
+}
+
+.link-grid > a:hover {
+	opacity: 1;
+	border: 3px solid black;
+}
+
+section {
+	height: 100%;
+	position: relative;
+}
+
+.circle {
+	border-radius: 100%;
+	height: 100px;
+	width: 100px;
+	margin: 5px;
+	padding: 5px;
+	float: left;
+	border: 0px solid black;
+	transition: border 0.1s ease-in-out;
+
+	word-break: break-all;
+
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+	text-align:center;
+
+	cursor: pointer;
+}
+
+.circle:hover {
+	border: 3px solid black;
+}
+
+.circle:hover::after {
+	opacity: 1;
+	z-index: 1;
+}
+
+#circle-container {
+	height: 180px;
+	width: 100%;
+	display: flex;
+	align-items: center;
+}
+
+#top-site-detail {
+	padding: 20px;
+	border-top: 4px solid black;
+	background: #E6E3D2;
+	position: absolute;
+	font-size: 18px;
+	top: 237px;
+	height: 500px;
+	left: 0px;
+	width: calc(100% - 40px);
+  
+	opacity: 0;
+	transition: opacity 0.2s linear;
+	z-index: -1;
+}
+
+#sites-need-love a {
+	margin-right: 10px;
+}
+
+#intro-exit {
+	position: absolute;
+	bottom: 16px;
+	right: 21px;
+	font-size: 18px;
+	text-decoration-line: underline;
+	opacity: 0.5;
+	cursor: pointer;
+  }

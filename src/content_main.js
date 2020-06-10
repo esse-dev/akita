@@ -2,23 +2,25 @@
  * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
  * properties which are added by JavaScript, such as document.monetization!
  * reference: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts#Content_script_environment
- *            https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
+ *			  https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
  * So we must inject some code into the JavaScript context of the current tab in order to
  * access the document.monetization object. We inject code using a script element:
  */
 const scriptEl = document.createElement('script');
 scriptEl.text = `
-	document.monetization.addEventListener('monetizationstart', (event) => {
-		document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
-	});
-
-	document.monetization.addEventListener('monetizationprogress', (event) => {
-		document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
-	});
-
-	document.monetization.addEventListener('monetizationstop', (event) => {
-		document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
-	});
+	if (document.monetization) {
+		document.monetization.addEventListener('monetizationstart', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
+		});
+	
+		document.monetization.addEventListener('monetizationprogress', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
+		});
+	
+		document.monetization.addEventListener('monetizationstop', (event) => {
+			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
+		});
+	}
 `;
 document.body.appendChild(scriptEl);
 
@@ -36,7 +38,6 @@ async function main() {
 		paymentPointer
 	} = await getAndValidatePaymentPointer();
 
-	//TODO: call setExtensionIconMonetizationState whenever the page regains visibility so that the icon changes between tabs:
 	setExtensionIconMonetizationState(isValid);
 
 	// paymentPointer will be null if it doesn't exist or is invalid
@@ -61,7 +62,7 @@ async function main() {
 	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
-	//loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
+	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
 }
 
 /***********************************************************
@@ -85,11 +86,14 @@ function setExtensionIconMonetizationState(isCurrentlyMonetized) {
  ***********************************************************/
 
 /**
- * Track the current visit to the site (origin).
+ * Track the current visit to the site (origin) and store the favicon to the site.
  * No data needs to be passed in, since it is handled in AkitaOriginVisitData.
  */
 async function trackVisitToSite() {
 	await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.ORIGIN_VISIT_DATA);
+
+	// TODO: only store favicon source if the relative path to the favicon has not changed
+	await storeDataIntoAkitaFormat(getFaviconPath(), AKITA_DATA_TYPE.ORIGIN_FAVICON);
 }
 
 /**
@@ -305,4 +309,43 @@ async function httpGet(endpoint, headerName, headerValue) {
 	}
 
 	return response;
+}
+
+/***********************************************************
+ * Get Website Favicon
+ ***********************************************************/
+
+/**
+ * Retrieve the favicon path.
+ * 
+ * @return {String} The absolute or relative path from the site origin to the favicon.
+ */
+function getFaviconPath() {
+	// Default favicon path is at the root of the origin
+	let faviconPath = null;
+	let linkElementsList = document.getElementsByTagName("link");
+	let relIconFoundIndex = -1;
+	
+	// Check for a link with rel "icon" or "shortcut icon"
+	for (let i = 0; i < linkElementsList.length; i++) {
+		const linkElementRel = linkElementsList[i].getAttribute("rel");
+
+		if (linkElementRel === "shortcut icon") {
+			// Specifically check for "shortcut icon" since the href tends to be a direct link
+			faviconPath = linkElementsList[i].getAttribute("href");
+			break;
+		} else if (linkElementRel === "icon") {
+			relIconFoundIndex = i;
+		}
+	}
+
+	if (!faviconPath && (relIconFoundIndex === -1)) {
+		// An icon link was not found, set path to default
+		faviconPath = "favicon.ico";
+	} else if (relIconFoundIndex !== -1) {
+		// The "icon" link was found, set path to specified href
+		faviconPath = linkElementsList[relIconFoundIndex].getAttribute("href");
+	}
+	
+	return faviconPath;		
 }

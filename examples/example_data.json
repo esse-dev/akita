@@ -32,6 +32,7 @@
 	"originDataList": [
 		{
 			"origin":"https://dev.to",
+			"faviconSource": "https://dev-to.s3.us-east-2.amazonaws.com/favicon.ico",
 			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 8731882,
@@ -54,6 +55,7 @@
 		},
 		{
 			"origin":"https://www.twitch.tv",
+			"faviconSource": "https://static.twitchcdn.net/assets/favicon-16-2d5d1f5ddd489ee10398.png",
 			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4723893,
@@ -86,6 +88,7 @@
 		},
 		{
 			"origin":"https://sdog.netlify.app",
+			"faviconSource": "https://sharonwang.netlify.app/favicon.ico",
 			"isCurrentlyMonetized":true,
 			"originVisitData":{
 				"timeSpentAtOrigin": 4567890218492,

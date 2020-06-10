@@ -2,7 +2,7 @@
 	"name":"Akita",
 	"version":"0.0.2",
 	"manifest_version": 2,
-	"description":"A browser extension that gives you insight into your involvement with web monetization.",
+	"description":"A browser extension that gives you insight into your involvement with Web Monetization.",
 	"icons": {
 		"16": "assets/icon_16x16.png",
 		"48": "assets/icon_48x48.png",
@@ -14,9 +14,9 @@
 		"<all_urls>",
 		"storage"
 	],
-    "background": {
-        "scripts": ["src/background_script.js"]
-    },
+	"background": {
+		"scripts": ["src/background_script.js"]
+	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
