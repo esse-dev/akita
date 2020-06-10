@@ -109,7 +109,7 @@ async function getStats() {
         }
     }
 
-    // Top sites visualization
+    // Top sites visualization with circles
     const topOrigins = await getTopOriginsByTimeSpent(6);
     let circleWeights = [];
     for (const originData of topOrigins) {
@@ -127,6 +127,7 @@ async function getStats() {
     const circleContainer = document.getElementById('circle-container');
 
     const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
+    // Ensure that the circles are as big as possible, but not so big they overflow, and in scale with eachother.
     const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
     circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
 
@@ -134,26 +135,12 @@ async function getStats() {
         const circleEl = document.createElement('div');
         const circleWeight = circleWeights[i];
         const color = CIRCLE_COLORS[i];
-        const originData = topOrigins[i];
-        const visitData = originData?.originVisitData;
-        let totalSentXRP = 0;
-        if (originData.paymentPointerMap) {
-            for (const paymentPointerData of Object.values(originData.paymentPointerMap)) {
-                if (paymentPointerData.sentAssetsMap?.XRP?.amount > 0) {
-                    const sentXRP = paymentPointerData.sentAssetsMap.XRP;
-                    const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
-                    totalSentXRP += actualAmount;
-                }
-            }
-        }
 
-        circleEl.setAttribute('data-url',
-            `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} spent here · 
-            ${originData.origin} · 
-            ${visitData.numberOfVisits} visits · 
-            ${totalSentXRP.toFixed(3)}XRP sent`);
+        const originData = topOrigins[i];
+        const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
+
         if (circleWeight > 40) {
-            circleEl.innerHTML = `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} visits`;
+            circleEl.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
             circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
         }
 
@@ -161,10 +148,56 @@ async function getStats() {
         circleEl.style.background = color;
         circleEl.style.height = circleWeight + 'px';
         circleEl.style.width = circleWeight + 'px';
-        circleEl.addEventListener("click", () => {
-            chrome.tabs.create({ url: originData.origin });
-        }, false);
+
+        const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP);
+        circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
+        circleEl.addEventListener('mouseleave', hideTopSiteDetail);
 
         circleContainer.appendChild(circleEl);
     }
+}
+
+function calculateTotalSentXRPForOrigin(originData) {
+    let totalSentXRP = 0;
+    if (originData.paymentPointerMap) {
+        for (const paymentPointerData of Object.values(originData.paymentPointerMap)) {
+            if (paymentPointerData.sentAssetsMap?.XRP?.amount > 0) {
+                const sentXRP = paymentPointerData.sentAssetsMap.XRP;
+                const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
+                totalSentXRP += actualAmount;
+            }
+        }
+    }
+    return totalSentXRP;
+}
+
+function createTopSiteCircleHTML(originData, totalSentXRP) {
+    const visitData = originData?.originVisitData;
+    if (totalSentXRP > 0) {
+        return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} visits`;
+    } else {
+        return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${visitData.numberOfVisits} visits`;
+    }
+}
+function createTopSiteDetailHTML(originData, totalSentXRP) {
+    const visitData = originData?.originVisitData;
+    return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} spent here · 
+        ${originData.origin} · 
+        ${visitData.numberOfVisits} visits · 
+        ${totalSentXRP.toFixed(3)}XRP sent`;
+}
+
+const topSiteDetailEl = document.getElementById('top-site-detail');
+function showTopSiteDetail(innerHTML, color) {
+    topSiteDetailEl.style.zIndex = 1;
+    topSiteDetailEl.style.opacity = 1;
+    topSiteDetailEl.style.background = color;
+    console.log(topSiteDetailEl, topSiteDetailEl.style.zIndex, topSiteDetailEl.style.opacity, innerHTML);
+    topSiteDetailEl.innerHTML = innerHTML;
+}
+function hideTopSiteDetail() {
+    // Place element "behind" all other elements so it does not intercept mouse interactions.
+    topSiteDetailEl.style.zIndex = -1;
+    // Make element invisible.
+    topSiteDetailEl.style.opacity = 0;
 }
