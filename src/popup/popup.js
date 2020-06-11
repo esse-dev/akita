@@ -16,12 +16,10 @@ new Flickity(document.getElementById('flickity'), {
 	on: { change: (slideNumber) => {
 		if (slideNumber === 5) {
 			document.getElementById('intro-exit').innerHTML = 'done';
-			document.getElementById('intro-exit').style.color = '#EF5E92';
-			document.getElementById('intro-exit').style.opacity = 1;
+            document.getElementById('intro-exit').style.color = '#C31354';
 		} else {
 			document.getElementById('intro-exit').innerHTML = 'skip';
 			document.getElementById('intro-exit').style.color = '#000000';
-			document.getElementById('intro-exit').style.opacity = 0.5;
 		}
 	}}
 });
@@ -148,7 +146,7 @@ async function getStats() {
 	};
 
 	const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
-	
+
 	// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
 	const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
 	circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
