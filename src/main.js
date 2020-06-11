@@ -157,13 +157,47 @@ function getEstimatedPaymentForTimeInUSD(timeSpent) {
  ***********************************************************/
 
 /**
+ * Get the percentage of time spent at the origin out of
+ * total time spent across all origins.
+ * 
+ * @param {AkitaOriginData} originData The origin data object.
+ * @param {AkitaOriginStats} originStats The origin stats object.
+ * @return {Number} The percent of time spent at the origin out of total time spent.
+ */
+function getPercentTimeSpentAtOriginOutOfTotal(originData, originStats) {
+	if (!originData || !originStats) return 0;
+
+	const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
+	const totalTimeSpent = originStats.totalTimeSpent;
+
+	return toPercent(timeSpentAtOrigin / totalTimeSpent);
+}
+
+/**
+ * Get the percentage of visits to the origin out of total
+ * origin visits.
+ * 
+ * @param {AkitaOriginData} originData The origin data object.
+ * @param {AkitaOriginStats} originStats The origin stats object.
+ * @return {Number} The percent of visits to the origin out of total visits.
+ */
+function getPercentVisitsToOriginOutOfTotal(originData, originStats) {
+	if (!originData || !originStats) return 0;
+
+	const visitsToOrigin = originData.originVisitData.numberOfVisits;
+	const totalVisits = originStats.totalVisits;
+
+	return toPercent(visitsToOrigin / totalVisits);
+}
+
+/**
  * Get the percentage of monetized origin time spent out of
  * total origin time spent.
  * 
  * @param {AkitaOriginStats} originStats The origin stats object.
- * @return {Promise<Number>} Resolves to the percent of monetized origin time spent.
+ * @return {Number} The percent of monetized origin time spent.
  */
-async function getMonetizedTimeSpentPercent(originStats) {
+function getMonetizedTimeSpentPercent(originStats) {
 	if (!originStats) return 0;
 
 	const totalMonetizedTimeSpent = originStats.totalMonetizedTimeSpent;
@@ -177,9 +211,9 @@ async function getMonetizedTimeSpentPercent(originStats) {
  * origin visits.
  * 
  * @param {AkitaOriginStats} originStats The origin stats object.
- * @return {Promise<Number>} Resolves to the percent of monetized origin visits.
+ * @return {Number} The percent of monetized origin visits.
  */
-async function getMonetizedVisitsPercent(originStats) {
+function getMonetizedVisitsPercent(originStats) {
 	if (!originStats) return 0;
 
 	const totalMonetizedVisits = originStats.totalMonetizedVisits;
@@ -189,13 +223,13 @@ async function getMonetizedVisitsPercent(originStats) {
 }
 
 /**
- * Convert a number to a percent with no decimal places.
+ * Convert a number to a percent with 2 decimal places.
  * 
  * @param {Number} number The number to convert into a percent.
  * @return {Number} The number as a percent.
  */
 function toPercent(number){
-	return Math.floor(100 * number);
+	return (100 * number).toFixed(2);
 }
 
 /**

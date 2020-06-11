@@ -154,8 +154,14 @@ section {
 	z-index: -1;
 }
 
+#sites-need-love img {
+	margin-left: 16px;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
 #sites-need-love a {
-	margin-right: 10px;
+	margin-left: 8px;
 }
 
 #intro-exit {

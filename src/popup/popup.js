@@ -63,8 +63,8 @@ async function getStats() {
 	const originStats = await loadOriginStats();
 
 	if (originStats && originStats.totalVisits > 0) {
-
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
+
 		if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
 			const sentXRP = originStats.totalSentAssetsMap.XRP;
 			const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
@@ -73,7 +73,8 @@ async function getStats() {
 			document.getElementById('monetized-sent-text').innerHTML = 'if you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
 			document.getElementById('monetized-sent-data').innerHTML = '$' + getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent) + '<span style="font-size: 12px;">USD</span>';
 		}
-		const monetizedTimePercent = await getMonetizedTimeSpentPercent(originStats);
+
+		const monetizedTimePercent = getMonetizedTimeSpentPercent(originStats);
 		if (monetizedTimePercent) {
 			document.getElementById('monetized-percent-data').innerHTML = monetizedTimePercent+'%';
 		} else {
@@ -83,13 +84,19 @@ async function getStats() {
 	} else {
 		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
 	}
+
 	const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
 	const needLoveSitesEl = document.getElementById('sites-need-love');
 
 	if (needLoveOrigins.length > 0) {
 		for (const originData of needLoveOrigins) {
 			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-				needLoveSitesEl.appendChild(createFaviconImgElement(originData.faviconSource));
+				const faviconEl = createFaviconImgElement(originData.faviconSource);
+				faviconEl.addEventListener("click", () => {
+					webBrowser.tabs.create({ url: originData.origin });
+				}, false);
+
+				needLoveSitesEl.appendChild(faviconEl);
 			}
 			
 			const linkEl = document.createElement('a');
@@ -132,7 +139,7 @@ async function getStats() {
 	const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
 
 	const circleContainer = document.getElementById('circle-container');
-    const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
+	const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
 	const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
 	const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
 	const square = {
@@ -171,9 +178,12 @@ async function getStats() {
 			circleEl.style.fontSize = Math.round(circleWeight / 6) + 'px';
 		}
 
-		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP);
+		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
 		circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
 		circleEl.addEventListener('mouseleave', hideTopSiteDetail);
+		circleEl.addEventListener("click", () => {
+			webBrowser.tabs.create({ url: originData.origin });
+		}, false);
 
 		circleContainer.appendChild(circleEl);
 	}
@@ -216,12 +226,15 @@ function createTopSiteCircleHTML(originData, totalSentXRP) {
 	}
 }
 
-function createTopSiteDetailHTML(originData, totalSentXRP) {
+function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 	const visitData = originData?.originVisitData;
+	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
+	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
+
 	return `<a href="${originData.origin}" style="color: black; text-decoration: underline;">${originData.origin}</a><br><br>
-		You've spent <strong>${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}</strong> here<br>
-		You've visited <strong>${visitData.numberOfVisits} times</strong><br>
-		You've sent <strong>${totalSentXRP.toFixed(3)}XRP</strong>`;
+		You've spent <strong>${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
+		You've visited <strong>${visitData.numberOfVisits} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
+		So far, you've sent <strong>${totalSentXRP.toFixed(3)}XRP</strong> to this site.`;
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
