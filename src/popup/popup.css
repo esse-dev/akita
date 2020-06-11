@@ -32,12 +32,12 @@ p {
 }
 
 a {
-	color: #C47233;
+	color: #A84900;
 	text-decoration: none;
 }
 
 a:hover {
-	color: #E3853C;
+	color: #C47233;
 	text-decoration: underline;
 }
 
@@ -105,9 +105,9 @@ section {
 	height: 100px;
 	width: 100px;
 	margin: 5px;
-	padding: 5px;
+	padding: 12px; /* padding is half of the minimum circle diameter */
 	float: left;
-	border: 0px solid black;
+	border: 0px solid transparent;
 	transition: border 0.1s ease-in-out;
 
 	word-break: break-all;
@@ -116,7 +116,8 @@ section {
 	justify-content: center;
 	align-content: center;
 	flex-direction: column;
-	text-align:center;
+	text-align: center;
+	align-items: center;
 
 	cursor: pointer;
 }
@@ -153,8 +154,14 @@ section {
 	z-index: -1;
 }
 
+#sites-need-love img {
+	margin-left: 16px;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
 #sites-need-love a {
-	margin-right: 10px;
+	margin-left: 8px;
 }
 
 #intro-exit {
