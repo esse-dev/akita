@@ -142,6 +142,16 @@ async function getEstimatedPaymentForOriginUSD(origin) {
 	return estimatedPayment;
 }
 
+/**
+ * Calculate the total estimated payment in USD based on the timeSpent.
+ * 
+ * @param {Number} timeSpent The amount of time spent in milliseconds.
+ * @return {Number} The estimated payment in USD.
+ */
+function getEstimatedPaymentForTimeInUSD(timeSpent) {
+	return Number.parseFloat(timeSpent * STREAM_RATE_PER_MILLISECOND).toFixed(2);
+}
+
 /***********************************************************
  * Various data retrieval functions
  ***********************************************************/

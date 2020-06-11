@@ -71,7 +71,7 @@ async function getStats() {
 			document.getElementById('monetized-sent-data').innerHTML = actualAmount.toFixed(3) + '<span style="font-size: 12px;">XRP</span>';
 		} else {
 			document.getElementById('monetized-sent-text').innerHTML = 'if you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
-			document.getElementById('monetized-sent-data').innerHTML = '$' + await getEstimatedPaymentForOriginUSD(origin) + '<span style="font-size: 12px;">USD</span>';
+			document.getElementById('monetized-sent-data').innerHTML = '$' + getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent) + '<span style="font-size: 12px;">USD</span>';
 		}
 		const monetizedTimePercent = await getMonetizedTimeSpentPercent(originStats);
 		if (monetizedTimePercent) {
@@ -89,12 +89,7 @@ async function getStats() {
 	if (needLoveOrigins.length > 0) {
 		for (const originData of needLoveOrigins) {
 			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-				const faviconEl = document.createElement('img');
-				faviconEl.src = originData.faviconSource;
-				// Set height and width to standard favicon size
-				faviconEl.width = 16;
-				faviconEl.height = 16;
-				needLoveSitesEl.appendChild(faviconEl);
+				needLoveSitesEl.appendChild(createFaviconImgElement(originData.faviconSource));
 			}
 			
 			const linkEl = document.createElement('a');
@@ -134,17 +129,20 @@ async function getStats() {
 	}
 
 	// Circles
-	const square = {
-		height: 155,
-		width: 245
-	};
 	const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
 
 	const circleContainer = document.getElementById('circle-container');
+    const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
+	const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
+	const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
+	const square = {
+		height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
+		width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
+	};
 
 	const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
 	
-	// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with eachother.
+	// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
 	const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
 	circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
 
@@ -156,15 +154,22 @@ async function getStats() {
 		const originData = topOrigins[i];
 		const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
 
-		if (circleWeight > 40) {
-			circleEl.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
-			circleEl.style.fontSize = Math.round(circleWeight / 8) + 'px';
-		}
-
 		circleEl.className = 'circle';
 		circleEl.style.background = color;
 		circleEl.style.height = circleWeight + 'px';
 		circleEl.style.width = circleWeight + 'px';
+
+		if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+			const faviconEl = createFaviconImgElement(originData.faviconSource);
+			circleEl.appendChild(faviconEl);
+		}
+
+		if (circleWeight > 40) {
+			const div = document.createElement('div');
+			div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
+			circleEl.appendChild(div);
+			circleEl.style.fontSize = Math.round(circleWeight / 6) + 'px';
+		}
 
 		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP);
 		circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
@@ -188,6 +193,20 @@ function calculateTotalSentXRPForOrigin(originData) {
 	return totalSentXRP;
 }
 
+function createFaviconImgElement(faviconSource) {
+	const faviconEl = document.createElement('img');
+	faviconEl.src = faviconSource;
+
+	// Set height and width to standard favicon size
+	faviconEl.width = 16;
+	faviconEl.height = 16;
+
+	// Make favicon round
+	faviconEl.style.borderRadius = "50%";
+
+	return faviconEl;
+}
+
 function createTopSiteCircleHTML(originData, totalSentXRP) {
 	const visitData = originData?.originVisitData;
 	if (totalSentXRP > 0) {
@@ -199,10 +218,10 @@ function createTopSiteCircleHTML(originData, totalSentXRP) {
 
 function createTopSiteDetailHTML(originData, totalSentXRP) {
 	const visitData = originData?.originVisitData;
-	return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)} spent here · 
-		${originData.origin} · 
-		${visitData.numberOfVisits} visits · 
-		${totalSentXRP.toFixed(3)}XRP sent`;
+	return `<a href="${originData.origin}" style="color: black; text-decoration: underline;">${originData.origin}</a><br><br>
+		You've spent <strong>${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}</strong> here<br>
+		You've visited <strong>${visitData.numberOfVisits} times</strong><br>
+		You've sent <strong>${totalSentXRP.toFixed(3)}XRP</strong>`;
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
@@ -210,7 +229,6 @@ function showTopSiteDetail(innerHTML, color) {
 	topSiteDetailEl.style.zIndex = 1;
 	topSiteDetailEl.style.opacity = 1;
 	topSiteDetailEl.style.background = color;
-	console.log(topSiteDetailEl, topSiteDetailEl.style.zIndex, topSiteDetailEl.style.opacity, innerHTML);
 	topSiteDetailEl.innerHTML = innerHTML;
 }
 
