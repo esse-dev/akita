@@ -170,6 +170,50 @@ section {
 	right: 21px;
 	font-size: 18px;
 	text-decoration-line: underline;
-	opacity: 0.5;
 	cursor: pointer;
-  }
+}
+
+.ad-popup-disapppointed-toaster {
+    height:170px;
+    animation: popup ease-in-out 7s infinite;
+}
+.ad-popup-free-dog {
+    width: 220px;
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    animation: popup 7s ease-in-out 2s infinite, flashing-border ease-in-out 1.5s infinite;
+}
+.ad-popup-new-rat {
+    height:140px;
+    position: absolute;
+    top: 40px;
+    left: 80px;
+    animation: popup 7s ease-in-out 4s infinite;
+}
+
+@keyframes flashing-border {
+    0% {
+        border: 3px solid white;
+    }
+    50% {
+        border: 3px solid red;
+    }
+    100% {
+        border: 3px solid white;
+    }
+}
+@keyframes popup {
+    0%{
+        z-index: -1;
+        transform: scale(1, 1);
+    }
+    50%{
+        z-index: 1;
+        transform: scale(1.2, 1.2);
+    }
+    100%{
+        z-index: -1;
+        transform: scale(1, 1);
+    }
+}
