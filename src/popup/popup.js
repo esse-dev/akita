@@ -225,14 +225,27 @@ function createTopSiteCircleHTML(originData, totalSentXRP) {
 }
 
 function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
-	const visitData = originData?.originVisitData;
+	if (!originData || !originStats) return "";
+
+	const origin = originData.origin;
+	const visitCount = originData.originVisitData.numberOfVisits;
+	const timeSpent = originData.originVisitData.timeSpentAtOrigin;
 	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
 	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
+	let sentPayment = totalSentXRP.toFixed(3);
+	let paymentString = "So far, you've sent";
 
-	return `<a href="${originData.origin}" style="color: black; text-decoration: underline;">${originData.origin}</a><br><br>
-		You've spent <strong>${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
-		You've visited <strong>${visitData.numberOfVisits} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
-		So far, you've sent <strong>${totalSentXRP.toFixed(3)}XRP</strong> to this site.`;
+	if (parseFloat(sentPayment) > 0) {
+		sentPayment += '<span style="font-size: 12px;">XRP</span>';
+	} else {
+		paymentString = 'If you were using Coil you would have sent';
+		sentPayment = "$" + getEstimatedPaymentForTimeInUSD(timeSpent) + '<span style="font-size: 12px;">USD</span>';
+	}
+
+	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
+		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
+		You've visited <strong>${visitCount} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
+		${paymentString} <strong>${sentPayment}</strong> to this site.`;
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
