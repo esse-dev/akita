@@ -83,35 +83,50 @@ async function getStats() {
 		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
 	}
 
-	const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
-	const needLoveSitesEl = document.getElementById('sites-need-love');
+	const sentXRPtotal = calculateTotalSentXRP();
 
-	if (needLoveOrigins.length > 0) {
-		for (const originData of needLoveOrigins) {
-			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-				const faviconEl = createFaviconImgElement(originData.faviconSource);
-				faviconEl.addEventListener("click", () => {
-					webBrowser.tabs.create({ url: originData.origin });
-				}, false);
+	if (sentXRPtotal > 0) {
+		const needsLoveContainer = document.getElementById('sites-need-love-container');
+		const needsLoveTitle = document.createElement('h1');
+		needsLoveTitle.title = "These are sites which you visit often, but do not spend much time on.";
+		needsLoveTitle.innerHTML = "These monetized sites could use ♥️";
 
-				needLoveSitesEl.appendChild(faviconEl);
+		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
+		const needLoveSitesEl = document.createElement("span");
+
+		needsLoveContainer.appendChild(needsLoveTitle);
+		needsLoveContainer.appendChild(needLoveSitesEl);
+
+		if (needLoveOrigins.length > 0) {
+			for (const originData of needLoveOrigins) {
+				if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+					const faviconEl = createFaviconImgElement(originData.faviconSource);
+					faviconEl.addEventListener("click", () => {
+						webBrowser.tabs.create({ url: originData.origin });
+					}, false);
+
+					needLoveSitesEl.appendChild(faviconEl);
+				}
+
+				const linkEl = document.createElement('a');
+				linkEl.href = originData.origin;
+
+				// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
+				linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
+
+				needLoveSitesEl.appendChild(linkEl);
+				const brEl = document.createElement('br');
+				needLoveSitesEl.appendChild(brEl);
 			}
-			
-			const linkEl = document.createElement('a');
-			linkEl.href = originData.origin;
+		} else {
+			const el = document.createElement('span');
+			el.innerHTML = 'No sites visited yet!';
 
-			// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-			linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
-
-			needLoveSitesEl.appendChild(linkEl);
-			const brEl = document.createElement('br');
-			needLoveSitesEl.appendChild(brEl);
+			needLoveSitesEl.appendChild(el);
 		}
 	} else {
-		const el = document.createElement('span');
-		el.innerHTML = 'No sites visited yet!';
-
-		needLoveSitesEl.appendChild(el);
+		const needsLoveContainer = document.getElementById("sites-need-love-container");
+		hideElement(needsLoveContainer);
 	}
 
 	// Make all links in extension popup clickable
@@ -178,7 +193,7 @@ async function getStats() {
 
 		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
 		circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
-		circleEl.addEventListener('mouseleave', hideTopSiteDetail);
+		circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
 		circleEl.addEventListener("click", () => {
 			webBrowser.tabs.create({ url: originData.origin });
 		}, false);
@@ -187,19 +202,6 @@ async function getStats() {
 	}
 }
 
-function calculateTotalSentXRPForOrigin(originData) {
-	let totalSentXRP = 0;
-	if (originData.paymentPointerMap) {
-		for (const paymentPointerData of Object.values(originData.paymentPointerMap)) {
-			if (paymentPointerData.sentAssetsMap?.XRP?.amount > 0) {
-				const sentXRP = paymentPointerData.sentAssetsMap.XRP;
-				const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
-				totalSentXRP += actualAmount;
-			}
-		}
-	}
-	return totalSentXRP;
-}
 
 function createFaviconImgElement(faviconSource) {
 	const faviconEl = document.createElement('img');
@@ -225,14 +227,27 @@ function createTopSiteCircleHTML(originData, totalSentXRP) {
 }
 
 function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
-	const visitData = originData?.originVisitData;
+	if (!originData || !originStats) return "";
+
+	const origin = originData.origin;
+	const visitCount = originData.originVisitData.numberOfVisits;
+	const timeSpent = originData.originVisitData.timeSpentAtOrigin;
 	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
 	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
+	let sentPayment = totalSentXRP.toFixed(3);
+	let paymentString = "So far, you've sent";
 
-	return `<a href="${originData.origin}" style="color: black; text-decoration: underline;">${originData.origin}</a><br><br>
-		You've spent <strong>${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
-		You've visited <strong>${visitData.numberOfVisits} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
-		So far, you've sent <strong>${totalSentXRP.toFixed(3)}XRP</strong> to this site.`;
+	if (parseFloat(sentPayment) > 0) {
+		sentPayment += '<span style="font-size: 12px;">XRP</span>';
+	} else {
+		paymentString = 'If you were using Coil you would have sent';
+		sentPayment = "$" + getEstimatedPaymentForTimeInUSD(timeSpent) + '<span style="font-size: 12px;">USD</span>';
+	}
+
+	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
+		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
+		You've visited <strong>${visitCount} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
+		${paymentString} <strong>${sentPayment}</strong> to this site.`;
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
@@ -243,9 +258,9 @@ function showTopSiteDetail(innerHTML, color) {
 	topSiteDetailEl.innerHTML = innerHTML;
 }
 
-function hideTopSiteDetail() {
-	// Place element "behind" all other elements so it does not intercept mouse interactions.
-	topSiteDetailEl.style.zIndex = -1;
+function hideElement(element) {
 	// Make element invisible.
-	topSiteDetailEl.style.opacity = 0;
+	element.style.opacity = 0;
+	// Place element "behind" all other elements so it does not intercept mouse interactions.
+	element.style.zIndex = -1;
 }
