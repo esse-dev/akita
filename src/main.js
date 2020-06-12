@@ -153,6 +153,47 @@ function getEstimatedPaymentForTimeInUSD(timeSpent) {
 }
 
 /***********************************************************
+ * Payment Streamed Calculation
+ ***********************************************************/
+
+/**
+ * Calculate the total sent XRP across all origins.
+ * 
+ * @return {Number} The total sent XRP across all origins.
+ */
+async function calculateTotalSentXRP() {
+	const originDataList = await getMonetizedOriginDataList();
+	let totalSentXRP = 0;
+
+	for (const originData in originDataList) {
+		totalSentXRP += calculateTotalSentXRPForOrigin(originData);
+	}
+
+	return totalSentXRP;
+}
+
+/**
+ * Calculate the total sent XRP for the specified origin.
+ * 
+ * @param {AkitaOriginData} originData The AkitaOriginData to calculate sent XRP for.
+ * @return {Number} The total sent XRP for the specified origin.
+ */
+function calculateTotalSentXRPForOrigin(originData) {
+	let totalSentXRP = 0;
+
+	if (originData.paymentPointerMap) {
+		for (const paymentPointerData of Object.values(originData.paymentPointerMap)) {
+			if (paymentPointerData.sentAssetsMap?.XRP?.amount > 0) {
+				const sentXRP = paymentPointerData.sentAssetsMap.XRP;
+				const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
+				totalSentXRP += actualAmount;
+			}
+		}
+	}
+	return totalSentXRP;
+}
+
+/***********************************************************
  * Various data retrieval functions
  ***********************************************************/
 
