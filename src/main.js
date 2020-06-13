@@ -136,7 +136,7 @@ async function getEstimatedPaymentForOriginUSD(origin) {
 
 	if (originData) {
 		const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
-		estimatedPayment = Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND).toFixed(2);
+		estimatedPayment = unNaN(Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND)).toFixed(2);
 	}
 
 	return estimatedPayment;
@@ -169,7 +169,7 @@ async function calculateTotalSentXRP() {
 		totalSentXRP += calculateTotalSentXRPForOrigin(originData);
 	}
 
-	return totalSentXRP;
+	return unNaN(totalSentXRP);
 }
 
 /**
@@ -190,7 +190,7 @@ function calculateTotalSentXRPForOrigin(originData) {
 			}
 		}
 	}
-	return totalSentXRP;
+	return unNaN(totalSentXRP);
 }
 
 /***********************************************************
@@ -269,8 +269,18 @@ function getMonetizedVisitsPercent(originStats) {
  * @param {Number} number The number to convert into a percent.
  * @return {Number} The number as a percent.
  */
-function toPercent(number){
-	return (100 * number).toFixed(2);
+function toPercent(number) {
+	return unNaN((100 * number)).toFixed(2);
+}
+
+/**
+ * If the number is NaN, return 0 so that the value is not NaN.
+ * 
+ * @param {Number} number Number to unNaN
+ * @return {Number} The non-NaN number, or 0 to unNaN the number.
+ */
+function unNaN(number) {
+	return isNaN(number) ? 0 : number;
 }
 
 /**
