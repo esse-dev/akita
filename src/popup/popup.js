@@ -94,10 +94,12 @@ async function getStats() {
 		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
 	}
 
+	const needsLoveContainer = document.getElementById('sites-need-love-container');
+	const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
+
 	if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
-		const needsLoveContainer = document.getElementById('sites-need-love-container');
-		const linkGrid = document.getElementsByClassName('link-grid')[0];
-		linkGrid.style.display = 'none';
+		noProviderResourcesContainer.style.display = 'none';
+		needsLoveContainer.style.display = 'block';
 
 		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
 
@@ -129,7 +131,7 @@ async function getStats() {
 			needsLoveContainer.appendChild(el);
 		}
 	} else {
-		const needsLoveContainer = document.getElementById("sites-need-love-container");
+		noProviderResourcesContainer.style.display = 'grid';
 		needsLoveContainer.style.display = 'none';
 	}
 
