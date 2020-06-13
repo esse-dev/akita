@@ -187,10 +187,14 @@ async function getStats() {
 		}
 
 		if (circleWeight > 40) {
-			const div = document.createElement('div');
-			div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
-			circleEl.appendChild(div);
-			circleEl.style.fontSize = Math.round(circleWeight / 6) + 'px';
+			let circleFontSize = Math.round(circleWeight / 6);
+			// Font size should be no smaller than 11, otherwise it's not legible
+			if (circleFontSize > 11) {
+				const div = document.createElement('div');
+				div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
+				circleEl.appendChild(div);
+				circleEl.style.fontSize = circleFontSize + 'px';
+			}
 		}
 
 		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
