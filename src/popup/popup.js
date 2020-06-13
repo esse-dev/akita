@@ -16,7 +16,7 @@ new Flickity(document.getElementById('flickity'), {
 	on: { change: (slideNumber) => {
 		if (slideNumber === 5) {
 			document.getElementById('intro-exit').innerHTML = 'done';
-            document.getElementById('intro-exit').style.color = '#C31354';
+			document.getElementById('intro-exit').style.color = '#C31354';
 		} else {
 			document.getElementById('intro-exit').innerHTML = 'skip';
 			document.getElementById('intro-exit').style.color = '#000000';
@@ -67,7 +67,7 @@ function convertMSToNiceTimeString(ms) {
 
 getStats();
 async function getStats() {
-    const originStats = await loadOriginStats();
+	const originStats = await loadOriginStats();
 
 	if (originStats && originStats.totalVisits > 0) {
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
@@ -93,9 +93,9 @@ async function getStats() {
 	}
 
 	if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
-        const needsLoveContainer = document.getElementById('sites-need-love-container');
-        const linkGrid = document.getElementsByClassName('link-grid')[0];
-        linkGrid.style.display = 'none';
+		const needsLoveContainer = document.getElementById('sites-need-love-container');
+		const linkGrid = document.getElementsByClassName('link-grid')[0];
+		linkGrid.style.display = 'none';
 
 		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
 
