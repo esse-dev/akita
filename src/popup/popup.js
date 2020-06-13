@@ -58,7 +58,7 @@ function convertMSToNiceTimeString(ms) {
 
 getStats();
 async function getStats() {
-	const originStats = await loadOriginStats();
+    const originStats = await loadOriginStats();
 
 	if (originStats && originStats.totalVisits > 0) {
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
@@ -83,19 +83,12 @@ async function getStats() {
 		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
 	}
 
-	const sentXRPtotal = calculateTotalSentXRP();
-
-	if (sentXRPtotal > 0) {
-		const needsLoveContainer = document.getElementById('sites-need-love-container');
-		const needsLoveTitle = document.createElement('h1');
-		needsLoveTitle.title = "These are sites which you visit often, but do not spend much time on.";
-		needsLoveTitle.innerHTML = "These monetized sites could use ♥️";
+	if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
+        const needsLoveContainer = document.getElementById('sites-need-love-container');
+        const linkGrid = document.getElementsByClassName('link-grid')[0];
+        linkGrid.style.display = 'none';
 
 		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
-		const needLoveSitesEl = document.createElement("span");
-
-		needsLoveContainer.appendChild(needsLoveTitle);
-		needsLoveContainer.appendChild(needLoveSitesEl);
 
 		if (needLoveOrigins.length > 0) {
 			for (const originData of needLoveOrigins) {
@@ -105,7 +98,7 @@ async function getStats() {
 						webBrowser.tabs.create({ url: originData.origin });
 					}, false);
 
-					needLoveSitesEl.appendChild(faviconEl);
+					needsLoveContainer.appendChild(faviconEl);
 				}
 
 				const linkEl = document.createElement('a');
@@ -114,19 +107,19 @@ async function getStats() {
 				// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
 				linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
 
-				needLoveSitesEl.appendChild(linkEl);
+				needsLoveContainer.appendChild(linkEl);
 				const brEl = document.createElement('br');
-				needLoveSitesEl.appendChild(brEl);
+				needsLoveContainer.appendChild(brEl);
 			}
 		} else {
 			const el = document.createElement('span');
 			el.innerHTML = 'No sites visited yet!';
 
-			needLoveSitesEl.appendChild(el);
+			needsLoveContainer.appendChild(el);
 		}
 	} else {
 		const needsLoveContainer = document.getElementById("sites-need-love-container");
-		hideElement(needsLoveContainer);
+		needsLoveContainer.style.display = 'none';
 	}
 
 	// Make all links in extension popup clickable
