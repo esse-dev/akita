@@ -249,6 +249,7 @@ function resolvePaymentPointer(paymentPointer) {
 	if (paymentPointer) {
 		resolvedPaymentPointer = paymentPointer.trim();
 
+		const httpsURL = "https://";
 		// The first character of the payment pointer should be '$'
 		if ('$' === resolvedPaymentPointer.charAt(0)) {
 			// Remove '$' from the resolved payment pointer
@@ -270,8 +271,9 @@ function resolvePaymentPointer(paymentPointer) {
 			}
 
 			// Payment pointers must resolve to an https URL, as per: https://tools.ietf.org/html/rfc7230#section-2.7.2
-			const httpsURL = "https://";
 			resolvedPaymentPointer = httpsURL.concat(resolvedPaymentPointer);
+		} else if (resolvedPaymentPointer.startsWith(httpsURL)) {
+			// An https:// payment pointer was provided, so it is "already resolved"
 		} else {
 			resolvedPaymentPointer = null;
 		}
