@@ -60,7 +60,7 @@ h1 {
 	list-style: none;
 	padding-left: 25px;
 }
- 
+
 .tutorial-list-ul li:before {
 	font-weight: bold;
 	content: "+";
@@ -154,13 +154,13 @@ section {
 	z-index: -1;
 }
 
-#sites-need-love img {
+#sites-need-love-container img {
 	margin-left: 16px;
 	vertical-align: middle;
 	cursor: pointer;
 }
 
-#sites-need-love a {
+#sites-need-love-container a {
 	margin-left: 8px;
 }
 
@@ -216,4 +216,43 @@ section {
         z-index: -1;
         transform: scale(1, 1);
     }
+}
+
+.tooltip-bubble-left, .tooltip-bubble-right {
+	position: absolute;
+	background: #000000;
+	color: white;
+	padding: 10px;
+	visibility: hidden;
+    z-index: 1;
+}
+.tooltip-bubble-left {
+    margin-right: 5px;
+    margin-left: -10px;
+}
+.tooltip-bubble-right {
+    margin-right: -10px;
+    margin-left: 5px;
+    right: 0;
+}
+
+.tooltip:hover + .tooltip-bubble-left, .tooltip:hover + .tooltip-bubble-right {
+	visibility: visible;
+}
+
+.tooltip-bubble-left:after, .tooltip-bubble-right:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 30%;
+	width: 0;
+	height: 0;
+	border: 5px solid transparent;
+	border-bottom-color: #000000;
+	border-top: 0;
+	margin-left: -5px;
+	margin-top: -5px;
+}
+.tooltip-bubble-right:after {
+    left: 65%;
 }
