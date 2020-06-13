@@ -69,7 +69,8 @@ const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
 
 getStats();
 async function getStats() {
-	const originStats = await loadOriginStats();
+	const circleContainer = document.getElementById('circle-container');
+    const originStats = await loadOriginStats();
 
 	if (originStats && originStats.totalVisits > 0) {
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
@@ -90,7 +91,11 @@ async function getStats() {
 			// TODO: ADD A CHANGE OF TEXT!
 			document.getElementById('monetized-percent-data').innerHTML = '0%';
 		}
+		document.getElementById('circle-empty-illustration').style.display = 'none';
+		circleContainer.style.display = 'flex';
 	} else {
+		document.getElementById('circle-empty-illustration').style.display = 'block';
+		circleContainer.style.display = 'none';
 		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
 	}
 
@@ -157,7 +162,6 @@ async function getStats() {
 	// Circles
 	const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
 
-	const circleContainer = document.getElementById('circle-container');
 	const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
 	const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
 	const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border

@@ -192,6 +192,12 @@ section {
 	animation: popup 7s ease-in-out 4s infinite;
 }
 
+#circle-empty-illustration {
+	margin: 15px auto;
+	padding-left: 35px;
+	width: 170px;
+}
+
 @keyframes flashing-border {
 	0% {
 		border: 3px solid white;
@@ -254,5 +260,22 @@ section {
 	margin-top: -5px;
 }
 .tooltip-bubble-right:after {
-	left: 65%;
+    left: 65%;
+}
+.tooltip-love {
+	top: 275px;
+}
+.tooltip-love:after {
+	content: '';
+	position: absolute;
+	top: auto;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 5px solid transparent;
+	border-top-color: black;
+	border-bottom: 0;
+	margin-left: -5px;
+	margin-bottom: -5px;
 }
