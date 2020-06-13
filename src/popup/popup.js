@@ -65,6 +65,8 @@ function convertMSToNiceTimeString(ms) {
 	return isSingularUnit ? niceTimeString.slice(0, -1) : niceTimeString;
 }
 
+const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
+
 getStats();
 async function getStats() {
 	const originStats = await loadOriginStats();
@@ -114,7 +116,7 @@ async function getStats() {
 				linkEl.href = originData.origin;
 
 				// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-				linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
+				linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
 
 				needsLoveContainer.appendChild(linkEl);
 				const brEl = document.createElement('br');
@@ -184,6 +186,12 @@ async function getStats() {
 		if ((originData.faviconSource) && (originData.faviconSource !== "")) {
 			const faviconEl = createFaviconImgElement(originData.faviconSource);
 			circleEl.appendChild(faviconEl);
+		} else {
+			// If no favicon is available, use the first character of site origin
+			// to represent the origin in its circle, capitalized and bolded
+			const characterEl = document.createElement('p');
+			characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
+			circleEl.appendChild(characterEl);
 		}
 
 		if (circleWeight > 40) {
