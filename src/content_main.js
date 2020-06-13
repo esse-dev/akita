@@ -62,7 +62,7 @@ async function main() {
 	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
-	loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
+	// loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
 }
 
 /***********************************************************
@@ -91,9 +91,7 @@ function setExtensionIconMonetizationState(isCurrentlyMonetized) {
  */
 async function trackVisitToSite() {
 	await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.ORIGIN_VISIT_DATA);
-
-	// TODO: only store favicon source if the relative path to the favicon has not changed
-	await storeDataIntoAkitaFormat(getFaviconPath(), AKITA_DATA_TYPE.ORIGIN_FAVICON);
+	await storeFaviconPath();
 }
 
 /**
@@ -316,6 +314,14 @@ async function httpGet(endpoint, headerName, headerValue) {
  ***********************************************************/
 
 /**
+ * Store the favicon path into storage.
+ */
+async function storeFaviconPath() {
+	// TODO: only update favicon source if the path to the favicon has not changed
+	await storeDataIntoAkitaFormat(getFaviconPath(), AKITA_DATA_TYPE.ORIGIN_FAVICON);
+}
+
+/**
  * Retrieve the favicon path.
  * 
  * @return {String} The absolute or relative path from the site origin to the favicon.
@@ -339,12 +345,14 @@ function getFaviconPath() {
 		}
 	}
 
-	if (!faviconPath && (relIconFoundIndex === -1)) {
-		// An icon link was not found, set path to default
-		faviconPath = "favicon.ico";
+	if (faviconPath) {
+		// "shortcut icon" was found, faviconPath already set
 	} else if (relIconFoundIndex !== -1) {
 		// The "icon" link was found, set path to specified href
 		faviconPath = linkElementsList[relIconFoundIndex].getAttribute("href");
+	} else {
+		// An icon link was not found, set path to default
+		faviconPath = "favicon.ico";
 	}
 	
 	return faviconPath;		

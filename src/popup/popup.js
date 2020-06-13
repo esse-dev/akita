@@ -16,7 +16,7 @@ new Flickity(document.getElementById('flickity'), {
 	on: { change: (slideNumber) => {
 		if (slideNumber === 5) {
 			document.getElementById('intro-exit').innerHTML = 'done';
-            document.getElementById('intro-exit').style.color = '#C31354';
+			document.getElementById('intro-exit').style.color = '#C31354';
 		} else {
 			document.getElementById('intro-exit').innerHTML = 'skip';
 			document.getElementById('intro-exit').style.color = '#000000';
@@ -40,25 +40,36 @@ function convertMSToNiceTimeString(ms) {
 	let days = seconds / (24 * 3600);
 	let hours = seconds / 3600;
 	let minutes = seconds / 60;
+	let niceTimeString = "";
+	let isSingularUnit = false;
 
-	if (days > 1) {
-		return `${days.toFixed(2)} days`;
+	if (days >= 1) {
+		niceTimeString = `${days.toFixed(2)} days`;
+		if (days === 1) isSingularUnit = true;
+	} else if ((hours >= 1) && (hours < 24)) {
+		niceTimeString = `${hours.toFixed(2)} hours`;
+		if (hours === 1) isSingularUnit = true;
+	} else if ((minutes >= 1) && (minutes < 60)) {
+		let roundedMinutes = Math.round(minutes);
+		niceTimeString = `${roundedMinutes} minutes`;
+		if (roundedMinutes === 1) isSingularUnit = true;
+	} else if ((seconds >= 1) && (seconds < 60)) {
+		let roundedSeconds = Math.round(seconds);
+		niceTimeString = `${roundedSeconds} seconds`;
+		if (roundedSeconds === 1) isSingularUnit = true;
+	} else {
+		return `${ms} ms`;
 	}
-	if (hours > 1) {
-		return `${hours.toFixed(2)} hours`;
-	}
-	if (minutes > 1) {
-		return `${Math.round(minutes)} minutes`;
-	}
-	if (seconds > 1) {
-		return `${Math.round(seconds)} seconds`;
-	}
-	return `${ms}ms`;
+
+	// remove the "s" from the end of the string if the unit is singular
+	return isSingularUnit ? niceTimeString.slice(0, -1) : niceTimeString;
 }
+
+const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
 
 getStats();
 async function getStats() {
-    const originStats = await loadOriginStats();
+	const originStats = await loadOriginStats();
 
 	if (originStats && originStats.totalVisits > 0) {
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
@@ -84,9 +95,9 @@ async function getStats() {
 	}
 
 	if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
-        const needsLoveContainer = document.getElementById('sites-need-love-container');
-        const linkGrid = document.getElementsByClassName('link-grid')[0];
-        linkGrid.style.display = 'none';
+		const needsLoveContainer = document.getElementById('sites-need-love-container');
+		const linkGrid = document.getElementsByClassName('link-grid')[0];
+		linkGrid.style.display = 'none';
 
 		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
 
@@ -105,7 +116,7 @@ async function getStats() {
 				linkEl.href = originData.origin;
 
 				// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-				linkEl.innerHTML = originData.origin.replace(/^(https?:\/\/)(www\.)?/, "");
+				linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
 
 				needsLoveContainer.appendChild(linkEl);
 				const brEl = document.createElement('br');
@@ -175,13 +186,23 @@ async function getStats() {
 		if ((originData.faviconSource) && (originData.faviconSource !== "")) {
 			const faviconEl = createFaviconImgElement(originData.faviconSource);
 			circleEl.appendChild(faviconEl);
+		} else {
+			// If no favicon is available, use the first character of site origin
+			// to represent the origin in its circle, capitalized and bolded
+			const characterEl = document.createElement('p');
+			characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
+			circleEl.appendChild(characterEl);
 		}
 
 		if (circleWeight > 40) {
-			const div = document.createElement('div');
-			div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
-			circleEl.appendChild(div);
-			circleEl.style.fontSize = Math.round(circleWeight / 6) + 'px';
+			let circleFontSize = Math.round(circleWeight / 6);
+			// Font size should be no smaller than 11, otherwise it's not legible
+			if (circleFontSize > 11) {
+				const div = document.createElement('div');
+				div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
+				circleEl.appendChild(div);
+				circleEl.style.fontSize = circleFontSize + 'px';
+			}
 		}
 
 		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
@@ -212,24 +233,21 @@ function createFaviconImgElement(faviconSource) {
 
 function createTopSiteCircleHTML(originData, totalSentXRP) {
 	const visitData = originData?.originVisitData;
+	const visitText = (visitData.numberOfVisits === 1) ? "visit" : "visits";
+
 	if (totalSentXRP > 0) {
-		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} visits`;
+		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} ` + visitText;
 	} else {
-		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${visitData.numberOfVisits} visits`;
+		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${visitData.numberOfVisits} ` + visitText;
 	}
 }
 
 function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 	if (!originData || !originStats) return "";
 
-	const origin = originData.origin;
-	const visitCount = originData.originVisitData.numberOfVisits;
 	const timeSpent = originData.originVisitData.timeSpentAtOrigin;
-	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
-	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
 	let sentPayment = totalSentXRP.toFixed(3);
 	let paymentString = "So far, you've sent";
-
 	if (parseFloat(sentPayment) > 0) {
 		sentPayment += '<span style="font-size: 12px;">XRP</span>';
 	} else {
@@ -237,9 +255,21 @@ function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 		sentPayment = "$" + getEstimatedPaymentForTimeInUSD(timeSpent) + '<span style="font-size: 12px;">USD</span>';
 	}
 
+	let visitCountText = "";
+	const visitCount = originData.originVisitData.numberOfVisits;
+	if (visitCount === 1) {
+		visitCountText = visitCount + " time";
+	} else {
+		visitCountText = visitCount + " times";
+	}
+
+	const origin = originData.origin;
+	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
+	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
+
 	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
 		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
-		You've visited <strong>${visitCount} times</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
+		You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
 		${paymentString} <strong>${sentPayment}</strong> to this site.`;
 }
 

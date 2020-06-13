@@ -148,7 +148,7 @@ section {
 	height: 500px;
 	left: 0px;
 	width: calc(100% - 40px);
-  
+
 	opacity: 0;
 	transition: opacity 0.2s linear;
 	z-index: -1;
@@ -174,48 +174,48 @@ section {
 }
 
 .ad-popup-disapppointed-toaster {
-    height:170px;
-    animation: popup ease-in-out 7s infinite;
+	height:170px;
+	animation: popup ease-in-out 7s infinite;
 }
 .ad-popup-free-dog {
-    width: 220px;
-    position: absolute;
-    top: 20px;
-    left: 40px;
-    animation: popup 7s ease-in-out 2s infinite, flashing-border ease-in-out 1.5s infinite;
+	width: 220px;
+	position: absolute;
+	top: 20px;
+	left: 40px;
+	animation: popup 7s ease-in-out 2s infinite, flashing-border ease-in-out 1.5s infinite;
 }
 .ad-popup-new-rat {
-    height:140px;
-    position: absolute;
-    top: 40px;
-    left: 80px;
-    animation: popup 7s ease-in-out 4s infinite;
+	height:140px;
+	position: absolute;
+	top: 40px;
+	left: 80px;
+	animation: popup 7s ease-in-out 4s infinite;
 }
 
 @keyframes flashing-border {
-    0% {
-        border: 3px solid white;
-    }
-    50% {
-        border: 3px solid red;
-    }
-    100% {
-        border: 3px solid white;
-    }
+	0% {
+		border: 3px solid white;
+	}
+	50% {
+		border: 3px solid red;
+	}
+	100% {
+		border: 3px solid white;
+	}
 }
 @keyframes popup {
-    0%{
-        z-index: -1;
-        transform: scale(1, 1);
-    }
-    50%{
-        z-index: 1;
-        transform: scale(1.2, 1.2);
-    }
-    100%{
-        z-index: -1;
-        transform: scale(1, 1);
-    }
+	0%{
+		z-index: -1;
+		transform: scale(1, 1);
+	}
+	50%{
+		z-index: 1;
+		transform: scale(1.2, 1.2);
+	}
+	100%{
+		z-index: -1;
+		transform: scale(1, 1);
+	}
 }
 
 .tooltip-bubble-left, .tooltip-bubble-right {
@@ -224,16 +224,16 @@ section {
 	color: white;
 	padding: 10px;
 	visibility: hidden;
-    z-index: 1;
+	z-index: 1;
 }
 .tooltip-bubble-left {
-    margin-right: 5px;
-    margin-left: -10px;
+	margin-right: 5px;
+	margin-left: -10px;
 }
 .tooltip-bubble-right {
-    margin-right: -10px;
-    margin-left: 5px;
-    right: 0;
+	margin-right: -10px;
+	margin-left: 5px;
+	right: 0;
 }
 
 .tooltip:hover + .tooltip-bubble-left, .tooltip:hover + .tooltip-bubble-right {
@@ -254,5 +254,5 @@ section {
 	margin-top: -5px;
 }
 .tooltip-bubble-right:after {
-    left: 65%;
+	left: 65%;
 }

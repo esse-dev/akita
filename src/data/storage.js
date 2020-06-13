@@ -128,6 +128,15 @@ function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
 	originStats.updateTimeSpent(recentTimeSpent, originData.isCurrentlyMonetized);
 }
 
+/**
+ * Store the path to the origin's favicon in the origin data. If a relative path
+ * is provided, construct the absolute path. Attempt to fetch the favicon to check
+ * if it is a valid path. If fetch response is 200 OK, the path is valid, so store
+ * the url of the favicon.
+ * 
+ * @param {AkitaOriginData} originData The origin data to update.
+ * @param {String} faviconData The absolute or relative path to the site's favicon.
+ */
 async function updateOriginFavicon(originData, faviconData) {
 	let faviconPath = null;
 	let origin = originData.origin;
