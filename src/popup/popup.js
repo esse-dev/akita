@@ -88,7 +88,7 @@ async function getStats() {
 			link.addEventListener("click", () => {
 				setTimeout(() => {
 					window.close();
-				}, 1);
+				}, 100);
 			}, false);
 		}
 	}
