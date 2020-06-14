@@ -7,8 +7,8 @@ those interested to join our effort. Stay tuned for that!_
 Here's how you can get involved:
 - [Open an Issue](#open-an-issue)
 - [Contribute Code](#contribute-code)
-  - [Implement Your Changes](#implement-your-changes)
-  - [Open a Pull Request](#open-a-pull-request)
+	- [Implement Your Changes](#implement-your-changes)
+	- [Open a Pull Request](#open-a-pull-request)
 - [When in doubt, don't hesitate to bark at us 🐶](#when-in-doubt-dont-hesitate-to-bark-at-us-) 
 
 ## Open an Issue
@@ -29,7 +29,7 @@ Issue Templates you can choose from:
 - 💡 [Create New Feature Request](https://github.com/dog-s/akita/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFEATURE+REQUEST%5D)
 
 ## Contribute Code
-   
+	 
 ### Implement Your Changes
 1. Fork Akita and clone your fork
 2. Create a new branch with a name that reflects your changes
@@ -53,11 +53,11 @@ Thanks so much for contributing to Akita! ❤️
 
 ## When in doubt, don't hesitate to bark at us 🐶
 - Find us on DEV.to
-  - [dog-s](https://dev.to/dog-s)
-  - [Elliot](https://dev.to/elliot)
-  - [Sharon](https://dev.to/sharon)
+	- [dog-s](https://dev.to/dog-s)
+	- [Elliot](https://dev.to/elliot)
+	- [Sharon](https://dev.to/sharon)
 - Discord
-  - [Akita Discord Server](https://discord.gg/psyNbWW)
+	- [Akita Discord Server](https://discord.gg/psyNbWW)
 - Twitter
-  - [Elliot](https://twitter.com/elliotokay)
-  - [Sharon](https://twitter.com/_sharonwang)
+	- [Elliot](https://twitter.com/elliotokay)
+	- [Sharon](https://twitter.com/_sharonwang)
