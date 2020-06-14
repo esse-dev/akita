@@ -1,6 +1,6 @@
 // Section navigation
 let otherSection = document.getElementById('intro-carousel');
-let currentSection =  document.getElementById('data-story');
+let currentSection = document.getElementById('data-story');
 function switchSection() {
 	let swapTemp = otherSection;
 	otherSection = currentSection;
@@ -9,6 +9,15 @@ function switchSection() {
 	currentSection.scrollIntoView({
 		behavior: 'smooth'
 	});
+
+	// Hacky thing to get past buggy Firefox scrollIntoView smooth problem
+	if (getBrowser() === "Firefox") {
+		if (currentSection === document.getElementById('data-story')) {
+			setTimeout(() => {
+				currentSection.scrollIntoView();
+			}, 320);
+		}
+	}
 }
 
 // Slideshow / carousel
@@ -69,10 +78,35 @@ const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
 
 getStats();
 async function getStats() {
-	const circleContainer = document.getElementById('circle-container');
-    const originStats = await loadOriginStats();
+	// Make all links in extension popup clickable and open in new tab
+	var links = document.getElementsByTagName("a");
 
-	if (originStats && originStats.totalVisits > 0) {
+	for (const link of Array.from(links)) {
+		if (link.id !== 'goto-intro') {
+			link.target = "_blank";
+
+			link.addEventListener("click", () => {
+				setTimeout(() => {
+					window.close();
+				}, 1);
+			}, false);
+		}
+	}
+
+	const originStats = await loadOriginStats();
+	const circleContainer = document.getElementById('circle-container');
+
+	if (!originStats || originStats.totalMonetizedVisits < 1) {
+		// The user has not visisted a monetized site yet
+		document.getElementById('circle-empty-illustration').style.display = 'block';
+		circleContainer.style.display = 'none';
+		document.getElementById('info-container').innerHTML = `You haven't visited any monetized websites yet! What are you waiting for? Get out there and explore the wild wild web.<br>Not sure where to start? <a href="https://coil.com/explore" target="_blank">Discover some monetized sites!</a>`;
+
+		return;
+	}
+
+	if (originStats && originStats.totalMonetizedVisits > 0) {
+		// If the user has visisted at least 1 monetized site, display monetization data
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
 
 		if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
@@ -93,135 +127,119 @@ async function getStats() {
 		}
 		document.getElementById('circle-empty-illustration').style.display = 'none';
 		circleContainer.style.display = 'flex';
-	} else {
-		document.getElementById('circle-empty-illustration').style.display = 'block';
-		circleContainer.style.display = 'none';
-		document.getElementById('info-container').innerHTML = `You haven't visited any websites yet! What are you waiting for? Get out there and explore the wild wild web.`;
-	}
 
-	const needsLoveContainer = document.getElementById('sites-need-love-container');
-	const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
-
-	if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
-		noProviderResourcesContainer.style.display = 'none';
-		needsLoveContainer.style.display = 'block';
-
-		const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
-
-		if (needLoveOrigins.length > 0) {
-			for (const originData of needLoveOrigins) {
-				if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-					const faviconEl = createFaviconImgElement(originData.faviconSource);
-					faviconEl.addEventListener("click", () => {
-						webBrowser.tabs.create({ url: originData.origin });
-					}, false);
-
-					needsLoveContainer.appendChild(faviconEl);
+		const needsLoveContainer = document.getElementById('sites-need-love-container');
+		const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
+	
+		if (originStats && originStats.totalSentAssetsMap?.XRP?.amount > 0) {
+			noProviderResourcesContainer.style.display = 'none';
+			needsLoveContainer.style.display = 'block';
+	
+			const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
+	
+			if (needLoveOrigins.length > 0) {
+				for (const originData of needLoveOrigins) {
+					if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+						const faviconEl = createFaviconImgElement(originData.faviconSource);
+						faviconEl.addEventListener("click", () => {
+							webBrowser.tabs.create({ url: originData.origin });
+						}, false);
+	
+						needsLoveContainer.appendChild(faviconEl);
+					}
+	
+					const linkEl = document.createElement('a');
+					linkEl.href = originData.origin;
+	
+					// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
+					linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
+	
+					needsLoveContainer.appendChild(linkEl);
+					const brEl = document.createElement('br');
+					needsLoveContainer.appendChild(brEl);
 				}
-
-				const linkEl = document.createElement('a');
-				linkEl.href = originData.origin;
-
-				// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-				linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
-
-				needsLoveContainer.appendChild(linkEl);
-				const brEl = document.createElement('br');
-				needsLoveContainer.appendChild(brEl);
+			} else {
+				const el = document.createElement('span');
+				el.innerHTML = 'No sites visited yet!';
+	
+				needsLoveContainer.appendChild(el);
 			}
 		} else {
-			const el = document.createElement('span');
-			el.innerHTML = 'No sites visited yet!';
-
-			needsLoveContainer.appendChild(el);
+			noProviderResourcesContainer.style.display = 'grid';
+			needsLoveContainer.style.display = 'none';
 		}
-	} else {
-		noProviderResourcesContainer.style.display = 'grid';
-		needsLoveContainer.style.display = 'none';
-	}
-
-	// Make all links in extension popup clickable
-	var links = document.getElementsByTagName("a");
-
-	for (const link of Array.from(links)) {
-		if (link.id !== 'goto-intro') {
-			link.addEventListener("click", () => {
-				webBrowser.tabs.create({ url: link.href });
+	
+		// Top sites visualization with circles
+		const topOrigins = await getTopOriginsByTimeSpent(5);
+		let circleWeights = [];
+		for (const originData of topOrigins) {
+			const timeSpent = originData?.originVisitData.timeSpentAtOrigin;
+			circleWeights.push(timeSpent);
+		}
+	
+		// Circles
+		const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
+	
+		const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
+		const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
+		const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
+		const square = {
+			height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
+			width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
+		};
+	
+		const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
+	
+		// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
+		const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
+		circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
+	
+		for (let i = 0; i < circleWeights.length; i++) {
+			const circleEl = document.createElement('div');
+			const circleWeight = circleWeights[i];
+			const color = CIRCLE_COLORS[i];
+	
+			const originData = topOrigins[i];
+			const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
+	
+			circleEl.className = 'circle';
+			circleEl.style.background = color;
+			circleEl.style.height = circleWeight + 'px';
+			circleEl.style.width = circleWeight + 'px';
+	
+			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+				const faviconEl = createFaviconImgElement(originData.faviconSource);
+				circleEl.appendChild(faviconEl);
+			} else {
+				// If no favicon is available, use the first character of site origin
+				// to represent the origin in its circle, capitalized and bolded
+				const characterEl = document.createElement('p');
+				characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
+				circleEl.appendChild(characterEl);
+			}
+	
+			if (circleWeight > 40) {
+				let circleFontSize = Math.round(circleWeight / 6);
+				// Font size should be no smaller than 11, otherwise it's not legible
+				if (circleFontSize > 11) {
+					const div = document.createElement('div');
+					div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
+					circleEl.appendChild(div);
+					circleEl.style.fontSize = circleFontSize + 'px';
+				}
+			}
+	
+			const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
+			circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
+			circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
+			circleEl.addEventListener("click", () => {
+				webBrowser.tabs.create({ url: originData.origin });
 			}, false);
+	
+			circleContainer.appendChild(circleEl);
 		}
-	}
-
-	// Top sites visualization with circles
-	const topOrigins = await getTopOriginsByTimeSpent(6);
-	let circleWeights = [];
-	for (const originData of topOrigins) {
-		const timeSpent = originData?.originVisitData.timeSpentAtOrigin;
-		circleWeights.push(timeSpent);
-	}
-
-	// Circles
-	const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
-
-	const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
-	const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
-	const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
-	const square = {
-		height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
-		width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
-	};
-
-	const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
-
-	// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
-	const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
-	circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
-
-	for (let i = 0; i < circleWeights.length; i++) {
-		const circleEl = document.createElement('div');
-		const circleWeight = circleWeights[i];
-		const color = CIRCLE_COLORS[i];
-
-		const originData = topOrigins[i];
-		const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
-
-		circleEl.className = 'circle';
-		circleEl.style.background = color;
-		circleEl.style.height = circleWeight + 'px';
-		circleEl.style.width = circleWeight + 'px';
-
-		if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-			const faviconEl = createFaviconImgElement(originData.faviconSource);
-			circleEl.appendChild(faviconEl);
-		} else {
-			// If no favicon is available, use the first character of site origin
-			// to represent the origin in its circle, capitalized and bolded
-			const characterEl = document.createElement('p');
-			characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
-			circleEl.appendChild(characterEl);
-		}
-
-		if (circleWeight > 40) {
-			let circleFontSize = Math.round(circleWeight / 6);
-			// Font size should be no smaller than 11, otherwise it's not legible
-			if (circleFontSize > 11) {
-				const div = document.createElement('div');
-				div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
-				circleEl.appendChild(div);
-				circleEl.style.fontSize = circleFontSize + 'px';
-			}
-		}
-
-		const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
-		circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
-		circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
-		circleEl.addEventListener("click", () => {
-			webBrowser.tabs.create({ url: originData.origin });
-		}, false);
-
-		circleContainer.appendChild(circleEl);
 	}
 }
-
 
 function createFaviconImgElement(faviconSource) {
 	const faviconEl = document.createElement('img');
@@ -292,4 +310,17 @@ function hideElement(element) {
 	element.style.opacity = 0;
 	// Place element "behind" all other elements so it does not intercept mouse interactions.
 	element.style.zIndex = -1;
+}
+
+// source: https://stackoverflow.com/a/45985333/5425899
+function getBrowser() {
+	if (typeof chrome !== "undefined") {
+		if (typeof browser !== "undefined") {
+			return "Firefox";
+		} else {
+			return "Chrome";
+		}
+	} else {
+		return "Edge";
+	}
 }
