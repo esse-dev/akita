@@ -15,7 +15,7 @@
 async function getTopOriginsByTimeSpent(nTopOrigins) {
 	let monetizedOriginDataList = await getMonetizedOriginDataList();
 	let topOriginsList = null;
-	let listSize = nTopOrigins - 1;
+	let listSize = nTopOrigins;
 
 	if (monetizedOriginDataList) {
 		if (monetizedOriginDataList.length > 1) {
