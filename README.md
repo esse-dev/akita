@@ -23,7 +23,7 @@ We've built this for the [Grant for the Web x DEV hackathon](https://res.cloudin
 ---
 
 ## Installing
-Check out the instructions [here](docs/InstallAkita.md).
+Check out the instructions to install from source [here](docs/InstallAkita.md). We plan to put Akita on browser extension stores soon - please stay tuned. :)
 
 ---
 
@@ -46,7 +46,7 @@ Otherwise, if the site does not have monetization enabled, then the icon will ap
 ### Akita Main View
 Our browser extension helps you see the top monetized sites you visit and your involvement with Web Monetization at-a-glance.
 
-If you are using a Web Monetization provider:
+Here's a screenshot of what Akita looks like if you're using a Web Monetization provider:
 
 <img src="assets/mon_demo_screenshot.png" alt="Monetization Enabled Akita Main View" height="450px">
 
@@ -54,12 +54,13 @@ You'll likely have some monetized sites that you visit often, but don't really s
 
 <img src="assets/needslove_demo_screenshot.png" alt="Needs Love Hover" width="330px">
 
-If you don't have a Web Monetization provider installed:
+Here's a screenshot of what Akita looks like if you don't have a Web Monetization provider installed:
 
 <img src="assets/nonmon_demo_screenshot.png" alt="Monetization Not Enabled Akita Main View" height="450px">
 
 ### Akita Demo Video
-Check out this video for a walkthrough of Akita: `<video link>`
+Click to check out a video walkthrough of Akita:
+[![Akita YouTube Walkthrough](https://img.youtube.com/vi/9cCqfMJjAWQ/0.jpg)](https://youtu.be/9cCqfMJjAWQ)
 
 ---
 
