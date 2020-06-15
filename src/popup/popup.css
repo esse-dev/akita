@@ -164,15 +164,6 @@ section {
 	margin-left: 8px;
 }
 
-#intro-exit {
-	position: absolute;
-	bottom: 16px;
-	right: 21px;
-	font-size: 18px;
-	text-decoration-line: underline;
-	cursor: pointer;
-}
-
 .ad-popup-disapppointed-toaster {
 	height:170px;
 	animation: popup ease-in-out 7s infinite;

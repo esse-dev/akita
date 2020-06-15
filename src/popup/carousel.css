@@ -1,0 +1,79 @@
+#carousel {
+	height: 500px;
+	display: grid;
+	grid-template-columns: repeat(6, 100%);
+}
+#intro-exit {
+	position: absolute;
+	bottom: 22px;
+	right: 18px;
+	font-size: 18px;
+	text-decoration-line: underline;
+	cursor: pointer;
+}
+#left-button, #right-button {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	bottom: 0px;
+	background: transparent;
+	opacity: 0.5;
+	transform: translateY(-10px) scale(1, 1);
+	transition: 0.2s opacity linear, 0.3s transform cubic-bezier(.28,.01,.29,1.67);
+	fill: black;
+	cursor: pointer;
+}
+.disabled-button {
+	opacity: 0 !important;
+	cursor: auto;
+}
+
+#right-button {
+	right: 60px;
+	transform: translateY(-10px) scale(-1, 1);
+}
+#left-button {
+	left: 60px;
+}
+
+#left-button:hover {
+	opacity: 1;
+	transform: translateY(-10px) scale(1.1, 1.1);
+}
+#right-button:hover {
+	opacity: 1;
+	transform: translateY(-10px) scale(-1.1, 1.1);
+}
+
+#carousel-dot-container {
+	display: grid;
+	position: absolute;
+	bottom: 25px;
+	left: 113px;
+	width: 185px;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.carousel-dot {
+	border-radius: 100%;
+	height: 10px;
+	width: 10px;
+
+	background: black;
+	opacity: 0.2;
+	cursor: pointer;
+
+	transition: 0.2s opacity linear, 0.3s transform cubic-bezier(.28,.01,.29,1.67);
+}
+.carousel-dot:hover {
+	transform: scale(1.1, 1.1);
+	opacity: 0.5;
+}
+
+.carousel-slide {
+	float: left;
+	position: relative;
+	width: 80%;
+	height: 470px;
+	padding: 30px;
+}

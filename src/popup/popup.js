@@ -20,19 +20,6 @@ function switchSection() {
 	}
 }
 
-// Slideshow / carousel
-new Flickity(document.getElementById('flickity'), {
-	on: { change: (slideNumber) => {
-		if (slideNumber === 5) {
-			document.getElementById('intro-exit').innerHTML = 'done';
-			document.getElementById('intro-exit').style.color = '#C31354';
-		} else {
-			document.getElementById('intro-exit').innerHTML = 'skip';
-			document.getElementById('intro-exit').style.color = '#000000';
-		}
-	}}
-});
-
 // Only default to the tutorial screen on first load
 webBrowser.storage.local.get('seenTutorial', ({ seenTutorial }) => {
 	if (!seenTutorial) {
@@ -324,3 +311,77 @@ function getBrowser() {
 		return "Edge";
 	}
 }
+
+
+//Carousel code
+document.getElementById('carousel');
+
+let currentSlide = 0;
+let currentTranslateX = 0;
+
+const carouselDotElements = document.getElementsByClassName('carousel-dot');
+for (let i = 0; i < carouselDotElements.length; i++) {
+	carouselDotElements[i].addEventListener('mousedown', () => {
+		currentSlide = i;
+	});
+}
+
+
+const carouselElements = document.getElementsByClassName('carousel-slide');
+const carouselEl = document.getElementById('carousel');
+const leftButtonEl = document.getElementById('left-button');
+const rightButtonEl = document.getElementById('right-button');
+
+leftButtonEl.addEventListener('mousedown', () => {
+	if (currentSlide > 0) {
+		currentSlide--;
+
+		onSlideChange();
+	}
+});
+rightButtonEl.addEventListener('mousedown', () => {
+	if (currentSlide < carouselElements.length - 1) {
+		currentSlide++;
+
+		onSlideChange();
+	}
+});
+onSlideChange();
+
+function onSlideChange() {
+	if (currentSlide === carouselElements.length - 1) {
+		rightButtonEl.classList.add('disabled-button');
+
+		document.getElementById('intro-exit').innerHTML = 'done';
+		document.getElementById('intro-exit').style.color = '#C31354';
+	} else {
+		rightButtonEl.classList.remove('disabled-button');
+
+		document.getElementById('intro-exit').innerHTML = 'skip';
+		document.getElementById('intro-exit').style.color = '#000000';
+	}
+	if (currentSlide === 0) {
+		leftButtonEl.classList.add('disabled-button');
+	} else {
+		leftButtonEl.classList.remove('disabled-button');
+	}
+	// Highlight the current slide dot
+	for (let i = 0; i < carouselDotElements.length; i++) {
+		if (i === currentSlide) {
+			carouselDotElements[i].style.opacity = 0.5;
+		} else {
+			carouselDotElements[i].style.opacity = 0.2;
+		}
+	}
+}
+
+const SLIDE_WIDTH = 390;
+const TRANSITION_RATE = 0.2;
+function carouselAnimationLoop() {
+	requestAnimationFrame(carouselAnimationLoop);
+
+	const targetTranslateX = -SLIDE_WIDTH * currentSlide;
+	currentTranslateX += (targetTranslateX - currentTranslateX) * TRANSITION_RATE;
+	carouselEl.style.transform = `translateX(${currentTranslateX}px)`;
+}
+requestAnimationFrame(carouselAnimationLoop);
