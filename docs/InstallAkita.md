@@ -27,3 +27,20 @@ Note the path to the newly created `akita` directory.
 Some notes for Firefox:
 - Since Akita is installed as a temporary add-on, it only stays until you restart Firefox.
 - If you're feeling extra crafty, you can also install Akita using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/).
+
+## Package Akita into a .zip
+1. Make sure you have the command-line tools `bash` and `zip` installed.
+2. From the akita directory, run `bash ./packageAkita.sh`.
+3. The resulting file akita.zip can be loaded into Firefox and Chrome.
+
+### To Install `akita.zip` in Google Chrome
+1. In your Chrome address bar, type in `chrome://extensions/`. Press enter.
+2. Ensure "Developer mode" is toggled "ON" in the top right corner of the page.
+3. From your file explorer, drag `akita.zip` into the browser window.
+4. Akita is now installed - you should see the Akita extension icon in your browser bar!!
+
+### To Install `akita.zip` in Mozilla Firefox
+1. In your Firefox address bar, type in `about:debugging#/runtime/this-firefox`. Press enter.
+2. Click on "Load Temporary Add-on...". A system file selection window should open.
+3. In the selection window, select `akita.zip`
+4. Akita is now installed - you should see the Akita extension icon in your browser bar!!
