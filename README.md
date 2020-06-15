@@ -60,6 +60,7 @@ Here's a screenshot of what Akita looks like if you don't have a Web Monetizatio
 
 ### Akita Demo Video
 Click to check out a video walkthrough of Akita:
+
 [![Akita YouTube Walkthrough](https://img.youtube.com/vi/9cCqfMJjAWQ/0.jpg)](https://youtu.be/9cCqfMJjAWQ)
 
 ---
