@@ -12,12 +12,12 @@ We've built this for the [Grant for the Web x DEV hackathon](https://res.cloudin
 ## Table of Contents
   - [Installing](#installing)
   - [Contributing](#contributing)
-  - [Screenshots & Demos](#screenshots-&-demos)
+  - [Screenshots & Demos](#screenshots--demos)
   - [About Akita](#about-akita)
     - [The Problem We're Addressing](#the-problem-were-addressing)
     - [How Akita Helps](#how-akita-helps)
     - [Blog Posts on Our Process](#blog-posts-on-our-process)
-    - [Why 'Akita'?](#why-akita?)
+    - [Why 'Akita'?](#why-akita)
   - [Connect with Us](#connect-with-us)
 
 ---
@@ -91,6 +91,7 @@ Overall, our goal with Akita is to increase Web Monetization exposure and awaren
 2. [Kickstarting a project idea: going from 0 to...0 - Part 2](https://dev.to/dog-s/kickstarting-a-project-idea-going-from-0-to-0-part-2-3bph)
 3. [How can you support websites without having to deal with annoying ads?](https://dev.to/dog-s/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb) 
 4. [Hackathon Update: Breaking Our Idea Down Into Dog-Treat-Sized Tasks](https://dev.to/dog-s/hackathon-update-breaking-our-idea-down-into-dog-treat-sized-tasks-50e3)
+5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/dog-s/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post)
 
 ### Why 'Akita'?
 Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" as _dog-s_ and selecting "Akita" as our project name. 
