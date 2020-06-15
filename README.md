@@ -48,7 +48,7 @@ Our browser extension helps you see the top monetized sites you visit and your i
 
 Here's a screenshot of what Akita looks like if you're using a Web Monetization provider:
 
-<img src="assets/mon_demo_screenshot.png" alt="Monetization Enabled Akita Main View" height="450px">
+<img src="assets/mon_demo_screenshot1.png" alt="Monetization Enabled Akita Main View" height="450px"><img src="assets/mon_demo_screenshot2.png" alt="Monetization Enabled Akita Main View" height="450px">
 
 You'll likely have some monetized sites that you visit often, but don't really spend much time on. Maybe you'd like to give them a little more love and spend a bit more time there, so that additional payment can be streamed to them. Check out the 'These monetized sites could use ♥️' section!
 
@@ -56,7 +56,7 @@ You'll likely have some monetized sites that you visit often, but don't really s
 
 Here's a screenshot of what Akita looks like if you don't have a Web Monetization provider installed:
 
-<img src="assets/nonmon_demo_screenshot.png" alt="Monetization Not Enabled Akita Main View" height="450px">
+<img src="assets/nonmon_demo_screenshot1.png" alt="Monetization Not Enabled Akita Main View" height="450px"><img src="assets/nonmon_demo_screenshot2.png" alt="Monetization Not Enabled Akita Main View" height="450px">
 
 ### Akita Demo Video
 Click to check out a video walkthrough of Akita:
