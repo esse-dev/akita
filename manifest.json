@@ -10,7 +10,6 @@
 	},
 	"permissions":[
 		"tabs",
-		"activeTab",
 		"<all_urls>",
 		"storage"
 	],
