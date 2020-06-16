@@ -2,7 +2,7 @@
 	"name":"Akita",
 	"version":"0.0.2",
 	"manifest_version": 2,
-	"description":"A browser extension that gives you insight into your involvement with Web Monetization.",
+	"description":"Get involved with Web Monetization with or without the price tag.",
 	"icons": {
 		"16": "assets/icon_16x16.png",
 		"48": "assets/icon_48x48.png",
