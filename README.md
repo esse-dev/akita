@@ -1,11 +1,17 @@
 ![Akita Icon](assets/documentation/akita_social_preview.png)
 
 # Akita
+
+[![Software License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Assets License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
 A browser extension that gives you insight into your involvement with [Web Monetization](https://webmonetization.org/).
 
 Akita presents your top visited monetized sites, how much time you’re spending on them, and how much you're contributing (or could contribute) to them.
 
-We've built this for the [Grant for the Web x DEV hackathon](https://res.cloudinary.com/practicaldev/image/fetch/s--aIp9TotN--/c_imagga_scale,f_auto,fl_progressive,h_500,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/i/q19vviykh0oi1s5tkbqe.png)!
+We've built this for the [Grant for the Web x DEV hackathon](https://dev.to/devteam/announcing-the-grant-for-the-web-hackathon-on-dev-3kd1)! We're so thrilled to have received a Runner Up Award for this project 🎉 - [Winners Announcement](https://dev.to/devteam/announcing-the-grant-for-the-web-x-dev-hackathon-winners-1nl4).
+
+Our license information can be found [here](docs/LicenseInfo.md) and our license/copyright notices can be found in [LICENSE](LICENSE).
 
 ---
 
@@ -23,7 +29,7 @@ We've built this for the [Grant for the Web x DEV hackathon](https://res.cloudin
 ---
 
 ## Installing
-Check out the instructions to install from source [here](docs/InstallAkita.md). We plan to put Akita on browser extension stores soon - please stay tuned. :)
+Check out the instructions to install from source or package [here](docs/InstallAkita.md). We are working on making Akita available in browser extension/add-on stores - please stay tuned. :)
 
 ---
 
@@ -82,7 +88,7 @@ Because of these hurdles, it can be difficult to see the value and broad potenti
 
 If you’re looking to start supporting websites by streaming payment, Akita will give you a good idea of which sites you can directly support through Web Monetization. If you’re already using a Web Monetization payment provider, Akita gives you insight into your contributions to the website by showing you the time spent on the site and the amount of payment streamed as a result.
 
-As Web Monetization becomes more common on websites, you’ll be able to see the evolution through Akita. We hope to see your favourite sites join the Web Monetization community! All of the data collected about your browsing and streamed payments is stored in local browser storage, so **all of this information stays in your hands**. 
+As Web Monetization becomes more common on websites, you’ll be able to see the evolution through Akita. We hope to see your favourite sites join the Web Monetization community! All of the data collected about your browsing and streamed payments is stored in local browser storage, so **all of this information stays in your hands**.
 
 Overall, our goal with Akita is to increase Web Monetization exposure and awareness, and to help people understand how Web Monetization fits in with their regular browsing. We want to give people who aren’t using a Web Monetization provider a way to engage in payment streaming. As more Web Monetization providers pop up, users can choose providers that fit their needs based on the browsing data presented by Akita.
 
@@ -94,7 +100,7 @@ Overall, our goal with Akita is to increase Web Monetization exposure and awaren
 5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/dog-s/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post)
 
 ### Why 'Akita'?
-Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" as _dog-s_ and selecting "Akita" as our project name. 
+Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" as _dog-s_ and selecting "Akita" as our project name.
 
 The Akita is a Japanese dog breed known for its loyalty and dedication. It's also quite fluffy. We were drawn to "Akita" because of the values the breed represents (i.e. loyalty, dedication), as those characteristics are what we want to embrace with our project. Through Akita and Web Monetization, we want to enable mutual loyalty and dedication between content creators/websites and their users.
 
