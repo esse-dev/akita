@@ -117,13 +117,13 @@ async function getStats() {
 
 		const needsLoveContainer = document.getElementById('sites-need-love-container');
 		const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
-	
+
 		if (originStats && originStats.totalSentAssetsMap?.XRP?.amount > 0) {
 			noProviderResourcesContainer.style.display = 'none';
 			needsLoveContainer.style.display = 'block';
-	
+
 			const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
-	
+
 			if (needLoveOrigins.length > 0) {
 				for (const originData of needLoveOrigins) {
 					if ((originData.faviconSource) && (originData.faviconSource !== "")) {
@@ -131,16 +131,16 @@ async function getStats() {
 						faviconEl.addEventListener("click", () => {
 							webBrowser.tabs.create({ url: originData.origin });
 						}, false);
-	
+
 						needsLoveContainer.appendChild(faviconEl);
 					}
-	
+
 					const linkEl = document.createElement('a');
 					linkEl.href = originData.origin;
-	
+
 					// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
 					linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
-	
+
 					needsLoveContainer.appendChild(linkEl);
 					const brEl = document.createElement('br');
 					needsLoveContainer.appendChild(brEl);
@@ -148,14 +148,14 @@ async function getStats() {
 			} else {
 				const el = document.createElement('span');
 				el.innerHTML = 'No sites visited yet!';
-	
+
 				needsLoveContainer.appendChild(el);
 			}
 		} else {
 			noProviderResourcesContainer.style.display = 'grid';
 			needsLoveContainer.style.display = 'none';
 		}
-	
+
 		// Top sites visualization with circles
 		const topOrigins = await getTopOriginsByTimeSpent(5);
 		let circleWeights = [];
@@ -163,10 +163,10 @@ async function getStats() {
 			const timeSpent = originData?.originVisitData.timeSpentAtOrigin;
 			circleWeights.push(timeSpent);
 		}
-	
+
 		// Circles
 		const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
-	
+
 		const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
 		const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
 		const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
@@ -174,26 +174,26 @@ async function getStats() {
 			height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
 			width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
 		};
-	
+
 		const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
-	
+
 		// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
 		const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
 		circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
-	
+
 		for (let i = 0; i < circleWeights.length; i++) {
 			const circleEl = document.createElement('div');
 			const circleWeight = circleWeights[i];
 			const color = CIRCLE_COLORS[i];
-	
+
 			const originData = topOrigins[i];
 			const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
-	
+
 			circleEl.className = 'circle';
 			circleEl.style.background = color;
 			circleEl.style.height = circleWeight + 'px';
 			circleEl.style.width = circleWeight + 'px';
-	
+
 			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
 				const faviconEl = createFaviconImgElement(originData.faviconSource);
 				circleEl.appendChild(faviconEl);
@@ -204,7 +204,7 @@ async function getStats() {
 				characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
 				circleEl.appendChild(characterEl);
 			}
-	
+
 			if (circleWeight > 40) {
 				let circleFontSize = Math.round(circleWeight / 6);
 				// Font size should be no smaller than 11, otherwise it's not legible
@@ -215,14 +215,14 @@ async function getStats() {
 					circleEl.style.fontSize = circleFontSize + 'px';
 				}
 			}
-	
+
 			const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
 			circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
 			circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
 			circleEl.addEventListener("click", () => {
 				webBrowser.tabs.create({ url: originData.origin });
 			}, false);
-	
+
 			circleContainer.appendChild(circleEl);
 		}
 	}
@@ -323,6 +323,8 @@ const carouselDotElements = document.getElementsByClassName('carousel-dot');
 for (let i = 0; i < carouselDotElements.length; i++) {
 	carouselDotElements[i].addEventListener('mousedown', () => {
 		currentSlide = i;
+
+		onSlideChange();
 	});
 }
 
