@@ -14,7 +14,7 @@ Our license information can be found [here](LicenseInfo.md) and our license/copy
 ## Step 1: Download Akita Source
 From your preferred directory, run the command:
 
-`git clone https://github.com/dog-s/akita.git`
+`git clone https://github.com/esse-dev/akita.git`
 
 Note the path to the newly created `akita` directory.
 

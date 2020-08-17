@@ -93,14 +93,14 @@ As Web Monetization becomes more common on websites, you’ll be able to see the
 Overall, our goal with Akita is to increase Web Monetization exposure and awareness, and to help people understand how Web Monetization fits in with their regular browsing. We want to give people who aren’t using a Web Monetization provider a way to engage in payment streaming. As more Web Monetization providers pop up, users can choose providers that fit their needs based on the browsing data presented by Akita.
 
 ### Blog posts on our process
-1. [Kickstarting a project idea: going from 0 to...0 - Part 1](https://dev.to/dog-s/kickstarting-a-project-idea-going-from-0-to-0-part-1-3o2e)
-2. [Kickstarting a project idea: going from 0 to...0 - Part 2](https://dev.to/dog-s/kickstarting-a-project-idea-going-from-0-to-0-part-2-3bph)
-3. [How can you support websites without having to deal with annoying ads?](https://dev.to/dog-s/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb) 
-4. [Hackathon Update: Breaking Our Idea Down Into Dog-Treat-Sized Tasks](https://dev.to/dog-s/hackathon-update-breaking-our-idea-down-into-dog-treat-sized-tasks-50e3)
-5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/dog-s/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post)
+1. [Kickstarting a project idea: going from 0 to...0 - Part 1](https://dev.to/esse-dev/kickstarting-a-project-idea-going-from-0-to-0-part-1-3o2e)
+2. [Kickstarting a project idea: going from 0 to...0 - Part 2](https://dev.to/esse-dev/kickstarting-a-project-idea-going-from-0-to-0-part-2-3bph)
+3. [How can you support websites without having to deal with annoying ads?](https://dev.to/esse-dev/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb) 
+4. [Hackathon Update: Breaking Our Idea Down Into Dog-Treat-Sized Tasks](https://dev.to/esse-dev/hackathon-update-breaking-our-idea-down-into-dog-treat-sized-tasks-50e3)
+5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/esse-dev/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post)
 
 ### Why 'Akita'?
-Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" as _dog-s_ and selecting "Akita" as our project name.
+Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" at the time of the hackathon, which was _dog-s_, and selecting "Akita" as our project name.
 
 The Akita is a Japanese dog breed known for its loyalty and dedication. It's also quite fluffy. We were drawn to "Akita" because of the values the breed represents (i.e. loyalty, dedication), as those characteristics are what we want to embrace with our project. Through Akita and Web Monetization, we want to enable mutual loyalty and dedication between content creators/websites and their users.
 
@@ -110,7 +110,7 @@ We were also very inspired by the story of [Hachikō](https://en.wikipedia.org/w
 
 ## Connect with Us
 - DEV
-  - [dog-s](https://dev.to/dog-s)
+  - [esse-dev](https://dev.to/esse-dev)
   - [Elliot](https://dev.to/elliot)
   - [Sharon](https://dev.to/sharon)
 - Discord
