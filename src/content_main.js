@@ -389,6 +389,12 @@ async function httpGet(endpoint, headerName, headerValue) {
 
 		response = await fetch(endpoint, {
 			method: 'GET',
+			// When using cors (Cross-Origin Resource Sharing), mixed content is blocked.
+			// This means that any content retrieved from HTTP (instead of HTTPS) will be
+			// blocked when working in an HTTPS context. Since we expect endpoints to resolve
+			// to an HTTPS url, we do not want to permit content loaded from HTTP. It is part
+			// of the SPSP Endpoint specification that HTTPS is required.
+			mode: 'cors',
 			headers: requestHeaders
 		});
 	}
