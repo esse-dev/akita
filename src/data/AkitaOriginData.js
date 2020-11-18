@@ -116,7 +116,7 @@ class AkitaOriginData {
 
 	/**
 	 * Update time spent at the origin.
-	 * 
+	 *
 	 * @param {Number} recentTimeSpent The recent time spent at the origin.
 	 */
 	addTimeSpent(recentTimeSpent = 0) {
@@ -125,7 +125,7 @@ class AkitaOriginData {
 
 	/**
 	 * Store the favicon source.
-	 * 
+	 *
 	 * @param {String} faviconPath The url of the origin's favicon.
 	 */
 	storeOriginFavicon(faviconPath) {

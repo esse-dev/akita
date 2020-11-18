@@ -1,8 +1,8 @@
 /**
  * Holds calculated origin stats based on data stored in Akita.
- * 
+ *
  * Refer to originStats in example_data.json for an example.
- * 
+ *
  * Origin stats include:
  *   - total time spent at all origins since using Akita (in milliseconds)
  *   - total time spent at all monetized origins since using Akita (in milliseconds)
@@ -51,7 +51,7 @@ class AkitaOriginStats {
 	/**
 	 * Update the total monetized time spent if the origin is monetized; update
 	 * the total time spent regardless.
-	 * 
+	 *
 	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
 	 * @param {Boolean} originIsCurrentlyMonetized Whether the origin is monetized or not.
 	 */
@@ -65,7 +65,7 @@ class AkitaOriginStats {
 
 	/**
 	 * Update the total time spent at all origins.
-	 * 
+	 *
 	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
 	 */
 	updateTotalTimeSpent(recentTimeSpent) {
@@ -74,7 +74,7 @@ class AkitaOriginStats {
 
 	/**
 	 * Update the total time spent at monetized origins.
-	 * 
+	 *
 	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
 	 */
 	updateTotalMonetizedTimeSpent(recentTimeSpent) {
@@ -88,7 +88,7 @@ class AkitaOriginStats {
 	/**
 	 * Update the total visits to monetized origins if the origin is monetized,
 	 * and update the total visits to origins regardless.
-	 * 
+	 *
 	 * @param {Boolean} originIsCurrentlyMonetized Whether the origin is monetized or not.
 	 */
 	incrementVisits(originIsCurrentlyMonetized) {
@@ -119,7 +119,7 @@ class AkitaOriginStats {
 	/**
 	 * Update the total sent assets map by adding the amount to an existing
 	 * asset (currency) or create a new asset in the total sent assets map.
-	 * 
+	 *
 	 * @param {{
 	 *	paymentPointer: String,
 	 *	amount?: Number,

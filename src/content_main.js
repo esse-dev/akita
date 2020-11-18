@@ -15,11 +15,11 @@ scriptEl.text = `
 		document.monetization.addEventListener('monetizationstart', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
 		});
-	
+
 		document.monetization.addEventListener('monetizationprogress', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
 		});
-	
+
 		document.monetization.addEventListener('monetizationstop', (event) => {
 			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
 		});
@@ -95,7 +95,7 @@ async function trackVisitToSite() {
 /**
  * Calculate and store the time the user spends on the site.
  * Call this function once at the beginning of website logic.
- * 
+ *
  * Use the Page Visibility API to check if the current webpage is visible or not.
  * https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
  * https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState
@@ -118,19 +118,19 @@ async function trackTimeOnSite() {
 	/**
 	 * NOTE: setInterval may not be called while the document is hidden (while visibility lost)
 	 * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified
-	 * 
+	 *
 	 * Store the recent time spent every 2 seconds to ensure time spent on site is recorded
 	 * even if the user closes the site.
 	 */
 	setInterval(async () => {
 		const now = getCurrentTime();
-		
+
 		if (document.visibilityState === 'visible') {
 			if (docHiddenTime > previousStoreTime) {
 				// Adding time after visibility lost (document becomes hidden) and then gained (document is visible again)
 				// i.e. If the user navigates away from the site and then comes back
 				const timeFromPreviousStoreToDocHidden = docHiddenTime - previousStoreTime;
-				const timeSinceDocVisible = now - docVisibleTime;	
+				const timeSinceDocVisible = now - docVisibleTime;
 				await storeRecentTimeSpent(timeFromPreviousStoreToDocHidden + timeSinceDocVisible);
 			} else {
 				// Adding time during regular interval (document visible)
@@ -151,7 +151,7 @@ function getCurrentTime() {
 
 /**
  * Store the recent time spent in the webpage session into AkitaFormat.
- * 
+ *
  * @param {Number} recentTimeSpent The recent time spent on the webpage. This number is
  * a Double, since performance.now() is used to construct this number.
  */
@@ -317,14 +317,14 @@ async function isPaymentPointerValid(paymentPointer) {
 
 /**
  * Resolve a payment pointer into an SPSP endpoint.
- * 
+ *
  * Payment pointer format: "$" host path-abempty
  * Resolution format: "https://" host path-abempty
- * 
+ *
  * SPSP Endpoint Specification: https://interledger.org/rfcs/0009-simple-payment-setup-protocol/#specification
  * Payment pointer syntax resolution examples: https://paymentpointers.org/syntax-resolution/#examples
  * Refer to https://paymentpointers.org/ for resolution details.
- * 
+ *
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
  * @return {string} The resolved payment pointer.
  */
@@ -369,9 +369,9 @@ function resolvePaymentPointer(paymentPointer) {
 
 /**
  * Send an asynchronous http request to the provided endpoint with a header if specified.
- * 
+ *
  * TODO: add handling for multiple header values.
- * 
+ *
  * @param {string} endpoint The URL to make an http request against.
  * @param {string} headerName The name of the header.
  * @param {string} headerValue The value for the header.
@@ -410,7 +410,7 @@ async function storeFaviconPath() {
 
 /**
  * Retrieve the favicon path.
- * 
+ *
  * @return {String} The absolute or relative path from the site origin to the favicon.
  */
 function getFaviconPath() {
@@ -418,7 +418,7 @@ function getFaviconPath() {
 	let faviconPath = null;
 	let linkElementsList = document.getElementsByTagName("link");
 	let relIconFoundIndex = -1;
-	
+
 	// Check for a link with rel "icon" or "shortcut icon"
 	for (let i = 0; i < linkElementsList.length; i++) {
 		const linkElementRel = linkElementsList[i].getAttribute("rel");
@@ -441,6 +441,6 @@ function getFaviconPath() {
 		// An icon link was not found, set path to default
 		faviconPath = "favicon.ico";
 	}
-	
-	return faviconPath;		
+
+	return faviconPath;
 }
