@@ -1,3 +1,6 @@
+const NEW_PAYMENT_POINTER_CHECK_RATE_MS = 1000; // 1 second
+const PAYMENT_POINTER_VALIDATION_RATE_MS = 1000 * 60 * 60; // 1 hour
+
 /**
  * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
  * properties which are added by JavaScript, such as document.monetization!
@@ -32,17 +35,6 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	// TODO: check payment pointer periodically for existence and validity
-	const {
-		isValid,
-		paymentPointer
-	} = await getAndValidatePaymentPointer();
-
-	setExtensionIconMonetizationState(isValid);
-
-	// paymentPointer will be null if it doesn't exist or is invalid
-	await storeDataIntoAkitaFormat({ paymentPointer: paymentPointer }, AKITA_DATA_TYPE.PAYMENT);
-
 	// Test storing assets
 	// await storeDataIntoAkitaFormat({
 	// 	paymentPointer: paymentPointer,
@@ -58,6 +50,8 @@ async function main() {
 	//	storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
 	//});
 
+	trackPaymentPointer();
+	handleUpdatingExtensionIconOnTabVisibilityChange();
 	await trackTimeOnSite();
 	await trackVisitToSite();
 
@@ -77,8 +71,12 @@ async function main() {
  *   If true, a pink $ badge is displayed. If false, just the dog face without the tongue is used as the icon.
  */
 function setExtensionIconMonetizationState(isCurrentlyMonetized) {
-	const webBrowser = chrome ? chrome : browser;
-	webBrowser.runtime.sendMessage({ isCurrentlyMonetized });
+	const tabIsVisible = !document.hidden;
+
+	if (tabIsVisible) {
+		const webBrowser = chrome ? chrome : browser;
+		webBrowser.runtime.sendMessage({ isCurrentlyMonetized });
+	}
 }
 
 /***********************************************************
@@ -114,12 +112,6 @@ async function trackTimeOnSite() {
 		} else {
 			// The page is now visible
 			docVisibleTime = getCurrentTime();
-
-			const {
-				isValid,
-				paymentPointer
-			} = await getAndValidatePaymentPointer();
-			setExtensionIconMonetizationState(isValid);
 		}
 	});
 
@@ -171,42 +163,135 @@ async function storeRecentTimeSpent(recentTimeSpent) {
 }
 
 /***********************************************************
- * Validate Payment Pointer
+ * Track and Validate Payment Pointer
  ***********************************************************/
 
 /**
- * Check for a monetization meta tag on the website and verify that
- * the payment pointer is valid (resolves to a valid SPSP endpoint).
- * 
- * TODO: use enum to indicate no meta tag, meta tag + valid endpoint,
- * meta tag + invalid endpoint.
- * 
- * @return {Promise<{ isPaymentPointerValid: boolean, paymentPointer:string}>} 
- * isPaymentPointerValid is true if both monetization is present and the payment endpoint is valid.
- * paymentPointer is the paymentPointer if it is found in the monetization meta tag, otherwise null.
+ * Gets the payment pointer as a string from the monetization meta tag on the current page.
+ * If there is no monetization meta tag on the page, null is returned.
+ *
+ * For more info on the monetization meta tag:
+ *	- https://webmonetization.org/docs/getting-started
+ *	- https://webmonetization.org/specification.html#meta-tags-set
+ *
+ * @return {string|null} The payment pointer on the current page, or null if no meta tag is present.
  */
-async function getAndValidatePaymentPointer() {
-	const monetizationMeta = document.querySelector('meta[name="monetization"]');
-	let paymentPointer = (monetizationMeta) ? monetizationMeta.content : null;
-	let isValid = false;
+function getPaymentPointerFromPage() {
+	const monetizationMetaTag = document.querySelector('meta[name="monetization"]');
 
-	if (null === monetizationMeta) {
-		/* No monetization meta tag provided */
+	if (monetizationMetaTag) {
+		return monetizationMetaTag.content;
 	} else {
-		if (await isPaymentPointerValid(paymentPointer)) {
-			isValid = true;
-		}
+		return null;
 	}
-
-	return {
-		isValid,
-		paymentPointer
-	};
 }
 
 /**
- * Check if a payment pointer is valid or not.
- * 
+ * Checks every NEW_PAYMENT_POINTER_CHECK_RATE_MS milliseconds to see if a new payment pointer is
+ * added to the page. Calls `handleValidationAndSetExtensionIcon` to set the extension icon.
+ */
+function trackPaymentPointer() {
+	let cachedPaymentPointer = null;
+
+	setInterval(async () => {
+		const paymentPointerOnPage = getPaymentPointerFromPage();
+
+		const isNewPaymentPointer =
+			(paymentPointerOnPage !== null) &&
+			(paymentPointerOnPage !== cachedPaymentPointer);
+
+		if (isNewPaymentPointer) {
+			// Note that paymentPointerOnPage may be newly added to the current page and tab,
+			// but it is possible that this payment pointer was recently validated in another tab.
+			// Therefore it is necessary to use handleValidationAndSetExtensionIcon which checks the
+			// browser storage to see if the payment pointer has been recently validated.
+			handleValidationAndSetExtensionIcon(paymentPointerOnPage);
+			cachedPaymentPointer = paymentPointerOnPage;
+		}
+	}, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
+}
+
+/**
+ * Ensures that the extension icon is updated to the correct state when switching between tabs.
+ */
+function handleUpdatingExtensionIconOnTabVisibilityChange() {
+	document.addEventListener('visibilitychange', (event) => {
+		const tabIsVisible = !document.hidden;
+
+		if (tabIsVisible) {
+			const paymentPointerOnPage = getPaymentPointerFromPage();
+			if (paymentPointerOnPage === null) {
+				setExtensionIconMonetizationState(false);
+			} else {
+				handleValidationAndSetExtensionIcon(paymentPointerOnPage);
+			}
+		}
+	});
+}
+
+/**
+ * Given a payment pointer, if it is valid, this function sets the extension icon to its monetized
+ * state and stores the payment pointer in browser storage, otherwise the extension icon is set to
+ * its unmonetized state.
+ *
+ * @param {string} paymentPointer The payment pointer to validate.
+ * @returns {Promise<>} A promise that resolves when validation is finished.
+ */
+async function handleValidationAndSetExtensionIcon(paymentPointer) {
+	if (await isPaymentPointerRecentlyValidated(paymentPointer)) {
+		setExtensionIconMonetizationState(true);
+	} else {
+		// Validate if not validated recently
+		if (await isPaymentPointerValid(paymentPointer)) {
+			// Store the payment pointer and the UTC timestamp for the time it was validated (now)
+			await storeDataIntoAkitaFormat({
+				paymentPointer: paymentPointer,
+				validationTimestamp: Date.now()
+			}, AKITA_DATA_TYPE.PAYMENT);
+			setExtensionIconMonetizationState(true);
+		} else {
+			setExtensionIconMonetizationState(false);
+		}
+	}
+}
+
+/**
+ * Checks the browser storage to see if Akita has validated the given payment pointer and stored a
+ * validation timestamp for it recently.
+ *
+ * @param {string} paymentPointer The payment pointer to check.
+ * @returns {Promise<boolean>} Resolves to true if there is a timestamp retrieved from storage and
+ * the timestamp is recent (less than PAYMENT_POINTER_VALIDATION_RATE_MS from present time).
+ * Resolves false otherwise.
+ */
+async function isPaymentPointerRecentlyValidated(paymentPointer) {
+	const originData = await loadOriginData(window.location.origin);
+	let validationTimestamp = null;
+	if (originData && originData.paymentPointerMap[paymentPointer]) {
+		// Get validationTimestamp from originData under the given payment pointer
+		validationTimestamp =
+			originData.paymentPointerMap[paymentPointer].validationTimestamp;
+	}
+	if (validationTimestamp === null) {
+		return false;
+	}
+
+	// Check if validationTimestamp is recent
+	const timeSinceLastValidated = Date.now() - validationTimestamp;
+	if (timeSinceLastValidated < PAYMENT_POINTER_VALIDATION_RATE_MS) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Check if a payment pointer is valid (resolves to a valid SPSP endpoint).
+ *
+ * For more information on payment pointer resolution and validation see:
+ *	- https://paymentpointers.org/syntax-resolution/#requirements
+ *	- https://interledger.org/rfcs/0009-simple-payment-setup-protocol
+ *
  * @param {string} paymentPointer The paymentPointer found in a meta tag.
  * @return {Promise<boolean>} Whether or not the specified payment pointer is valid.
  */

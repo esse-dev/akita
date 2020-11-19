@@ -85,11 +85,12 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 
 /**
  * Update payment data in originData and in originStats.
- * 
+ *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {AkitaOriginStats} originStats The origin stats to update.
  * @param {{
  *	paymentPointer: String,
+ *	validationTimestamp: Number,
  *	amount?: Number,
  *	assetScale?: Number,
  *	assetCode?: String
@@ -97,6 +98,8 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
  * 	 This object may be created, or a Web Monetization event detail object can be used.
  * 	 Pass in an object with just a paymentPointer to register a payment pointer for
  * 	 the current website. Payment pointer should be validated first.
+ *	 Optionally pass in validationTimestamp to set when the payment pointer was most
+ *	 recently validated.
  * 	 Additionally pass in assetCode, assetScale, and amount together to add to the
  * 	 total amount sent to the current website.
  */

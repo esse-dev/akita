@@ -4,6 +4,11 @@
  */
 class AkitaPaymentPointerData {
 	paymentPointer = null;
+
+	// The most recent time (UTC timestamp) when Akita validated the payment pointer
+	// For more info on payment pointer validation: see ../content_main.js, function isPaymentPointerValid
+	validationTimestamp = null;
+
 	// The type of each entry in sentAssetsMap is: WebMonetizationAsset
 	sentAssetsMap = {};
 
@@ -21,6 +26,7 @@ class AkitaPaymentPointerData {
 	 */
 	static fromObject(akitaPaymentPointerDataObject) {
 		const newPaymentPointerData = new AkitaPaymentPointerData(akitaPaymentPointerDataObject.paymentPointer);
+		newPaymentPointerData.validationTimestamp = akitaPaymentPointerDataObject.validationTimestamp;
 
 		for (const assetCode in akitaPaymentPointerDataObject.sentAssetsMap) {
 			newPaymentPointerData.sentAssetsMap[assetCode] = WebMonetizationAsset.fromObject(
@@ -28,6 +34,20 @@ class AkitaPaymentPointerData {
 			);
 		}
 		return newPaymentPointerData;
+	}
+
+	/**
+	 * When Akita validates a payment pointer, the time it was validated should be set using this
+	 * function. It is expected that payment pointers are validated by Akita often. In order to make
+	 * sure that validation occurs often, we keep track of the last time the payment pointer was
+	 * validated using validationTimestamp.
+	 *
+	 * For more info on payment pointer validation: see ./main.js, function isPaymentPointerValid
+	 *
+	 * @param {Number} validationTimestamp UTC Timestamp of last time payment pointer was validated.
+	 */
+	setValidationTimestamp(validationTimestamp) {
+		this.validationTimestamp = validationTimestamp;
 	}
 
 	/**
