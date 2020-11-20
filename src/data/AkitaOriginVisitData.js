@@ -1,8 +1,8 @@
 /**
  * Holds visit data for an origin.
- * 
+ *
  * Refer to originVisitData in example_data.json for examples.
- * 
+ *
  * Visit data includes:
  *   - amount of time spent at origin since using Akita (in milliseconds)
  *   - number of visits recorded in Akita
@@ -33,13 +33,13 @@ class AkitaOriginVisitData {
 			newOriginVisitData.dateOfFirstVisit = akitaOriginVisitDataObject.dateOfFirstVisit;
 			newOriginVisitData.dateOfMostRecentVisit = akitaOriginVisitDataObject.dateOfMostRecentVisit;
 		}
-		
+
 		return newOriginVisitData;
 	}
 
 	/**
 	 * Update the total time spent by adding the recent time to the total.
-	 * 
+	 *
 	 * @param {Number} recentTimeSpentAtOrigin The new amount of time spent at the origin.
 	 */
 	addTimeSpent(recentTimeSpentAtOrigin = 0) {
@@ -61,7 +61,7 @@ class AkitaOriginVisitData {
 
 	/**
 	 * Return the current date formatted as YYYY-MM-DD.
-	 * 
+	 *
 	 * @return {Number} The current date.
 	 */
 	getCurrentDateAsYYYYMMDD() {
@@ -79,11 +79,11 @@ class AkitaOriginVisitData {
 	/**
 	 * Prepend the number with a zero if its value is between
 	 * zero and ten, so that it is compatible in date strings.
-	 * 
+	 *
 	 * e.g. If number = 6, return "06"
-	 * 
+	 *
 	 * @param {Number} number Value to format as a date number.
-	 * @return The formatted number. 
+	 * @return The formatted number.
 	 */
 	formatNumberAsDateString(number) {
 		if (number < 10 && number > 0) {

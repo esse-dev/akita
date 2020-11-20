@@ -19,7 +19,7 @@ let webBrowser = chrome ? chrome : browser;
  * special Akita format. Using this method ensures that the data in storage
  * maintains the Akita format structure. For an example of the Akita format
  * see ./example_data.json
- * 
+ *
  * @param {Object} data Data to store. May be null if no data included.
  * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
  */
@@ -110,7 +110,7 @@ function updatePaymentData(originData, originStats, paymentData) {
 
 /**
  * Update visit data in originData and in originStats.
- * 
+ *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {AkitaOriginStats} originStats The origin stats to update.
  */
@@ -121,7 +121,7 @@ function updateVisitData(originData, originStats) {
 
 /**
  * Update time spent in originData and in originStats.
- * 
+ *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {AkitaOriginStats} originStats The origin stats to update.
  * @param {Number} recentTimeSpent The recent time spent at the origin in milliseconds.
@@ -136,7 +136,7 @@ function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
  * is provided, construct the absolute path. Attempt to fetch the favicon to check
  * if it is a valid path. If fetch response is 200 OK, the path is valid, so store
  * the url of the favicon.
- * 
+ *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {String} faviconData The absolute or relative path to the site's favicon.
  */
@@ -153,7 +153,7 @@ async function updateOriginFavicon(originData, faviconData) {
 	} else {
 		// The favicon path is relative to the origin
 		if ((origin.charAt(origin.length) !== '/')
-			&& (faviconData.charAt(0) !== '/') 
+			&& (faviconData.charAt(0) !== '/')
 		) {
 			faviconPath = origin + "/" + faviconData;
 		} else {
@@ -163,7 +163,7 @@ async function updateOriginFavicon(originData, faviconData) {
 
 	if (faviconPath) {
 		let response = await fetch(faviconPath);
-		
+
 		if (response) {
 			if (200 === response.status) {
 				originData.storeOriginFavicon(faviconPath);
@@ -180,7 +180,7 @@ async function updateOriginFavicon(originData, faviconData) {
 
 /**
  * Load origin stats from storage.
- * 
+ *
  * @return {Promise<string[]>} asynchronously load from storage. Resolves to the origin stats.
  **/
 async function loadOriginStats() {
@@ -201,7 +201,7 @@ async function loadOriginStats() {
 
 /**
  * Store origin stats to storage.
- * 
+ *
  * @param {AkitaOriginStats]} originStats an AkitaOriginStats object.
  * @return {Promise<AkitaOriginStats>} asynchronously store (overwrite) data in storage. Resolves to the AkitaOriginStats object which was stored.
  **/
@@ -224,7 +224,7 @@ async function storeOriginStats(originStats) {
 
 /**
  * Get the entire list of origin data, 'originDataList' in example_data.json
- * 
+ *
  * @return {Promise<[AkitaOriginData]>} asynchronously load from storage.
  *   Resolves to a list of all AkitaOriginData in storage.
  */
@@ -253,7 +253,7 @@ async function getOriginDataList() {
 
 /**
  * @param {string} origin identify a website by origin.
- * @return {Promise<AkitaOriginData>} asynchronously load from storage. 
+ * @return {Promise<AkitaOriginData>} asynchronously load from storage.
  *	 Resolves to the AkitaOriginData associated with the website.
  */
 async function loadOriginData(origin) {
