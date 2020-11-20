@@ -54,6 +54,7 @@ class AkitaOriginData {
 	/**
 	 * @param {{
 	 *	paymentPointer: String,
+	 *	validationTimestamp: Number,
 	 *	amount?: Number,
 	 *	assetScale?: Number,
 	 *	assetCode?: String
@@ -61,7 +62,9 @@ class AkitaOriginData {
 	 *	 This object may be created, or a Web Monetization event detail object can be used.
 	 *	 Pass in an object with just a paymentPointer to register a payment pointer for
 	 *	 the current website. Payment pointer should be validated first.
-	 *	 Additionally pass in assetCode, assetScale, and amount together to add to the
+	 *	 Optionally pass in validationTimestamp to set when the payment pointer was most
+	 *	 recently validated.
+	 *	 Optionally pass in assetCode, assetScale, and amount together to add to the
 	 *	 total amount sent to the current website.
 	 *
 	 *	 assetCode e.g. 'XRP', 'USD', 'CAD'
@@ -74,7 +77,7 @@ class AkitaOriginData {
 	updatePaymentData(paymentData) {
 		if (paymentData) {
 			const paymentPointer = paymentData.paymentPointer;
-			
+
 			if (paymentPointer) {
 				this.isCurrentlyMonetized = true;
 
@@ -82,6 +85,14 @@ class AkitaOriginData {
 					this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
 				}
 
+				// Handling for optional argument: validationTimestamp
+				const validationTimestamp = paymentData.validationTimestamp;
+
+				if (validationTimestamp) {
+					this.paymentPointerMap[paymentPointer].setValidationTimestamp(validationTimestamp);
+				}
+
+				// Handling for the 3 optional arguments: amount, assetScale, and assetCode
 				const amount = paymentData.amount;
 				const assetScale = paymentData.assetScale;
 				const assetCode = paymentData.assetCode;
