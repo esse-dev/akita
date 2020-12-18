@@ -270,3 +270,14 @@ section {
 	margin-left: -5px;
 	margin-bottom: -5px;
 }
+
+.favicon {
+	height: 16px;
+	width: 16px;
+	border-radius: 50%;
+}
+
+/* Hide lazy-loaded favicons before they have a src because chrome gives them an ugly border */
+.favicon[src=''], .favicon:not([src]) {
+	opacity: 0;
+}
