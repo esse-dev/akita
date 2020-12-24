@@ -230,14 +230,13 @@ async function getStats() {
 
 function createFaviconImgElement(faviconSource) {
 	const faviconEl = document.createElement('img');
-	faviconEl.src = faviconSource;
+	faviconEl.classList.add('favicon');
 
-	// Set height and width to standard favicon size
-	faviconEl.width = 16;
-	faviconEl.height = 16;
-
-	// Make favicon round
-	faviconEl.style.borderRadius = "50%";
+	// Lazy-load the image in javascript so that popup opening is not blocked by faviconEl loading
+	fetch(faviconSource).then(async (response) => {
+		const blob = await response.blob();
+		faviconEl.src = URL.createObjectURL(blob);
+	});
 
 	return faviconEl;
 }
