@@ -4,8 +4,8 @@
  */
 const AKITA_DATA_TYPE = {
 	'PAYMENT': 0,
-	'ORIGIN_VISIT_DATA': 1,
-	'ORIGIN_TIME_SPENT': 2,
+	'VISIT_DATA': 1,
+	'TIME_SPENT': 2,
 	'ORIGIN_FAVICON': 3
 };
 
@@ -15,18 +15,14 @@ const ORIGIN_DATA_LIST_KEY = 'originDataList';
 let webBrowser = chrome ? chrome : browser;
 
 /**
- * Updates application data by saving data to local extension storage in a
- * special Akita format. Using this method ensures that the data in storage
- * maintains the Akita format structure. For an example of the Akita format
- * see ./example_data.json
+ * Store data for a monetized origin.
  *
  * @param {Object} data Data to store. May be null if no data included.
  * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
  */
 async function storeDataIntoAkitaFormat(data, typeOfData) {
-	// TODO: ensure typeOfData is one of AKITA_DATA_TYPE
-
 	const origin = window.location.origin;
+
 	// Start getting originList asynchronously
 	const originListPromise = getOriginList();
 
@@ -38,6 +34,47 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 		originData = new AkitaOriginData(origin);
 	}
 
+	await updateAkitaData(originData, data, typeOfData, isMonetizedData = true);
+
+	// Overwrite or create the data for this origin in storage
+	await storeOriginData(origin, originData);
+
+	// If the origin is monetized and data does not already exist for this origin,
+	// then the origin must not be in the originList, so add it.
+	if (!originDataExists) {
+		const originList = await originListPromise;
+
+		originList.push(origin);
+		await storeOriginList(originList);
+	}
+}
+
+/**
+ * Store data for a non-monetized origin.
+ *
+ * @param {Object} data Data to store. May be null if no data included.
+ * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
+ */
+async function storeDataIntoAkitaFormatNonMonetized(data, typeOfData) {
+	// There is no origin data when storing non-monetized data
+	await updateAkitaData(originData = null, data, typeOfData, isMonetizedData = false);
+}
+
+/**
+ * Updates application data by saving data to local extension storage in a
+ * special Akita format. Using this method ensures that the data in storage
+ * maintains the Akita format structure. For an example of the Akita format
+ * see ./example_data.json
+ *
+ * @param {AkitaOriginData} originData The origin data to store data for. Will be null if storing
+ *		data for a non-monetized origin.
+ * @param {Object} data Data to store. May be null if no data included.
+ * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
+ * @param {Boolean} isMonetizedData Whether or not the data being stored is for a monetized origin.
+ */
+async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
+	// TODO: ensure typeOfData is one of AKITA_DATA_TYPE
+
 	// Get existing originStats or create it if it doesn't already exist
 	let originStats = await loadOriginStats();
 
@@ -47,36 +84,24 @@ async function storeDataIntoAkitaFormat(data, typeOfData) {
 	}
 
 	switch (typeOfData) {
-		case AKITA_DATA_TYPE.PAYMENT:
+		case AKITA_DATA_TYPE.PAYMENT: // Only for a monetized origin
 			updatePaymentData(originData, originStats, data);
 			break;
-		case AKITA_DATA_TYPE.ORIGIN_VISIT_DATA:
-			updateVisitData(originData, originStats);
+		case AKITA_DATA_TYPE.VISIT_DATA:
+			updateVisitData(originData, originStats, isMonetizedData);
 			break;
-		case AKITA_DATA_TYPE.ORIGIN_TIME_SPENT:
-			updateTimeSpent(originData, originStats, data);
+		case AKITA_DATA_TYPE.TIME_SPENT:
+			updateTimeSpent(originData, originStats, data, isMonetizedData);
 			break;
-		case AKITA_DATA_TYPE.ORIGIN_FAVICON:
+		case AKITA_DATA_TYPE.ORIGIN_FAVICON: // Only for a monetized origin
 			await updateOriginFavicon(originData, data);
 			break;
 		default:
 			// console.log("invalid data type provided");
 	}
 
-	// Overwrite or create the data for this origin in storage
-	await storeOriginData(origin, originData);
-
 	// Overwrite or create origin stats in storage
 	await storeOriginStats(originStats);
-
-	// If data does not already exist for this origin, then the origin must not
-	// be in the originList, so add it.
-	if (!originDataExists) {
-		const originList = await originListPromise;
-
-		originList.push(origin);
-		await storeOriginList(originList);
-	}
 }
 
 /***********************************************************
@@ -113,10 +138,14 @@ function updatePaymentData(originData, originStats, paymentData) {
  *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {AkitaOriginStats} originStats The origin stats to update.
+ * @param {Boolean} isMonetizedVisit If the visit is to a monetized site.
  */
-function updateVisitData(originData, originStats) {
-	originData.updateVisitData();
-	originStats.incrementVisits(originData.isCurrentlyMonetized);
+function updateVisitData(originData, originStats, isMonetizedVisit) {
+	if (isMonetizedVisit) {
+		originData.updateVisitData();
+	}
+
+	originStats.incrementTotalVisits();
 }
 
 /**
@@ -124,11 +153,15 @@ function updateVisitData(originData, originStats) {
  *
  * @param {AkitaOriginData} originData The origin data to update.
  * @param {AkitaOriginStats} originStats The origin stats to update.
- * @param {Number} recentTimeSpent The recent time spent at the origin in milliseconds.
+ * @param {Number} recentTimeSpent Amount of recent time spent at the origin.
+ * @param {Boolean} isMonetizedTime If the recent time spent was monetized or not.
  */
-function updateTimeSpent(originData, originStats, recentTimeSpent = 0) {
-	originData.addTimeSpent(recentTimeSpent);
-	originStats.updateTimeSpent(recentTimeSpent, originData.isCurrentlyMonetized);
+function updateTimeSpent(originData, originStats, recentTimeSpent, isMonetizedTime) {
+	if (isMonetizedTime) {
+		originData.addMonetizedTimeSpent(recentTimeSpent);
+	}
+
+	originStats.updateTimeSpent(recentTimeSpent, isMonetizedTime);
 }
 
 /**
@@ -207,7 +240,6 @@ async function loadOriginStats() {
  **/
 async function storeOriginStats(originStats) {
 	return new Promise((resolve, reject) => {
-
 		const storageSetterObject = {};
 		storageSetterObject[ORIGIN_STATS_KEY] = originStats;
 
@@ -258,7 +290,6 @@ async function getOriginDataList() {
  */
 async function loadOriginData(origin) {
 	return new Promise((resolve, reject) => {
-
 		webBrowser.storage.local.get(
 			origin,
 			(storageObject) => {
@@ -280,7 +311,6 @@ async function loadOriginData(origin) {
  */
 async function storeOriginData(origin, akitaOriginData) {
 	return new Promise((resolve, reject) => {
-
 		const storageSetterObject = {};
 		storageSetterObject[origin] = akitaOriginData;
 
@@ -303,10 +333,9 @@ async function storeOriginData(origin, akitaOriginData) {
  */
 async function loadAllData() {
 	const originList = await getOriginList();
-
 	const originStats = await loadOriginStats();
-
 	const promiseList = [];
+
 	for (const origin of originList) {
 		promiseList.push(loadOriginData(origin));
 	}
@@ -341,7 +370,6 @@ async function getOriginList() {
  **/
 async function storeOriginList(originList) {
 	return new Promise((resolve, reject) => {
-
 		const storageSetterObject = {};
 		storageSetterObject[ORIGIN_NAME_LIST_KEY] = originList;
 

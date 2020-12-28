@@ -14,7 +14,6 @@ class AkitaOriginStats {
 	totalTimeSpent = 0;
 	totalMonetizedTimeSpent = 0;
 	totalVisits = 0;
-	totalMonetizedVisits = 0;
 
 	// The type of each entry in totalSentAssetsMap is: WebMonetizationAsset
 	totalSentAssetsMap = {};
@@ -33,7 +32,6 @@ class AkitaOriginStats {
 		newAkitaOriginStats.totalTimeSpent = akitaOriginStats.totalTimeSpent;
 		newAkitaOriginStats.totalMonetizedTimeSpent = akitaOriginStats.totalMonetizedTimeSpent;
 		newAkitaOriginStats.totalVisits = akitaOriginStats.totalVisits;
-		newAkitaOriginStats.totalMonetizedVisits = akitaOriginStats.totalMonetizedVisits;
 
 		for (const assetCode in akitaOriginStats.totalSentAssetsMap) {
 			newAkitaOriginStats.totalSentAssetsMap[assetCode] = WebMonetizationAsset.fromObject(
@@ -49,16 +47,16 @@ class AkitaOriginStats {
 	 ***********************************************************/
 
 	/**
-	 * Update the total monetized time spent if the origin is monetized; update
+	 * Update the total monetized time spent if the time was monetized; update
 	 * the total time spent regardless.
 	 *
 	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
-	 * @param {Boolean} originIsCurrentlyMonetized Whether the origin is monetized or not.
+	 * @param {Boolean} isMonetizedTime Whether the time spent is monetized or not.
 	 */
-	updateTimeSpent(recentTimeSpent, originIsCurrentlyMonetized) {
+	updateTimeSpent(recentTimeSpent, isMonetizedTime) {
 		this.updateTotalTimeSpent(recentTimeSpent);
 
-		if (originIsCurrentlyMonetized) {
+		if (isMonetizedTime) {
 			this.updateTotalMonetizedTimeSpent(recentTimeSpent);
 		}
 	}
@@ -75,7 +73,7 @@ class AkitaOriginStats {
 	/**
 	 * Update the total time spent at monetized origins.
 	 *
-	 * @param {Number} recentTimeSpent The new amount of time spent at the origin.
+	 * @param {Number} recentTimeSpent The new amount of monetized time spent.
 	 */
 	updateTotalMonetizedTimeSpent(recentTimeSpent) {
 		this.totalMonetizedTimeSpent += recentTimeSpent;
@@ -86,30 +84,10 @@ class AkitaOriginStats {
 	 ***********************************************************/
 
 	/**
-	 * Update the total visits to monetized origins if the origin is monetized,
-	 * and update the total visits to origins regardless.
-	 *
-	 * @param {Boolean} originIsCurrentlyMonetized Whether the origin is monetized or not.
-	 */
-	incrementVisits(originIsCurrentlyMonetized) {
-		if (originIsCurrentlyMonetized) {
-			this.incrementTotalMonetizedVisits();
-		}
-		this.incrementTotalVisits();
-	}
-
-	/**
 	 * Increment the total visits to origins.
 	 */
 	incrementTotalVisits() {
 		this.totalVisits += 1;
-	}
-
-	/**
-	 * Increment the total visits to monetized origins.
-	 */
-	incrementTotalMonetizedVisits() {
-		this.totalMonetizedVisits += 1;
 	}
 
 	/***********************************************************

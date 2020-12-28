@@ -10,7 +10,7 @@
  *   - date of most recent visit recorded in Akita (format: YYYY-MM-DD)
  */
 class AkitaOriginVisitData {
-	timeSpentAtOrigin = 0; // time in milliseconds
+	monetizedTimeSpent = 0; // time in milliseconds
 	numberOfVisits = 0;
 	dateOfFirstVisit = "";
 	dateOfMostRecentVisit = "";
@@ -28,7 +28,7 @@ class AkitaOriginVisitData {
 
 		if (akitaOriginVisitDataObject) {
 			newOriginVisitData = new AkitaOriginVisitData();
-			newOriginVisitData.timeSpentAtOrigin = akitaOriginVisitDataObject.timeSpentAtOrigin;
+			newOriginVisitData.monetizedTimeSpent = akitaOriginVisitDataObject.monetizedTimeSpent;
 			newOriginVisitData.numberOfVisits = akitaOriginVisitDataObject.numberOfVisits;
 			newOriginVisitData.dateOfFirstVisit = akitaOriginVisitDataObject.dateOfFirstVisit;
 			newOriginVisitData.dateOfMostRecentVisit = akitaOriginVisitDataObject.dateOfMostRecentVisit;
@@ -38,12 +38,12 @@ class AkitaOriginVisitData {
 	}
 
 	/**
-	 * Update the total time spent by adding the recent time to the total.
+	 * Update the total monetized time spent by adding the recent monetized time to the total.
 	 *
-	 * @param {Number} recentTimeSpentAtOrigin The new amount of time spent at the origin.
+	 * @param {Number} recentMonetizedTimeSpentAtOrigin The new amount of monetized time spent at the origin.
 	 */
-	addTimeSpent(recentTimeSpentAtOrigin = 0) {
-		this.timeSpentAtOrigin += recentTimeSpentAtOrigin;
+	addMonetizedTimeSpent(recentMonetizedTimeSpentAtOrigin = 0) {
+		this.monetizedTimeSpent += recentMonetizedTimeSpentAtOrigin;
 	}
 
 	/**

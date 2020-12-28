@@ -10,7 +10,6 @@
 		"totalTimeSpent": 1834971294872194719204821,
 		"totalMonetizedTimeSpent": 194719204821,
 		"totalVisits": 500,
-		"totalMonetizedVisits": 30,
 		"totalSentAssetsMap": {
 			"XRP": {
 				"amount": 74289471,
@@ -33,9 +32,8 @@
 		{
 			"origin":"https://dev.to",
 			"faviconSource": "https://dev-to.s3.us-east-2.amazonaws.com/favicon.ico",
-			"isCurrentlyMonetized":true,
 			"originVisitData":{
-				"timeSpentAtOrigin": 8731882,
+				"monetizedTimeSpent": 8731882,
 				"numberOfVisits": 3,
 				"dateOfFirstVisit": "2020-05-01",
 				"dateOfMostRecentVisit": "2020-06-02"
@@ -56,9 +54,8 @@
 		{
 			"origin":"https://www.twitch.tv",
 			"faviconSource": "https://static.twitchcdn.net/assets/favicon-16-2d5d1f5ddd489ee10398.png",
-			"isCurrentlyMonetized":true,
 			"originVisitData":{
-				"timeSpentAtOrigin": 4723893,
+				"monetizedTimeSpent": 4723893,
 				"numberOfVisits": 2,
 				"dateOfFirstVisit": "2020-05-15",
 				"dateOfMostRecentVisit": "2020-05-27"
@@ -89,9 +86,8 @@
 		{
 			"origin":"https://sdog.netlify.app",
 			"faviconSource": "https://sharonwang.netlify.app/favicon.ico",
-			"isCurrentlyMonetized":true,
 			"originVisitData":{
-				"timeSpentAtOrigin": 4567890218492,
+				"monetizedTimeSpent": 4567890218492,
 				"numberOfVisits": 300,
 				"dateOfFirstVisit": "2020-01-01",
 				"dateOfMostRecentVisit": "2020-06-02"

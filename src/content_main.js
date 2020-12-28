@@ -1,5 +1,6 @@
 const NEW_PAYMENT_POINTER_CHECK_RATE_MS = 1000; // 1 second
 const PAYMENT_POINTER_VALIDATION_RATE_MS = 1000 * 60 * 60; // 1 hour
+let paymentPointersBeingValidated = new Set();
 
 /**
  * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
@@ -50,9 +51,8 @@ async function main() {
 	//	storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
 	//});
 
-	trackPaymentPointer();
 	handleUpdatingExtensionIconOnTabVisibilityChange();
-	await trackTimeOnSite();
+	trackPaymentPointerAndTimeOnSite();
 	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
@@ -88,8 +88,17 @@ function setExtensionIconMonetizationState(isCurrentlyMonetized) {
  * No data needs to be passed in, since it is handled in AkitaOriginVisitData.
  */
 async function trackVisitToSite() {
-	await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.ORIGIN_VISIT_DATA);
-	await storeFaviconPath();
+	const paymentPointerOnPage = getPaymentPointerFromPage();
+
+	// If the payment pointer is valid, then the visit is a monetized visit
+	const isMonetizedVisit = await validatePaymentPointer(paymentPointerOnPage);
+
+	if (isMonetizedVisit) {
+		await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.VISIT_DATA);
+		await storeFaviconPath();
+	} else {
+		await storeDataIntoAkitaFormatNonMonetized(null, AKITA_DATA_TYPE.VISIT_DATA);
+	}
 }
 
 /**
@@ -100,18 +109,18 @@ async function trackVisitToSite() {
  * https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
  * https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState
  */
-async function trackTimeOnSite() {
+function trackPaymentPointerAndTimeOnSite() {
 	let previousStoreTime = getCurrentTime();
 	let docHiddenTime = -1;
 	let docVisibleTime = -1;
 
-	document.addEventListener('visibilitychange', async (event) => {
-		if (document.hidden) {
-			// The page is no longer visible
-			docHiddenTime = getCurrentTime();
-		} else {
-			// The page is now visible
+	document.addEventListener('visibilitychange', (event) => {
+		const tabIsVisible = !document.hidden;
+
+		if (tabIsVisible) {
 			docVisibleTime = getCurrentTime();
+		} else {
+			docHiddenTime = getCurrentTime();
 		}
 	});
 
@@ -119,27 +128,43 @@ async function trackTimeOnSite() {
 	 * NOTE: setInterval may not be called while the document is hidden (while visibility lost)
 	 * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified
 	 *
-	 * Store the recent time spent every 2 seconds to ensure time spent on site is recorded
-	 * even if the user closes the site.
+	 * Check if a new payment pointer is added to the page and store the recent time spent
+	 * every NEW_PAYMENT_POINTER_CHECK_RATE_MS milliseconds to ensure time spent on site is recorded
+	 * even if the user closes the site. Calls `handleValidationAndSetExtensionIcon` to set the extension icon.
 	 */
 	setInterval(async () => {
-		const now = getCurrentTime();
+		const paymentPointerOnPage = getPaymentPointerFromPage();
 
+		// Logic to store time spent at the origin (monetized or non-monetized)
 		if (document.visibilityState === 'visible') {
+			const currentTime = getCurrentTime();
+			let recentTimeSpent = 0;
+
 			if (docHiddenTime > previousStoreTime) {
 				// Adding time after visibility lost (document becomes hidden) and then gained (document is visible again)
 				// i.e. If the user navigates away from the site and then comes back
 				const timeFromPreviousStoreToDocHidden = docHiddenTime - previousStoreTime;
-				const timeSinceDocVisible = now - docVisibleTime;
-				await storeRecentTimeSpent(timeFromPreviousStoreToDocHidden + timeSinceDocVisible);
+				const timeSinceDocVisible = currentTime - docVisibleTime;
+				recentTimeSpent = timeFromPreviousStoreToDocHidden + timeSinceDocVisible;
 			} else {
 				// Adding time during regular interval (document visible)
-				await storeRecentTimeSpent(now - previousStoreTime);
+				recentTimeSpent = currentTime - previousStoreTime;
 			}
 
-			previousStoreTime = now;
+			previousStoreTime = currentTime;
+
+			// If the payment pointer has been recently validated, then the time elapsed is monetized time
+			const isMonetizedTime = await isPaymentPointerRecentlyValidated(paymentPointerOnPage);
+			await storeRecentTimeSpent(recentTimeSpent, isMonetizedTime);
 		}
-	}, 2000); // 2 second interval
+
+		// Logic to update the payment pointer and set the extension icon
+		const isValidPaymentPointer = await validatePaymentPointer(paymentPointerOnPage);
+
+		// Set the extension icon to monetized if the payment pointer is valid
+		setExtensionIconMonetizationState(isValidPaymentPointer);
+
+	}, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
 }
 
 /**
@@ -154,12 +179,18 @@ function getCurrentTime() {
  *
  * @param {Number} recentTimeSpent The recent time spent on the webpage. This number is
  * a Double, since performance.now() is used to construct this number.
+ * @param {Boolean} isMonetizedTime Set to true if the recent time spent is monetized time;
+ * false otherwise.
  */
-async function storeRecentTimeSpent(recentTimeSpent) {
-	// Round the number up so that it is a whole number.
+async function storeRecentTimeSpent(recentTimeSpent, isMonetizedTime) {
+	// Round the number up so that it is a whole number
 	const recentTimeSpentRounded = Math.ceil(recentTimeSpent);
 
-	await storeDataIntoAkitaFormat(recentTimeSpentRounded, AKITA_DATA_TYPE.ORIGIN_TIME_SPENT);
+	if (isMonetizedTime) {
+		await storeDataIntoAkitaFormat(recentTimeSpentRounded, AKITA_DATA_TYPE.TIME_SPENT);
+	} else {
+		await storeDataIntoAkitaFormatNonMonetized(recentTimeSpentRounded, AKITA_DATA_TYPE.TIME_SPENT);
+	}
 }
 
 /***********************************************************
@@ -187,77 +218,67 @@ function getPaymentPointerFromPage() {
 }
 
 /**
- * Checks every NEW_PAYMENT_POINTER_CHECK_RATE_MS milliseconds to see if a new payment pointer is
- * added to the page. Calls `handleValidationAndSetExtensionIcon` to set the extension icon.
- */
-function trackPaymentPointer() {
-	let cachedPaymentPointer = null;
-
-	setInterval(async () => {
-		const paymentPointerOnPage = getPaymentPointerFromPage();
-
-		const isNewPaymentPointer =
-			(paymentPointerOnPage !== null) &&
-			(paymentPointerOnPage !== cachedPaymentPointer);
-
-		if (isNewPaymentPointer) {
-			// Note that paymentPointerOnPage may be newly added to the current page and tab,
-			// but it is possible that this payment pointer was recently validated in another tab.
-			// Therefore it is necessary to use handleValidationAndSetExtensionIcon which checks the
-			// browser storage to see if the payment pointer has been recently validated.
-			handleValidationAndSetExtensionIcon(paymentPointerOnPage);
-			cachedPaymentPointer = paymentPointerOnPage;
-		}
-	}, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
-}
-
-/**
  * Ensures that the extension icon is updated to the correct state when switching between tabs.
  */
 function handleUpdatingExtensionIconOnTabVisibilityChange() {
-	document.addEventListener('visibilitychange', (event) => {
+	document.addEventListener('visibilitychange', async (event) => {
 		const tabIsVisible = !document.hidden;
 
 		if (tabIsVisible) {
 			const paymentPointerOnPage = getPaymentPointerFromPage();
-			if (paymentPointerOnPage === null) {
-				setExtensionIconMonetizationState(false);
-			} else {
-				handleValidationAndSetExtensionIcon(paymentPointerOnPage);
-			}
+			const isValidPaymentPointer = await validatePaymentPointer(paymentPointerOnPage);
+
+			// Set the extension icon to monetized if the payment pointer is valid
+			setExtensionIconMonetizationState(isValidPaymentPointer);
 		}
 	});
 }
 
 /**
- * Given a payment pointer, if it is valid, this function sets the extension icon to its monetized
- * state and stores the payment pointer in browser storage, otherwise the extension icon is set to
- * its unmonetized state.
+ * Validate the payment pointer or check the recently validated result
+ * and return whether the payment pointer is valid or not. Stores the payment
+ * pointer if it does not already exist.
  *
- * @param {string} paymentPointer The payment pointer to validate.
- * @returns {Promise<>} A promise that resolves when validation is finished.
+ * @param {String} paymentPointer The payment pointer to validate.
+ * @returns {Promise<boolean>} The validated payment pointer or null if invalid.
  */
-async function handleValidationAndSetExtensionIcon(paymentPointer) {
-	if (await isPaymentPointerRecentlyValidated(paymentPointer)) {
-		setExtensionIconMonetizationState(true);
-	} else {
-		// Validate if not validated recently
-		if (await isPaymentPointerValid(paymentPointer)) {
-			// Store the payment pointer and the UTC timestamp for the time it was validated (now)
-			await storeDataIntoAkitaFormat({
-				paymentPointer: paymentPointer,
-				validationTimestamp: Date.now()
-			}, AKITA_DATA_TYPE.PAYMENT);
-			setExtensionIconMonetizationState(true);
-		} else {
-			setExtensionIconMonetizationState(false);
+async function validatePaymentPointer(paymentPointer) {
+	let isValid = false;
+
+	if (paymentPointer) {
+		// Check if the payment pointer on the page is currently undergoing the validation process
+		const paymentPointerIsCurrentlyBeingValidated = paymentPointersBeingValidated.has(paymentPointer);
+
+		if (!paymentPointerIsCurrentlyBeingValidated) {
+			// Add the payment pointer to the validation "in progress" set
+			paymentPointersBeingValidated.add(paymentPointer);
+
+			if (await isPaymentPointerRecentlyValidated(paymentPointer)) {
+				isValid = true;
+			} else {
+				// Validate if not validated recently
+				if (await isPaymentPointerValid(paymentPointer)) {
+					// Store the payment pointer and the UTC timestamp for the time it was validated (now)
+					await storeDataIntoAkitaFormat({
+						paymentPointer: paymentPointer,
+						validationTimestamp: Date.now()
+					}, AKITA_DATA_TYPE.PAYMENT);
+
+					isValid = true;
+				}
+			}
+
+			// Done validation process, remove the payment pointer from the "in progress" set
+			paymentPointersBeingValidated.delete(paymentPointer);
 		}
 	}
+
+	return isValid;
 }
 
 /**
- * Checks the browser storage to see if Akita has validated the given payment pointer and stored a
- * validation timestamp for it recently.
+ * Checks the browser storage to see if Akita has successfully validated the given payment pointer
+ * and stored a validation timestamp for it recently.
  *
  * @param {string} paymentPointer The payment pointer to check.
  * @returns {Promise<boolean>} Resolves to true if there is a timestamp retrieved from storage and
@@ -267,11 +288,13 @@ async function handleValidationAndSetExtensionIcon(paymentPointer) {
 async function isPaymentPointerRecentlyValidated(paymentPointer) {
 	const originData = await loadOriginData(window.location.origin);
 	let validationTimestamp = null;
+
 	if (originData && originData.paymentPointerMap[paymentPointer]) {
 		// Get validationTimestamp from originData under the given payment pointer
 		validationTimestamp =
 			originData.paymentPointerMap[paymentPointer].validationTimestamp;
 	}
+
 	if (validationTimestamp === null) {
 		return false;
 	}
@@ -296,7 +319,6 @@ async function isPaymentPointerRecentlyValidated(paymentPointer) {
  * @return {Promise<boolean>} Whether or not the specified payment pointer is valid.
  */
 async function isPaymentPointerValid(paymentPointer) {
-	let isPaymentPointerValid = false;
 	const resolvedPaymentPointer = resolvePaymentPointer(paymentPointer);
 
 	if (resolvedPaymentPointer) {
@@ -307,12 +329,12 @@ async function isPaymentPointerValid(paymentPointer) {
 			const httpStatusOK = 200;
 
 			if (httpStatusOK === response.status) {
-				isPaymentPointerValid = true;
+				return true;
 			}
 		}
 	}
 
-	return isPaymentPointerValid;
+	return false;
 }
 
 /**
@@ -344,10 +366,10 @@ function resolvePaymentPointer(paymentPointer) {
 			const pathabemptyIndex = resolvedPaymentPointer.indexOf('/');
 
 			// If no custom path is specified, append /.well-known/pay to the endpoint, otherwise keep the path as is
-			if (-1 == pathabemptyIndex) {
+			if (-1 === pathabemptyIndex) {
 				// There is no path specified for the payment pointer; eg. $pointer.exampleILPwalletprovider.com
 				resolvedPaymentPointer.concat("/" + wellKnownPath);
-			} else if ((resolvedPaymentPointer.length - 1) == pathabemptyIndex) {
+			} else if ((resolvedPaymentPointer.length - 1) === pathabemptyIndex) {
 				// There is no path specified for the payment pointer, but it ends in a forward slash; eg. $pointer.exampleILPwalletprovider.com/
 				resolvedPaymentPointer.concat(wellKnownPath);
 			} else {
