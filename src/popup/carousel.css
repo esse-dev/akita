@@ -1,7 +1,7 @@
 #carousel {
 	height: 500px;
 	display: grid;
-	grid-template-columns: repeat(6, 100%);
+	grid-template-columns: repeat(7, 100%);
 }
 #intro-exit {
 	position: absolute;
@@ -51,7 +51,7 @@
 	bottom: 25px;
 	left: 113px;
 	width: 185px;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
 .carousel-dot {
