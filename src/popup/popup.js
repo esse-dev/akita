@@ -65,21 +65,6 @@ const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
 
 getStats();
 async function getStats() {
-	// Make all links in extension popup clickable and open in new tab
-	var links = document.getElementsByTagName("a");
-
-	for (const link of Array.from(links)) {
-		if (link.id !== 'goto-intro') {
-			link.target = "_blank";
-
-			link.addEventListener("click", () => {
-				setTimeout(() => {
-					window.close();
-				}, 100);
-			}, false);
-		}
-	}
-
 	const originStats = await loadOriginStats();
 	const circleContainer = document.getElementById('circle-container');
 
@@ -224,6 +209,22 @@ async function getStats() {
 			}, false);
 
 			circleContainer.appendChild(circleEl);
+		}
+	}
+
+	// Make all links in extension popup clickable and open in new tab.
+	// Must be done at the end of this function so that links added above are made clickable as well.
+	var links = document.getElementsByTagName("a");
+
+	for (const link of Array.from(links)) {
+		if (link.id !== 'goto-intro') {
+			link.target = "_blank";
+
+			link.addEventListener("click", () => {
+				setTimeout(() => {
+					window.close();
+				}, 100);
+			}, false);
 		}
 	}
 }
