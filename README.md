@@ -24,6 +24,7 @@ Our license information can be found [here](docs/LicenseInfo.md) and our license
     - [How Akita Helps](#how-akita-helps)
     - [Blog Posts on Our Process](#blog-posts-on-our-process)
     - [Why 'Akita'?](#why-akita)
+    - [Akita Data](#akita-data)
   - [Connect with Us](#connect-with-us)
 
 ---
@@ -105,6 +106,18 @@ Naming projects can be pretty challenging. We spent a good chunk of time coming 
 The Akita is a Japanese dog breed known for its loyalty and dedication. It's also quite fluffy. We were drawn to "Akita" because of the values the breed represents (i.e. loyalty, dedication), as those characteristics are what we want to embrace with our project. Through Akita and Web Monetization, we want to enable mutual loyalty and dedication between content creators/websites and their users.
 
 We were also very inspired by the story of [Hachikō](https://en.wikipedia.org/wiki/Hachik%C5%8D) - a dog of immense loyalty. Hachikō was an Akita who would meet with his owner every day at the train station. Even after his owner passed away, Hachikō continued to wait for his owner at the train station for more than 9 years. Hachikō continues to have a legacy in Japanese culture, with various statues created in his memory - there was even an [American film](https://en.wikipedia.org/wiki/Hachi:_A_Dog%27s_Tale) based on him.
+
+### Akita Data
+Akita collects data on
+
+- your time spent and number of visits on all websites,
+- the [Payment Pointers](https://paymentpointers.org/) present on the websites you visit,
+- and the currency and amount of payments streamed to Payment Pointers via Web Monetization.
+
+You can view an example of the data collected by Akita in [`examples/example_data.json`](examples/example_data.json).
+The data collected by Akita is stored on your machine, in your browser's local storage.
+Your data stays in your hands: it is not backed up, shared, or uploaded anywhere.
+Therefore, if you uninstall the Akita browser extension, your data will be **permanently deleted** and will not be recoverable.
 
 ---
 
