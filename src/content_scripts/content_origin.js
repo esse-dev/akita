@@ -1,41 +1,33 @@
-const NEW_PAYMENT_POINTER_CHECK_RATE_MS = 1000; // 1 second
-const PAYMENT_POINTER_VALIDATION_RATE_MS = 1000 * 60 * 60; // 1 hour
-let paymentPointersBeingValidated = new Set();
+/***********************************************************
+ * content_origin.js handles time and visit tracking for the top level page. content_origin.js decides
+ * if the page is monetized based on the payment pointers on the page and in iframes on the page.
+ ***********************************************************/
 
-/**
- * Content scripts can only see a "clean version" of the DOM, i.e. a version of the DOM without
- * properties which are added by JavaScript, such as document.monetization!
- * reference: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts#Content_script_environment
- *			  https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
- * So we must inject some code into the JavaScript context of the current tab in order to
- * access the document.monetization object. We inject code using a script element:
- */
-const scriptEl = document.createElement('script');
-scriptEl.text = `
-	if (document.monetization) {
-		document.monetization.addEventListener('monetizationstart', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
-		});
+const paymentPointersBeingValidated = new Set();
 
-		document.monetization.addEventListener('monetizationprogress', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
-		});
+const iframesWithUuids = new Set();
+const iframeUuidMap = new Map();
+const paymentPointerIframeMap = new Map();
 
-		document.monetization.addEventListener('monetizationstop', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
-		});
-	}
-`;
-document.body.appendChild(scriptEl);
+// content_origin.js only runs in the top level page so it sets window.isTopLevel to true so that
+// other content scripts can check whether they are also running in the top level page.
+// See ./content_iframe.js for more info.
+window.isTopLevel = true;
 
-
-setExtensionIconMonetizationState(false);
 main();
 
 /**
  * Main function to initiate the application.
  */
 async function main() {
+	document.addEventListener('akita_monetizationprogress', (event) => {
+		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
+	});
+
+	setExtensionIconMonetizationState(false);
+	trackPaymentPointerAndTimeOnSite();
+	await trackVisitToSite();
+
 	// Test storing assets
 	// await storeDataIntoAkitaFormat({
 	// 	paymentPointer: paymentPointer,
@@ -43,17 +35,6 @@ async function main() {
 	// 	assetScale: 9,
 	// 	amount: 123456
 	// }, AKITA_DATA_TYPE.PAYMENT);
-
-	document.addEventListener('akita_monetizationprogress', (event) => {
-		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
-	});
-	//document.addEventListener('akita_monetizationstop', (event) => {
-	//	storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.PAYMENT);
-	//});
-
-	handleUpdatingExtensionIconOnTabVisibilityChange();
-	trackPaymentPointerAndTimeOnSite();
-	await trackVisitToSite();
 
 	// For TESTING purposes: output all stored data to the console (not including current site)
 	// loadAllData().then(result => console.log(JSON.stringify(result, null, 2)));
@@ -75,7 +56,9 @@ function setExtensionIconMonetizationState(isCurrentlyMonetized) {
 
 	if (tabIsVisible) {
 		const webBrowser = chrome ? chrome : browser;
-		webBrowser.runtime.sendMessage({ isCurrentlyMonetized });
+		webBrowser.runtime.sendMessage({
+			isCurrentlyMonetized: { value: isCurrentlyMonetized }
+		});
 	}
 }
 
@@ -114,11 +97,14 @@ function trackPaymentPointerAndTimeOnSite() {
 	let docHiddenTime = -1;
 	let docVisibleTime = -1;
 
-	document.addEventListener('visibilitychange', (event) => {
+	document.addEventListener('visibilitychange', async (event) => {
 		const tabIsVisible = !document.hidden;
 
 		if (tabIsVisible) {
 			docVisibleTime = getCurrentTime();
+			const isMonetized = await isPageMonetized();
+			// Set the extension icon to monetized if the payment pointer is valid
+			setExtensionIconMonetizationState(isMonetized);
 		} else {
 			docHiddenTime = getCurrentTime();
 		}
@@ -130,11 +116,11 @@ function trackPaymentPointerAndTimeOnSite() {
 	 *
 	 * Check if a new payment pointer is added to the page and store the recent time spent
 	 * every NEW_PAYMENT_POINTER_CHECK_RATE_MS milliseconds to ensure time spent on site is recorded
-	 * even if the user closes the site. Calls `handleValidationAndSetExtensionIcon` to set the extension icon.
+	 * even if the user closes the site. Calls `setExtensionIconMonetizationState` to set the extension icon.
 	 */
-	setInterval(async () => {
-		const paymentPointerOnPage = getPaymentPointerFromPage();
-
+	trackTimeAndSetIcon();
+	setInterval(trackTimeAndSetIcon, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
+	async function trackTimeAndSetIcon() {
 		// Logic to store time spent at the origin (monetized or non-monetized)
 		if (document.visibilityState === 'visible') {
 			const currentTime = getCurrentTime();
@@ -154,17 +140,13 @@ function trackPaymentPointerAndTimeOnSite() {
 			previousStoreTime = currentTime;
 
 			// If the payment pointer has been recently validated, then the time elapsed is monetized time
-			const isMonetizedTime = await isPaymentPointerRecentlyValidated(paymentPointerOnPage);
-			await storeRecentTimeSpent(recentTimeSpent, isMonetizedTime);
+			const isMonetized = await isPageMonetized();
+			// Set the extension icon to monetized if the payment pointer is valid
+			setExtensionIconMonetizationState(isMonetized);
+
+			await storeRecentTimeSpent(recentTimeSpent, isMonetized);
 		}
-
-		// Logic to update the payment pointer and set the extension icon
-		const isValidPaymentPointer = await validatePaymentPointer(paymentPointerOnPage);
-
-		// Set the extension icon to monetized if the payment pointer is valid
-		setExtensionIconMonetizationState(isValidPaymentPointer);
-
-	}, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
+	}
 }
 
 /**
@@ -194,44 +176,34 @@ async function storeRecentTimeSpent(recentTimeSpent, isMonetizedTime) {
 }
 
 /***********************************************************
- * Track and Validate Payment Pointer
+ * Payment Pointer Validation
  ***********************************************************/
 
 /**
- * Gets the payment pointer as a string from the monetization meta tag on the current page.
- * If there is no monetization meta tag on the page, null is returned.
+ * The page is considered to be monetized if the payment pointer on the page or in any of the
+ * iframes on the page are valid. isPageMonetized will validate payment pointers if they have not
+ * been recently validated.
  *
- * For more info on the monetization meta tag:
- *	- https://webmonetization.org/docs/getting-started
- *	- https://webmonetization.org/specification.html#meta-tags-set
- *
- * @return {string|null} The payment pointer on the current page, or null if no meta tag is present.
+ * @return {boolean} True if the page is considered monetized.
  */
-function getPaymentPointerFromPage() {
-	const monetizationMetaTag = document.querySelector('meta[name="monetization"]');
-
-	if (monetizationMetaTag) {
-		return monetizationMetaTag.content;
-	} else {
-		return null;
+async function isPageMonetized() {
+	const paymentPointerOnPage = getPaymentPointerFromPage();
+	const isPaymentPointerOnPageValid = await validatePaymentPointer(paymentPointerOnPage);
+	if (isPaymentPointerOnPageValid) {
+		return true;
 	}
-}
 
-/**
- * Ensures that the extension icon is updated to the correct state when switching between tabs.
- */
-function handleUpdatingExtensionIconOnTabVisibilityChange() {
-	document.addEventListener('visibilitychange', async (event) => {
-		const tabIsVisible = !document.hidden;
-
-		if (tabIsVisible) {
-			const paymentPointerOnPage = getPaymentPointerFromPage();
-			const isValidPaymentPointer = await validatePaymentPointer(paymentPointerOnPage);
-
-			// Set the extension icon to monetized if the payment pointer is valid
-			setExtensionIconMonetizationState(isValidPaymentPointer);
+	trackIframesByUuid();
+	for (const [iframe, paymentPointer] of paymentPointerIframeMap) {
+		if (isMonetizationAllowedOnIframe(iframe)) {
+			const isPaymentPointerInIframeValid = await validatePaymentPointer(paymentPointer);
+			if (isPaymentPointerInIframeValid) {
+				return true;
+			}
 		}
-	});
+	}
+
+	return false;
 }
 
 /**
@@ -471,4 +443,91 @@ function getFaviconPath() {
 	}
 
 	return faviconPath;
+}
+
+/***********************************************************
+ * Iframe Communication
+ ***********************************************************
+ * About the main, shared, and iframe content scripts and how they work together:
+ * - content_origin.js handles time and visit tracking for the top level page. content_origin.js decides
+ *   if the page is monetized based on the payment pointers on the page and in iframes on the page.
+ * - content_general.js runs both at the top level page (alongside content_origin.js), and
+ *   in iframes (alongside content_iframe.js); it handles forwarding web monetization events into
+ *   akita events.
+ * - content_iframe.js runs inside of each iframe and tracks and notifies content_origin.js of
+ *   payment pointer changes in the iframe via the `webBrowser.runtime` message channel. Each
+ *   content_iframe.js in each iframe is assigned a uuid from content_origin.js via postMessage so
+ *   that content_origin.js can know which iframe the script is associated with when the script sends
+ *   messages.
+ ***********************************************************/
+
+// listen for payment pointer change and uuid received messages from iframes on the page.
+webBrowser.runtime.onMessage.addListener((message) => {
+	if (message.iframeReceivedUuid) {
+		const { iframeUuid } = message.iframeReceivedUuid;
+		const iframe = iframeUuidMap.get(iframeUuid);
+		iframesWithUuids.add(iframe);
+	}
+	if (message.iframePaymentPointerChange) {
+		const { iframeUuid, paymentPointer } = message.iframePaymentPointerChange;
+		const iframe = iframeUuidMap.get(iframeUuid);
+		paymentPointerIframeMap.set(iframe, paymentPointer);
+	}
+});
+
+/**
+ * Ensures that all iframes on the page have a uuid. If an iframe on the page does not yet have a
+ * uuid one is generated and sent to the iframe via postMessage. postMessage is used so that
+ * the message can be sent directly to the iframe's ./content_iframe.js script through the iframe
+ * element. This function keeps retrying to send the iframe its uuid until the content_iframe.js
+ * script running in the iframe acknowledges that it has received the uuid (and iframesWithUuids is
+ * set).
+ *
+ * uuids are used so that when a message from an iframe is received via
+ * `webBrowser.runtime.onMessage` we are able to know which iframe sent the message.
+ */
+function trackIframesByUuid() {
+	const iframeEls = Array.from(document.getElementsByTagName('iframe'));
+
+	for (const iframeEl of iframeEls) {
+		if (!iframesWithUuids.has(iframeEl)) {
+			const iframeUuid = generateUuidv4();
+			iframeUuidMap.set(iframeUuid, iframeEl);
+
+			const origin = window.location.origin;
+			const data = {
+				uuid: iframeUuid,
+				topLevelOrigin: origin
+			};
+			const ACCEPT_ANY_IFRAME_ORIGIN = '*';
+			iframeEl.contentWindow.postMessage(data, ACCEPT_ANY_IFRAME_ORIGIN);
+		}
+	}
+}
+
+/**
+ * Check if an iframe element's allow attribute contains 'monetization' i.e.
+ * `<iframe allow="fullscreen monetization"></iframe>`.
+ *
+ * @param {HTMLIFrameElement} iframeEl the iframe element.
+ * @return {boolean} true if the iframe has an allow attribute containing 'monetization', false otherwise.
+ */
+function isMonetizationAllowedOnIframe(iframeEl) {
+	const iframeAllowString = iframeEl.getAttribute('allow');
+	return iframeAllowString.includes('monetization');
+}
+
+/**
+ * Generates a RFC4122 version 4 universally unique identifier (uuid). A uuid string
+ * is cryptographically guaranteed to be different than any other uuid string.
+ *
+ * Source: https://stackoverflow.com/a/2117523/5425899
+ * - Licenced under CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+ *
+ * @return {string} a uuid string.
+ */
+function generateUuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
 }

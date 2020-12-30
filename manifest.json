@@ -10,7 +10,6 @@
 	},
 	"permissions":[
 		"tabs",
-		"<all_urls>",
 		"storage"
 	],
 	"background": {
@@ -18,7 +17,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["<all_urls>", "http://*/*", "https://*/*"],
+			"matches": ["http://*/*", "https://*/*"],
 			"js": [
 				"src/data/WebMonetizationAsset.js",
 				"src/data/AkitaPaymentPointerData.js",
@@ -26,9 +25,18 @@
 				"src/data/AkitaOriginData.js",
 				"src/data/AkitaOriginStats.js",
 				"src/data/storage.js",
-				"src/content_main.js",
-				"src/main.js"
-			]
+				"src/content_scripts/content_general.js"
+			],
+			"all_frames":true
+		},
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["src/content_scripts/content_origin.js"]
+		},
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["src/content_scripts/content_iframe.js"],
+			"all_frames":true
 		}
 	],
 	"browser_action": {

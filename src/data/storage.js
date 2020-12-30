@@ -19,10 +19,9 @@ let webBrowser = chrome ? chrome : browser;
  *
  * @param {Object} data Data to store. May be null if no data included.
  * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
+ * @param {string} origin The origin of the page storing the data. Defaults to window.location.origin.
  */
-async function storeDataIntoAkitaFormat(data, typeOfData) {
-	const origin = window.location.origin;
-
+async function storeDataIntoAkitaFormat(data, typeOfData, origin=window.location.origin) {
 	// Start getting originList asynchronously
 	const originListPromise = getOriginList();
 
