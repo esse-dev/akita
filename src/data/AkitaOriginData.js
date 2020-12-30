@@ -125,4 +125,39 @@ class AkitaOriginData {
 	storeOriginFavicon(faviconPath) {
 		this.faviconSource = faviconPath;
 	}
+
+	/**
+	 * Calculate the total sent assets at the origin for each currency sent to the payment
+	 * pointers seen at the origin and return the data as a map.
+	 *
+	 * @return {Map<String, Number>} A map containing the sent asset amounts, with the currency
+	 * as the key (String) and the sent amount as the value (Number).
+	 */
+	getTotalSentAssets() {
+		if (this.paymentPointerMap) {
+			let sentAssetsMap = new Map();
+
+			for (const paymentPointerData of Object.values(this.paymentPointerMap)) {
+				for (const sentAssetData of Object.values(paymentPointerData.sentAssetsMap)) {
+					const currency = sentAssetData.assetCode;
+					let amount = sentAssetData.toAmount();
+					const existingAmountForCurrency = sentAssetsMap.get(currency);
+
+					// If the currency for sent assets already exists in the map (for a
+					// different payment pointer), then add to the existing amount
+					if (existingAmountForCurrency) {
+						amount = existingAmountForCurrency + amount;
+					}
+
+					sentAssetsMap.set(currency, amount);
+				}
+			}
+
+			if (sentAssetsMap.size > 0) {
+				return sentAssetsMap;
+			}
+		}
+
+		return null;
+	}
 }

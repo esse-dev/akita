@@ -57,10 +57,25 @@ class WebMonetizationAsset {
 		this.amount += amount;
 	}
 
+	/**
+	 * Update the Web Monetization Asset's amount and assetScale to
+	 * reflect the new scale.
+	 *
+	 * @param {Number} newScale The new scale to use for the asset.
+	 */
 	convertAmountToNewAssetScale(newScale) {
 		const scaleDifference = newScale - this.assetScale;
 
-		this.amount * 10**scaleDifference;
+		this.amount *= 10**scaleDifference;
 		this.assetScale = newScale;
+	}
+
+	/**
+	 * Convert the Web Monetization Asset to its representative amount.
+	 *
+	 * @return {Number} The converted asset amount.
+	 */
+	toAmount() {
+		return (this.amount * (10**(-this.assetScale)));
 	}
 }

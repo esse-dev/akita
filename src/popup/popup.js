@@ -1,3 +1,8 @@
+// Code for the extension popup window
+
+// The number of decimal points to use when displaying an amount of payment
+const GENERAL_CURRENCY_PRECISION = 2;
+
 // Section navigation
 let otherSection = document.getElementById('intro-carousel');
 let currentSection = document.getElementById('data-story');
@@ -81,13 +86,17 @@ async function getStats() {
 		// If the user has visisted at least 1 monetized site, display monetization data
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
 
-		if (originStats.totalSentAssetsMap?.XRP?.amount > 0) {
-			const sentXRP = originStats.totalSentAssetsMap.XRP;
-			const actualAmount = sentXRP.amount * 10**(-sentXRP.assetScale);
-			document.getElementById('monetized-sent-data').innerHTML = actualAmount.toFixed(3) + '<span style="font-size: 12px;">XRP</span>';
+		const totalSentAssetsMap = originStats.getTotalSentAssets();
+
+		if (totalSentAssetsMap) {
+			document.getElementById('monetized-sent-data').innerHTML = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
 		} else {
-			document.getElementById('monetized-sent-text').innerHTML = 'if you were using <a href="https://www.coil.com/">Coil</a> you would have sent '
-			document.getElementById('monetized-sent-data').innerHTML = '$' + getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent) + '<span style="font-size: 12px;">USD</span>';
+			// No payment has been streamed to the site -- present estimation based on Coil rate
+			const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
+			if (estimatedPaymentSentInUSD > 0) {
+				document.getElementById('monetized-sent-text').innerHTML = `if you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
+				document.getElementById('monetized-sent-data').innerHTML = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>`;
+			}
 		}
 
 		const monetizedTimePercent = getMonetizedTimeSpentPercent(originStats);
@@ -171,13 +180,12 @@ async function getStats() {
 			const circleWeight = circleWeights[i];
 			const color = CIRCLE_COLORS[i];
 
-			const originData = topOrigins[i];
-			const totalSentXRP = calculateTotalSentXRPForOrigin(originData);
-
 			circleEl.className = 'circle';
 			circleEl.style.background = color;
 			circleEl.style.height = circleWeight + 'px';
 			circleEl.style.width = circleWeight + 'px';
+
+			const originData = topOrigins[i];
 
 			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
 				const faviconEl = createFaviconImgElement(originData.faviconSource);
@@ -195,13 +203,13 @@ async function getStats() {
 				// Font size should be no smaller than 11, otherwise it's not legible
 				if (circleFontSize > 11) {
 					const div = document.createElement('div');
-					div.innerHTML = createTopSiteCircleHTML(originData, totalSentXRP);
+					div.innerHTML = createTopSiteCircleHTML(originData);
 					circleEl.appendChild(div);
 					circleEl.style.fontSize = circleFontSize + 'px';
 				}
 			}
 
-			const detailHTML = createTopSiteDetailHTML(originData, totalSentXRP, originStats);
+			const detailHTML = createTopSiteDetailHTML(originData, originStats);
 			circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
 			circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
 			circleEl.addEventListener("click", () => {
@@ -242,36 +250,52 @@ function createFaviconImgElement(faviconSource) {
 	return faviconEl;
 }
 
-function createTopSiteCircleHTML(originData, totalSentXRP) {
-	const visitData = originData?.originVisitData;
-	const visitText = (visitData.numberOfVisits === 1) ? "visit" : "visits";
+function createTopSiteCircleHTML(originData) {
+	if (originData) {
+		const visitData = originData.originVisitData;
+		const visitText = (visitData.numberOfVisits === 1) ? 'visit' : 'visits';
 
-	if (totalSentXRP > 0) {
-		return `${convertMSToNiceTimeString(visitData.monetizedTimeSpent)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} ` + visitText;
-	} else {
 		return `${convertMSToNiceTimeString(visitData.monetizedTimeSpent)}<br>${visitData.numberOfVisits} ` + visitText;
 	}
 }
 
-function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
-	if (!originData || !originStats) return "";
+function createTopSiteDetailHTML(originData, originStats) {
+	if (!originData || !originStats) return ``;
 
 	const timeSpent = originData.originVisitData.monetizedTimeSpent;
-	let sentPayment = totalSentXRP.toFixed(3);
-	let paymentString = "So far, you've sent";
-	if (parseFloat(sentPayment) > 0) {
-		sentPayment += '<span style="font-size: 12px;">XRP</span>';
+
+	// Set payment data text
+	let paymentString = ``;
+	let sentPayment = ``;
+
+	const sentAssetsMap = originData.getTotalSentAssets();
+
+	if (sentAssetsMap) {
+		sentPayment = getSentAssetsMapAsString(sentAssetsMap, GENERAL_CURRENCY_PRECISION);
+
+		if ((sentPayment) && (sentPayment !== ``)) {
+			paymentString = `So far, you've sent `;
+		}
 	} else {
-		paymentString = 'If you were using Coil you would have sent';
-		sentPayment = "$" + getEstimatedPaymentForTimeInUSD(timeSpent) + '<span style="font-size: 12px;">USD</span>';
+		// No payment has been streamed to the site -- present estimation based on Coil rate
+		const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(timeSpent);
+		if (estimatedPaymentSentInUSD > 0) {
+			paymentString = `You haven't sent payment here yet. In the time you've spent here, with Coil you could have sent `;
+			sentPayment = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>`;
+		}
 	}
 
-	let visitCountText = "";
+	if (paymentString !== ``) {
+		paymentString += `${sentPayment} to this site.`;
+	}
+
+	// Set visit count text
+	let visitCountText = ``;
 	const visitCount = originData.originVisitData.numberOfVisits;
 	if (visitCount === 1) {
-		visitCountText = visitCount + " time";
+		visitCountText = `${visitCount} time`;
 	} else {
-		visitCountText = visitCount + " times";
+		visitCountText = `${visitCount} times`;
 	}
 
 	const origin = originData.origin;
@@ -281,7 +305,7 @@ function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
 		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> of monetized time here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
 		You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
-		${paymentString} <strong>${sentPayment}</strong> to this site.`;
+		${paymentString}`;
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
@@ -312,8 +336,7 @@ function getBrowser() {
 	}
 }
 
-
-//Carousel code
+// Carousel code
 document.getElementById('carousel');
 
 let currentSlide = 0;
@@ -327,7 +350,6 @@ for (let i = 0; i < carouselDotElements.length; i++) {
 		onSlideChange();
 	});
 }
-
 
 const carouselElements = document.getElementsByClassName('carousel-slide');
 const carouselEl = document.getElementById('carousel');
