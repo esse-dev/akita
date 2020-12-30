@@ -68,7 +68,7 @@ async function getStats() {
 	const originStats = await loadOriginStats();
 	const circleContainer = document.getElementById('circle-container');
 
-	if (!originStats || originStats.totalMonetizedVisits < 1) {
+	if (!originStats || originStats.totalMonetizedTimeSpent === 0) {
 		// The user has not visisted a monetized site yet
 		document.getElementById('circle-empty-illustration').style.display = 'block';
 		circleContainer.style.display = 'none';
@@ -77,7 +77,7 @@ async function getStats() {
 		return;
 	}
 
-	if (originStats && originStats.totalMonetizedVisits > 0) {
+	if (originStats && originStats.totalMonetizedTimeSpent > 0) {
 		// If the user has visisted at least 1 monetized site, display monetization data
 		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
 
@@ -145,7 +145,7 @@ async function getStats() {
 		const topOrigins = await getTopOriginsByTimeSpent(5);
 		let circleWeights = [];
 		for (const originData of topOrigins) {
-			const timeSpent = originData?.originVisitData.timeSpentAtOrigin;
+			const timeSpent = originData?.originVisitData.monetizedTimeSpent;
 			circleWeights.push(timeSpent);
 		}
 
@@ -247,16 +247,16 @@ function createTopSiteCircleHTML(originData, totalSentXRP) {
 	const visitText = (visitData.numberOfVisits === 1) ? "visit" : "visits";
 
 	if (totalSentXRP > 0) {
-		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} ` + visitText;
+		return `${convertMSToNiceTimeString(visitData.monetizedTimeSpent)}<br>${totalSentXRP.toFixed(3)} XRP<br>${visitData.numberOfVisits} ` + visitText;
 	} else {
-		return `${convertMSToNiceTimeString(visitData.timeSpentAtOrigin)}<br>${visitData.numberOfVisits} ` + visitText;
+		return `${convertMSToNiceTimeString(visitData.monetizedTimeSpent)}<br>${visitData.numberOfVisits} ` + visitText;
 	}
 }
 
 function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 	if (!originData || !originStats) return "";
 
-	const timeSpent = originData.originVisitData.timeSpentAtOrigin;
+	const timeSpent = originData.originVisitData.monetizedTimeSpent;
 	let sentPayment = totalSentXRP.toFixed(3);
 	let paymentString = "So far, you've sent";
 	if (parseFloat(sentPayment) > 0) {
@@ -279,7 +279,7 @@ function createTopSiteDetailHTML(originData, totalSentXRP, originStats) {
 	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
 
 	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
-		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
+		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> of monetized time here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
 		You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
 		${paymentString} <strong>${sentPayment}</strong> to this site.`;
 }

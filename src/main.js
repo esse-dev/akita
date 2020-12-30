@@ -13,22 +13,22 @@
  * @return {Promise<[AkitaOriginData]>} Resolves to a list of nTopOrigins AkitaOriginData objects.
  */
 async function getTopOriginsByTimeSpent(nTopOrigins) {
-	let monetizedOriginDataList = await getMonetizedOriginDataList();
+	let originDataList = await getOriginDataList();
 	let topOriginsList = null;
 	let listSize = nTopOrigins;
 
-	if (monetizedOriginDataList) {
-		if (monetizedOriginDataList.length > 1) {
-			// Sort the list of origin data by timeSpentAtOrigin,
+	if (originDataList) {
+		if (originDataList.length > 1) {
+			// Sort the list of origin data by monetizedTimeSpent,
 			// i.e. sort by descending time starting from index 0
-			monetizedOriginDataList.sort((a, b) => {
-				return b.originVisitData.timeSpentAtOrigin - a.originVisitData.timeSpentAtOrigin
-			});
+			originDataList.sort((a, b) =>
+				b.originVisitData.monetizedTimeSpent - a.originVisitData.monetizedTimeSpent
+			);
 
-			listSize = (listSize < monetizedOriginDataList.length) ? listSize : monetizedOriginDataList.length;
-			topOriginsList = monetizedOriginDataList.slice(0, listSize);
+			listSize = Math.min(listSize, originDataList.length);
+			topOriginsList = originDataList.slice(0, listSize);
 		} else {
-			topOriginsList = monetizedOriginDataList;
+			topOriginsList = originDataList;
 		}
 	}
 
@@ -46,8 +46,8 @@ const NEEDS_LOVE_MAGIC_NUMBER = 1;
  * Get the top N monetized origins based on how much the origin
  * "needs some love" compared to other monetized origins.
  *
- * To calculate how much an origin "needs love", get the ratio of timeSpent
- * to visits. i.e. "needs love ratio" = timeSpentAtOrigin / numberOfVisits.
+ * To calculate how much an origin "needs love", get the ratio of monetized time
+ * to visits. i.e. "needs love ratio" = monetizedTimeSpent / numberOfVisits.
  * A small ratio indicates that, relative to how many times the user visits
  * the monetized site, they don't seem to spend much time there. We'd like to
  * inform the user if this is the case, so that the user can consider spending
@@ -60,18 +60,18 @@ const NEEDS_LOVE_MAGIC_NUMBER = 1;
  * @return {Promise<[AkitaOriginData]>} Resolves to a list of nTopOrigins AkitaOriginData objects.
  */
 async function getTopOriginsThatNeedSomeLove(nTopOrigins) {
-	let monetizedOriginDataList = await getMonetizedOriginDataList();
+	let originDataList = await getOriginDataList();
 	let topOriginsList = null;
 	let listSize = nTopOrigins;
 
-	if (monetizedOriginDataList) {
-		if (monetizedOriginDataList.length > 1) {
+	if (originDataList) {
+		if (originDataList.length > 1) {
 			// Sort the list of origin data by the "needs love ratio",
 			// i.e. sort by ascending "needs love ratio" starting from index 0
 			// The smallest ratios indicate the most "love needed"
-			monetizedOriginDataList.sort((a, b) => {
-				const needsLoveRatioA = a.originVisitData.timeSpentAtOrigin / a.originVisitData.numberOfVisits;
-				const needsLoveRatioB = b.originVisitData.timeSpentAtOrigin / b.originVisitData.numberOfVisits;
+			originDataList.sort((a, b) => {
+				const needsLoveRatioA = a.originVisitData.monetizedTimeSpent / a.originVisitData.numberOfVisits;
+				const needsLoveRatioB = b.originVisitData.monetizedTimeSpent / b.originVisitData.numberOfVisits;
 				const ratioComparison = needsLoveRatioA / needsLoveRatioB;
 
 				// If Array.prototype.sort() returns 0, 'b' and 'a' will be unchanged with respect to one another
@@ -102,10 +102,10 @@ async function getTopOriginsThatNeedSomeLove(nTopOrigins) {
 				return sortResult;
 			});
 
-			listSize = (listSize < monetizedOriginDataList.length) ? listSize : monetizedOriginDataList.length;
-			topOriginsList = monetizedOriginDataList.slice(0, listSize);
+			listSize = Math.min(listSize, originDataList.length);
+			topOriginsList = originDataList.slice(0, listSize);
 		} else {
-			topOriginsList = monetizedOriginDataList;
+			topOriginsList = originDataList;
 		}
 	}
 
@@ -135,8 +135,8 @@ async function getEstimatedPaymentForOriginUSD(origin) {
 	let estimatedPayment = 0;
 
 	if (originData) {
-		const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
-		estimatedPayment = unNaN(Number.parseFloat(timeSpentAtOrigin * STREAM_RATE_PER_MILLISECOND)).toFixed(2);
+		const monetizedTimeSpent = originData.originVisitData.monetizedTimeSpent;
+		estimatedPayment = unNaN(Number.parseFloat(monetizedTimeSpent * STREAM_RATE_PER_MILLISECOND)).toFixed(2);
 	}
 
 	return estimatedPayment;
@@ -162,7 +162,7 @@ function getEstimatedPaymentForTimeInUSD(timeSpent) {
  * @return {Number} The total sent XRP across all origins.
  */
 async function calculateTotalSentXRP() {
-	const originDataList = await getMonetizedOriginDataList();
+	const originDataList = await getOriginDataList();
 	let totalSentXRP = 0;
 
 	for (const originData in originDataList) {
@@ -208,10 +208,10 @@ function calculateTotalSentXRPForOrigin(originData) {
 function getPercentTimeSpentAtOriginOutOfTotal(originData, originStats) {
 	if (!originData || !originStats) return 0;
 
-	const timeSpentAtOrigin = originData.originVisitData.timeSpentAtOrigin;
+	const monetizedTimeSpent = originData.originVisitData.monetizedTimeSpent;
 	const totalTimeSpent = originStats.totalTimeSpent;
 
-	return toPercent(timeSpentAtOrigin / totalTimeSpent);
+	return toPercent(monetizedTimeSpent / totalTimeSpent);
 }
 
 /**
@@ -248,22 +248,6 @@ function getMonetizedTimeSpentPercent(originStats) {
 }
 
 /**
- * Get the percentage of monetized origin visits out of total
- * origin visits.
- *
- * @param {AkitaOriginStats} originStats The origin stats object.
- * @return {Number} The percent of monetized origin visits.
- */
-function getMonetizedVisitsPercent(originStats) {
-	if (!originStats) return 0;
-
-	const totalMonetizedVisits = originStats.totalMonetizedVisits;
-	const totalVisits = originStats.totalVisits;
-
-	return toPercent(totalMonetizedVisits / totalVisits);
-}
-
-/**
  * Convert a number to a percent with 2 decimal places.
  *
  * @param {Number} number The number to convert into a percent.
@@ -281,41 +265,4 @@ function toPercent(number) {
  */
 function unNaN(number) {
 	return isNaN(number) ? 0 : number;
-}
-
-/**
- * Get all the monetized originData objects in a list.
- *
- * @return {Promise<[AkitaOriginData]>} Resolves to a list of monetized AkitaOriginData objects.
- */
-async function getMonetizedOriginDataList() {
-	const originDataList = await getOriginDataList();
-
-	let monetizedOriginDataList = null;
-
-	if (originDataList !== null) {
-		monetizedOriginDataList = originDataList.filter((originData) => originData.isCurrentlyMonetized);
-	}
-
-	return monetizedOriginDataList;
-}
-
-/**
- * Get the number of unique origins visited.
- *
- * @return {Promise<Number>} Resolves to the number of unique origins visited.
- */
-async function getNumberOfOriginsVisited() {
-	const originDataList = await getOriginDataList();
-	return originDataList ? originDataList.length : -1;
-}
-
-/**
- * Get the number of unique monetized origins visited.
- *
- * @return {Promise<Number>} Resolves to the number of unique monetized origins visited.
- */
-async function getNumberOfMonetizedOriginsVisited() {
-	const originDataList = await getMonetizedOriginDataList();
-	return originDataList ? originDataList.length : -1;
 }

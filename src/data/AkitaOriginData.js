@@ -11,7 +11,7 @@
 class AkitaOriginData {
 	origin = null;
 	faviconSource = null;
-	isCurrentlyMonetized = false;
+
 	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
 	paymentPointerMap = {};
 
@@ -34,7 +34,6 @@ class AkitaOriginData {
 	static fromObject(akitaOriginDataObject) {
 		const newOriginData = new AkitaOriginData(akitaOriginDataObject.origin);
 		newOriginData.faviconSource = akitaOriginDataObject.faviconSource;
-		newOriginData.isCurrentlyMonetized = akitaOriginDataObject.isCurrentlyMonetized;
 
 		for (const paymentPointer in akitaOriginDataObject.paymentPointerMap) {
 			newOriginData.paymentPointerMap[paymentPointer] = AkitaPaymentPointerData.fromObject(
@@ -79,8 +78,6 @@ class AkitaOriginData {
 			const paymentPointer = paymentData.paymentPointer;
 
 			if (paymentPointer) {
-				this.isCurrentlyMonetized = true;
-
 				if (!this.paymentPointerMap[paymentPointer]) {
 					this.paymentPointerMap[paymentPointer] = new AkitaPaymentPointerData(paymentPointer);
 				}
@@ -101,9 +98,6 @@ class AkitaOriginData {
 					this.paymentPointerMap[paymentPointer].addAsset(amount, assetScale, assetCode);
 				}
 			}
-		} else {
-			// If paymentData is null then monetization is pending or was stopped
-			this.isCurrentlyMonetized = false;
 		}
 	}
 
@@ -115,12 +109,12 @@ class AkitaOriginData {
 	}
 
 	/**
-	 * Update time spent at the origin.
+	 * Update monetized time spent at the origin.
 	 *
-	 * @param {Number} recentTimeSpent The recent time spent at the origin.
+	 * @param {Number} recentMonetizedTimeSpent The recent monetized time spent at the origin.
 	 */
-	addTimeSpent(recentTimeSpent = 0) {
-		this.originVisitData.addTimeSpent(recentTimeSpent);
+	addMonetizedTimeSpent(recentMonetizedTimeSpent = 0) {
+		this.originVisitData.addMonetizedTimeSpent(recentMonetizedTimeSpent);
 	}
 
 	/**
