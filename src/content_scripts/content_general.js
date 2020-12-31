@@ -13,24 +13,14 @@ const PAYMENT_POINTER_VALIDATION_RATE_MS = 1000 * 60 * 60; // 1 hour
  * reference: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts#Content_script_environment
  *			  https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
  * So we must inject some code into the JavaScript context of the current tab in order to
- * access the document.monetization object. We inject code using a script element:
+ * access the document.monetization object. We inject code using a script element with
+ * `chrome.extension.getURL` as recommended by google chrome developers:
+ * https://developer.chrome.com/docs/extensions/mv3/mv3-migration-checklist/
  */
 const scriptEl = document.createElement('script');
-scriptEl.text = `
-	if (document.monetization) {
-		document.monetization.addEventListener('monetizationstart', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstart', { detail: event.detail }));
-		});
-
-		document.monetization.addEventListener('monetizationprogress', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationprogress', { detail: event.detail }));
-		});
-
-		document.monetization.addEventListener('monetizationstop', (event) => {
-			document.dispatchEvent(new CustomEvent('akita_monetizationstop', { detail: event.detail }));
-		});
-	}
-`;
+scriptEl.src = chrome.extension.getURL('src/page_inject_script.js');
+(document.head||document.documentElement).appendChild(scriptEl);
+scriptEl.onload = () => scriptEl.parentNode.removeChild(scriptEl);
 document.body.appendChild(scriptEl);
 
 /**
