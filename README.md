@@ -5,7 +5,7 @@
 [![Software License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Assets License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-A browser extension that gives you insight into your involvement with [Web Monetization](https://webmonetization.org/).
+A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/).
 
 Akita presents your top visited monetized sites, how much time you’re spending on them, and how much you're contributing (or could contribute) to them.
 
@@ -51,7 +51,7 @@ Otherwise, if the site does not have monetization enabled, then the icon will ap
 <img src="assets/demo_unmon.svg" alt="Monetization Not Enabled Akita Icon" height="100px">
 
 ### Akita Main View
-Our browser extension helps you see the top monetized sites you visit and your involvement with Web Monetization at-a-glance.
+Our browser extension helps you see the top monetized sites you visit and your engagement with Web Monetization at-a-glance.
 
 Here's a screenshot of what Akita looks like if you're using a Web Monetization provider:
 

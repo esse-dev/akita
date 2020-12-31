@@ -2,7 +2,7 @@
 	"name":"Akita",
 	"version":"1.0.0",
 	"manifest_version": 2,
-	"description":"Get involved in Web Monetization with or without the price tag",
+	"description":"Insight into your engagement with Web Monetization",
 	"icons": {
 		"16": "assets/icon_16x16.png",
 		"48": "assets/icon_48x48.png",
