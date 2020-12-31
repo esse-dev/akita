@@ -117,7 +117,7 @@ async function getStats() {
 		const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
 		if ((originStats)
 			&& (originStats.totalSentAssetsMap)
-			&& (Object.keys(originStats.totalSentAssetsMap).length === 0)
+			&& (Object.keys(originStats.totalSentAssetsMap).length !== 0)
 		) {
 			noProviderResourcesContainer.style.display = 'none';
 			needsLoveContainer.style.display = 'block';
