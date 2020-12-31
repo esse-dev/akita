@@ -9,6 +9,8 @@ const iframesWithUuids = new Set();
 const iframeUuidMap = new Map();
 const paymentPointerIframeMap = new Map();
 
+let monetizedVisitRegistered = false;
+
 // content_origin.js only runs in the top level page so it sets window.isTopLevel to true so that
 // other content scripts can check whether they are also running in the top level page.
 // See ./content_iframe.js for more info.
@@ -20,13 +22,13 @@ main();
  * Main function to initiate the application.
  */
 async function main() {
-	document.addEventListener('akita_monetizationprogress', (event) => {
-		storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT);
-	});
+	document.addEventListener('akita_monetizationprogress', async (event) =>
+		await storeDataIntoAkitaFormat(event.detail, AKITA_DATA_TYPE.PAYMENT)
+	);
 
 	setExtensionIconMonetizationState(false);
-	trackPaymentPointerAndTimeOnSite();
-	await trackVisitToSite();
+	trackOriginData();
+	await storeDataIntoAkitaFormatNonMonetized(null, AKITA_DATA_TYPE.VISIT_DATA);
 
 	// Test storing assets
 	// await storeDataIntoAkitaFormat({
@@ -70,29 +72,21 @@ function setExtensionIconMonetizationState(isCurrentlyMonetized) {
  * Track the current visit to the site (origin) and store the favicon to the site.
  * No data needs to be passed in, since it is handled in AkitaOriginVisitData.
  */
-async function trackVisitToSite() {
-	const paymentPointerOnPage = getPaymentPointerFromPage();
-
-	// If the payment pointer is valid, then the visit is a monetized visit
-	const isMonetizedVisit = await validatePaymentPointer(paymentPointerOnPage);
-
-	if (isMonetizedVisit) {
-		await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.VISIT_DATA);
-		await storeFaviconPath();
-	} else {
-		await storeDataIntoAkitaFormatNonMonetized(null, AKITA_DATA_TYPE.VISIT_DATA);
-	}
+async function registerMonetizedVisit() {
+	monetizedVisitRegistered = true;
+	await storeDataIntoAkitaFormat(null, AKITA_DATA_TYPE.VISIT_DATA);
+	await storeFaviconPath();
 }
 
 /**
- * Calculate and store the time the user spends on the site.
+ * Carry out core Akita processes to store data and update the extension icon.
  * Call this function once at the beginning of website logic.
  *
  * Use the Page Visibility API to check if the current webpage is visible or not.
  * https://developer.mozilla.org/en-US/docs/Web/API/Page_Visibility_API
  * https://developer.mozilla.org/en-US/docs/Web/API/Document/visibilityState
  */
-function trackPaymentPointerAndTimeOnSite() {
+function trackOriginData() {
 	let previousStoreTime = getCurrentTime();
 	let docHiddenTime = -1;
 	let docVisibleTime = -1;
@@ -110,17 +104,23 @@ function trackPaymentPointerAndTimeOnSite() {
 		}
 	});
 
+	// setInterval doesn't call the function right away (it waits for the interval time first),
+	// so we call the function here to ensure it's called as early as possible
+	trackData();
+
+	// NOTE: setInterval may not be called while the document is hidden (while visibility lost)
+	// https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified
+	setInterval(trackData, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
+
 	/**
-	 * NOTE: setInterval may not be called while the document is hidden (while visibility lost)
-	 * https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout#Reasons_for_delays_longer_than_specified
-	 *
-	 * Check if a new payment pointer is added to the page and store the recent time spent
-	 * every NEW_PAYMENT_POINTER_CHECK_RATE_MS milliseconds to ensure time spent on site is recorded
-	 * even if the user closes the site. Calls `setExtensionIconMonetizationState` to set the extension icon.
+	 * This function carries out core Akita processes:
+	 *    - Calculates and stores recent time spent at the origin
+	 *    - Checks if the origin is monetized (and registers a monetized visit if it is)
+	 *    - Sets the extension icon
+	 * It is executed every NEW_PAYMENT_POINTER_CHECK_RATE_MS so that the data
+	 * for the origin stays up to date.
 	 */
-	trackTimeAndSetIcon();
-	setInterval(trackTimeAndSetIcon, NEW_PAYMENT_POINTER_CHECK_RATE_MS);
-	async function trackTimeAndSetIcon() {
+	async function trackData() {
 		// Logic to store time spent at the origin (monetized or non-monetized)
 		if (document.visibilityState === 'visible') {
 			const currentTime = getCurrentTime();
@@ -143,6 +143,10 @@ function trackPaymentPointerAndTimeOnSite() {
 			const isMonetized = await isPageMonetized();
 			// Set the extension icon to monetized if the payment pointer is valid
 			setExtensionIconMonetizationState(isMonetized);
+
+			if (!monetizedVisitRegistered && isMonetized) {
+				await registerMonetizedVisit();
+			}
 
 			await storeRecentTimeSpent(recentTimeSpent, isMonetized);
 		}

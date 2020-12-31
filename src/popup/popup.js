@@ -89,13 +89,17 @@ async function getStats() {
 		const totalSentAssetsMap = originStats.getTotalSentAssets();
 
 		if (totalSentAssetsMap) {
-			document.getElementById('monetized-sent-data').innerHTML = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
+			const sentAssetsString = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
+			if (sentAssetsString && sentAssetsString !== ``) {
+				document.getElementById('monetized-sent-text').innerHTML = `In total, you’ve streamed `;
+				document.getElementById('monetized-sent-data').innerHTML = `${sentAssetsString}.`;
+			}
 		} else {
 			// No payment has been streamed to the site -- present estimation based on Coil rate
 			const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
 			if (estimatedPaymentSentInUSD > 0) {
-				document.getElementById('monetized-sent-text').innerHTML = `if you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
-				document.getElementById('monetized-sent-data').innerHTML = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>`;
+				document.getElementById('monetized-sent-text').innerHTML = `If you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
+				document.getElementById('monetized-sent-data').innerHTML = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>.`;
 			}
 		}
 
@@ -111,8 +115,10 @@ async function getStats() {
 
 		const needsLoveContainer = document.getElementById('sites-need-love-container');
 		const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
-
-		if (originStats && originStats.totalSentAssetsMap?.XRP?.amount > 0) {
+		if ((originStats)
+			&& (originStats.totalSentAssetsMap)
+			&& (Object.keys(originStats.totalSentAssetsMap).length === 0)
+		) {
 			noProviderResourcesContainer.style.display = 'none';
 			needsLoveContainer.style.display = 'block';
 
@@ -264,15 +270,43 @@ function createTopSiteDetailHTML(originData, originStats) {
 
 	const timeSpent = originData.originVisitData.monetizedTimeSpent;
 
+	// Set time spent text
+	let timeSpentString = ``;
+	if (timeSpent > 0) {
+		const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
+		if (percentTimeSpent > 0) {
+			timeSpentString = `You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> of monetized time here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>`;
+		} else {
+			timeSpentString = `Crunching time spent numbers...<br><br>`
+		}
+	}
+
+	// Set visit count text
+	let visitCountText = ``;
+	const visitCount = originData.originVisitData.numberOfVisits;
+	if (visitCount === 0) {
+		// Don't set the visit count text
+	} else if (visitCount === 1) {
+		visitCountText = `${visitCount} time`;
+	} else {
+		visitCountText = `${visitCount} times`;
+	}
+	let visitCountString = ``;
+	if (visitCountText !== ``) {
+		const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
+		if (percentVisits > 0) {
+			visitCountString = `You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>`;
+		} else {
+			visitCountString = `Counting up visits...<br><br>`;
+		}
+	}
+
 	// Set payment data text
 	let paymentString = ``;
 	let sentPayment = ``;
-
 	const sentAssetsMap = originData.getTotalSentAssets();
-
 	if (sentAssetsMap) {
 		sentPayment = getSentAssetsMapAsString(sentAssetsMap, GENERAL_CURRENCY_PRECISION);
-
 		if ((sentPayment) && (sentPayment !== ``)) {
 			paymentString = `So far, you've sent `;
 		}
@@ -284,27 +318,17 @@ function createTopSiteDetailHTML(originData, originStats) {
 			sentPayment = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>`;
 		}
 	}
-
-	if (paymentString !== ``) {
+	if ((paymentString !== ``) && (sentPayment !== ``)) {
 		paymentString += `${sentPayment} to this site.`;
-	}
-
-	// Set visit count text
-	let visitCountText = ``;
-	const visitCount = originData.originVisitData.numberOfVisits;
-	if (visitCount === 1) {
-		visitCountText = `${visitCount} time`;
 	} else {
-		visitCountText = `${visitCount} times`;
+		paymentString = `You'll have to spend some more time here before there's payment data to show you!`;
 	}
 
 	const origin = originData.origin;
-	const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
-	const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
 
 	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
-		You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> of monetized time here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>
-		You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>
+		${timeSpentString}
+		${visitCountString}
 		${paymentString}`;
 }
 

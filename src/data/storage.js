@@ -14,6 +14,9 @@ const ORIGIN_STATS_KEY = 'originStats';
 const ORIGIN_DATA_LIST_KEY = 'originDataList';
 let webBrowser = chrome ? chrome : browser;
 
+// Promise used for locking when storing data to local storage
+let storeDataLockPromise = Promise.resolve();
+
 /**
  * Store data for a monetized origin.
  *
@@ -22,6 +25,8 @@ let webBrowser = chrome ? chrome : browser;
  * @param {string} origin The origin of the page storing the data. Defaults to window.location.origin.
  */
 async function storeDataIntoAkitaFormat(data, typeOfData, origin=window.location.origin) {
+	const resolveLock = await acquireStoreLock();
+
 	// Start getting originList asynchronously
 	const originListPromise = getOriginList();
 
@@ -46,6 +51,8 @@ async function storeDataIntoAkitaFormat(data, typeOfData, origin=window.location
 		originList.push(origin);
 		await storeOriginList(originList);
 	}
+
+	resolveLock();
 }
 
 /**
@@ -55,8 +62,12 @@ async function storeDataIntoAkitaFormat(data, typeOfData, origin=window.location
  * @param {AKITA_DATA_TYPE} typeOfData The type of param data, should be one of AKITA_DATA_TYPE.
  */
 async function storeDataIntoAkitaFormatNonMonetized(data, typeOfData) {
+	const resolveLock = await acquireStoreLock();
+
 	// There is no origin data when storing non-monetized data
 	await updateAkitaData(originData = null, data, typeOfData, isMonetizedData = false);
+
+	resolveLock();
 }
 
 /**
@@ -77,8 +88,7 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 	// Get existing originStats or create it if it doesn't already exist
 	let originStats = await loadOriginStats();
 
-	const originStatsExists = originStats !== null;
-	if (!originStatsExists) {
+	if (!originStats) {
 		originStats = new AkitaOriginStats();
 	}
 
@@ -87,7 +97,11 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 			updatePaymentData(originData, originStats, data);
 			break;
 		case AKITA_DATA_TYPE.VISIT_DATA:
-			updateVisitData(originData, originStats, isMonetizedData);
+			if (isMonetizedData) {
+				originData.updateVisitData();
+			} else {
+				originStats.incrementTotalVisits();
+			}
 			break;
 		case AKITA_DATA_TYPE.TIME_SPENT:
 			updateTimeSpent(originData, originStats, data, isMonetizedData);
@@ -101,6 +115,40 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 
 	// Overwrite or create origin stats in storage
 	await storeOriginStats(originStats);
+}
+
+
+/***********************************************************
+ * Locking Functions
+ ***********************************************************/
+
+/**
+ * Adds a promise to the data store lock chain. Promises in the chain are
+ * resolved sequentially in the order they are added to the chain.
+ * Data needs to be stored synchronously since simultaenous asynschronous stores
+ * might overwrite each other otherwise. As such, this should be called before the
+ * critical section to store data is executed.
+ *
+ * @return {Promise<>} The resolve function for the lock promise, to be used
+ * by releaseStoreLock() to release exclusive access to store data.
+ */
+async function acquireStoreLock() {
+	// Capture the data lock promise before chaining the new one
+	const previousStoreDataLockPromise = storeDataLockPromise;
+
+	// Create the new data lock promise
+	let newLockResolver = null;
+	let newStoreDataLockPromise = new Promise((resolve, reject) => {
+		newLockResolver = resolve;
+	});
+
+	// Add the new promise to the data lock promise chain
+	storeDataLockPromise = storeDataLockPromise.then(() => newStoreDataLockPromise);
+
+	// Wait for the previous data lock promise to resolve
+	await previousStoreDataLockPromise;
+
+	return newLockResolver;
 }
 
 /***********************************************************
@@ -130,21 +178,6 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 function updatePaymentData(originData, originStats, paymentData) {
 	originData.updatePaymentData(paymentData);
 	originStats.updateAssetsMapWithAsset(paymentData);
-}
-
-/**
- * Update visit data in originData and in originStats.
- *
- * @param {AkitaOriginData} originData The origin data to update.
- * @param {AkitaOriginStats} originStats The origin stats to update.
- * @param {Boolean} isMonetizedVisit If the visit is to a monetized site.
- */
-function updateVisitData(originData, originStats, isMonetizedVisit) {
-	if (isMonetizedVisit) {
-		originData.updateVisitData();
-	}
-
-	originStats.incrementTotalVisits();
 }
 
 /**
