@@ -236,12 +236,9 @@ function getPercentTimeSpentAtOriginOutOfTotal(originData, originStats) {
  * @return {Number} The percent of visits to the origin out of total visits.
  */
 function getPercentVisitsToOriginOutOfTotal(originData, originStats) {
-	if (!originData || !originStats) return 0;
+	if (!originData || !originStats || originStats.totalVisits === 0) return 0;
 
-	const visitsToOrigin = originData.originVisitData.numberOfVisits;
-	const totalVisits = originStats.totalVisits;
-
-	return toPercent(visitsToOrigin / totalVisits);
+	return toPercent(originData.originVisitData.numberOfVisits / originStats.totalVisits);
 }
 
 /**
@@ -252,12 +249,9 @@ function getPercentVisitsToOriginOutOfTotal(originData, originStats) {
  * @return {Number} The percent of monetized origin time spent.
  */
 function getMonetizedTimeSpentPercent(originStats) {
-	if (!originStats) return 0;
+	if (!originStats || originStats.totalTimeSpent === 0) return 0;
 
-	const totalMonetizedTimeSpent = originStats.totalMonetizedTimeSpent;
-	const totalTimeSpent = originStats.totalTimeSpent;
-
-	return toPercent(totalMonetizedTimeSpent / totalTimeSpent);
+	return toPercent(originStats.totalMonetizedTimeSpent / originStats.totalTimeSpent);
 }
 
 /**
