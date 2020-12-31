@@ -91,7 +91,7 @@ class AkitaOriginStats {
 	}
 
 	/***********************************************************
-	 * Update Total Sent Assets Map
+	 * Total Sent Assets Map
 	 ***********************************************************/
 
 	/**
@@ -129,5 +129,29 @@ class AkitaOriginStats {
 			}
 			this.totalSentAssetsMap[assetCode].addAmount(amount, assetScale);
 		}
+	}
+
+	/**
+	 * Calculate the total sent assets across all origins for each currency sent to the payment
+	 * pointers seen and return the data as a map.
+	 *
+	 * @return {Map<String, Number>} A map containing the sent asset amounts, with the currency
+	 * as the key (String) and the sent amount as the value (Number).
+	 */
+	getTotalSentAssets() {
+		if (this.totalSentAssetsMap) {
+			let sentAssetsMap = new Map();
+
+			for (const sentAssetData of Object.values(this.totalSentAssetsMap)) {
+				const currency = sentAssetData.assetCode;
+				sentAssetsMap.set(currency, sentAssetData.toAmount());
+			}
+
+			if (sentAssetsMap.size > 0) {
+				return sentAssetsMap;
+			}
+		}
+
+		return null;
 	}
 }
