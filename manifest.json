@@ -1,6 +1,6 @@
 {
 	"name":"Akita",
-	"version":"0.1.0",
+	"version":"1.0.0",
 	"manifest_version": 2,
 	"description":"Get involved in Web Monetization with or without the price tag",
 	"icons": {
@@ -9,7 +9,6 @@
 		"128": "assets/icon_128x128.png"
 	},
 	"permissions":[
-		"tabs",
 		"storage"
 	],
 	"background": {
@@ -39,6 +38,7 @@
 			"all_frames":true
 		}
 	],
+	"web_accessible_resources": ["src/page_inject_script.js"],
 	"browser_action": {
 		"default_icon": "assets/icon_unmonetized.png",
 		"default_popup": "src/popup/popup.html",
