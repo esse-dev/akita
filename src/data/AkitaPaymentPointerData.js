@@ -6,7 +6,7 @@ class AkitaPaymentPointerData {
 	paymentPointer = null;
 
 	// The most recent time (UTC timestamp) when Akita validated the payment pointer
-	// For more info on payment pointer validation: see ../content_main.js, function isPaymentPointerValid
+	// For more info on payment pointer validation: see ../content_origin.js, function isPaymentPointerValid
 	validationTimestamp = null;
 
 	// The type of each entry in sentAssetsMap is: WebMonetizationAsset
