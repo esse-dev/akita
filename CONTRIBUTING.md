@@ -5,6 +5,7 @@ We'd like to add beginner issues and tag our issues so that it's easier for
 those interested to join our effort. Stay tuned for that!_
 
 Here's how you can get involved:
+
 - [Open an Issue](#open-an-issue)
 - [Contribute Code](#contribute-code)
 	- [Implement Your Changes](#implement-your-changes)
@@ -13,7 +14,7 @@ Here's how you can get involved:
 
 ## Open an Issue
 
-Akita Issue List: https://github.com/esse-dev/akita/issues
+Akita Issue List: [https://github.com/esse-dev/akita/issues](https://github.com/esse-dev/akita/issues)
 
 Please let us know if Akita isn't working for you! Feel free to create a new
 issue or comment on an existing one. We'd love it if you could include as much
@@ -24,12 +25,17 @@ We're always looking to make Akita better, so definitely drop us a Feature Reque
 if you have any ideas brewing!
 
 Issue Templates you can choose from:
+
 - 📄 [Create New Blank Issue](https://github.com/esse-dev/akita/issues/new?assignees=&labels=&template=blank-issue.md&title=)
 - 🐞 [Create New Bug Report](https://github.com/esse-dev/akita/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D)
 - 💡 [Create New Feature Request](https://github.com/esse-dev/akita/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFEATURE+REQUEST%5D)
 
 ## Contribute Code
-	 
+
+Before contributing code to Akita please read [Akita's Privacy Policy](docs/PrivacyPolicy.md) so you
+can help us ensure data privacy for Akita users! If you make any changes that affect user data,
+please review the Privacy Policy to check if any updates should be made to it alongside your changes.
+
 ### Implement Your Changes
 1. Fork Akita and clone your fork
 2. Create a new branch with a name that reflects your changes
@@ -52,6 +58,9 @@ review it and may provide suggestions or feedback before approving and merging.
 Thanks so much for contributing to Akita! ❤️
 
 ## When in doubt, don't hesitate to bark at us 🐶
+
+- Email
+	- [AkitaFeedback@gmail.com](mailto:AkitaFeedback@gmail.com)
 - Find us on DEV.to
 	- [esse-dev](https://dev.to/esse-dev)
 	- [Elliot](https://dev.to/elliot)

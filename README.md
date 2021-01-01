@@ -119,9 +119,13 @@ The data collected by Akita is stored on your machine, in your browser's local s
 Your data stays in your hands: it is not backed up, shared, or uploaded anywhere.
 Therefore, if you uninstall the Akita browser extension, your data will be **permanently deleted** and will not be recoverable.
 
+For more info, check out [Akita's Privacy Policy](docs/PrivacyPolicy.md).
+
 ---
 
 ## Connect with Us
+- Email
+  - [AkitaFeedback@gmail.com](mailto:AkitaFeedback@gmail.com)
 - DEV
   - [esse-dev](https://dev.to/esse-dev)
   - [Elliot](https://dev.to/elliot)
