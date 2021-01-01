@@ -6,14 +6,10 @@
  * Visit data includes:
  *   - amount of time spent at origin since using Akita (in milliseconds)
  *   - number of visits recorded in Akita
- *   - date of first visit recorded in Akita (format: YYYY-MM-DD)
- *   - date of most recent visit recorded in Akita (format: YYYY-MM-DD)
  */
 class AkitaOriginVisitData {
 	monetizedTimeSpent = 0; // time in milliseconds
 	numberOfVisits = 0;
-	dateOfFirstVisit = "";
-	dateOfMostRecentVisit = "";
 
 	/**
 	 * This function takes an object with the same properties as AkitaOriginVisitData,
@@ -30,8 +26,6 @@ class AkitaOriginVisitData {
 			newOriginVisitData = new AkitaOriginVisitData();
 			newOriginVisitData.monetizedTimeSpent = akitaOriginVisitDataObject.monetizedTimeSpent;
 			newOriginVisitData.numberOfVisits = akitaOriginVisitDataObject.numberOfVisits;
-			newOriginVisitData.dateOfFirstVisit = akitaOriginVisitDataObject.dateOfFirstVisit;
-			newOriginVisitData.dateOfMostRecentVisit = akitaOriginVisitDataObject.dateOfMostRecentVisit;
 		}
 
 		return newOriginVisitData;
@@ -51,43 +45,5 @@ class AkitaOriginVisitData {
 	 */
 	updateVisitData() {
 		this.numberOfVisits += 1;
-		this.dateOfMostRecentVisit = this.getCurrentDateAsYYYYMMDD();
-
-		if (this.dateOfFirstVisit === "") {
-			// We haven't already stored the date of first visit
-			this.dateOfFirstVisit = this.dateOfMostRecentVisit;
-		}
-	}
-
-	/**
-	 * Return the current date formatted as YYYY-MM-DD.
-	 *
-	 * @return {Number} The current date.
-	 */
-	getCurrentDateAsYYYYMMDD() {
-		const DASH = '-';
-		const currentDate = new Date();
-		const currentYear = currentDate.getFullYear();
-		const currentMonth = this.formatNumberAsDateString(currentDate.getMonth() + 1); // +1 since month is 0-indexed in javascript :(
-		const currentDay = this.formatNumberAsDateString(currentDate.getDay());
-
-		const dateString = currentYear + DASH + currentMonth + DASH + currentDay;
-
-		return dateString;
-	}
-
-	/**
-	 * Prepend the number with a zero if its value is between
-	 * zero and ten, so that it is compatible in date strings.
-	 *
-	 * e.g. If number = 6, return "06"
-	 *
-	 * @param {Number} number Value to format as a date number.
-	 * @return The formatted number.
-	 */
-	formatNumberAsDateString(number) {
-		if (number < 10 && number > 0) {
-			return "0" + number;
-		}
 	}
 }

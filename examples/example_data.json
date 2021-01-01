@@ -4,27 +4,27 @@
 	"originList": [
 		"https://dev.to",
 		"https://www.twitch.tv",
-		"https://sdog.netlify.app"
+		"https://esse-dev.github.io/a-web-monetization-story/"
 	],
 	"originStats": {
 		"totalTimeSpent": 1834971294872194719204821,
-		"totalMonetizedTimeSpent": 194719204821,
-		"totalVisits": 500,
+		"totalMonetizedTimeSpent": 316034933,
+		"totalVisits": 538,
 		"totalSentAssetsMap": {
 			"XRP": {
-				"amount": 74289471,
+				"amount": 10041906693,
 				"assetScale":9,
 				"assetCode":"XRP"
 			},
 			"USD": {
-				"amount": 26862,
+				"amount": 3728743927,
 				"assetScale":9,
-				"assetCode":"XRP"
+				"assetCode":"USD"
 			},
 			"CAD": {
-				"amount": 324824,
+				"amount": 32482892884,
 				"assetScale":9,
-				"assetCode":"XRP"
+				"assetCode":"CAD"
 			}
 		}
 	},
@@ -33,19 +33,17 @@
 			"origin":"https://dev.to",
 			"faviconSource": "https://dev-to.s3.us-east-2.amazonaws.com/favicon.ico",
 			"originVisitData":{
-				"monetizedTimeSpent": 8731882,
+				"monetizedTimeSpent": 37287439,
 				"numberOfVisits": 3,
-				"dateOfFirstVisit": "2020-05-01",
-				"dateOfMostRecentVisit": "2020-06-02"
 			},
 			"paymentPointerMap":{
 				"$ilp.uphold.com/24HhrUGG7ekn":{
 					"paymentPointer":"$ilp.uphold.com/24HhrUGG7ekn",
 					"sentAssetsMap":{
-						"XRP":{
-							"amount":16505,
+						"USD":{
+							"amount":3728743927,
 							"assetScale":9,
-							"assetCode":"XRP"
+							"assetCode":"USD"
 						}
 					}
 				}
@@ -55,17 +53,15 @@
 			"origin":"https://www.twitch.tv",
 			"faviconSource": "https://static.twitchcdn.net/assets/favicon-16-2d5d1f5ddd489ee10398.png",
 			"originVisitData":{
-				"monetizedTimeSpent": 4723893,
-				"numberOfVisits": 2,
-				"dateOfFirstVisit": "2020-05-15",
-				"dateOfMostRecentVisit": "2020-05-27"
+				"monetizedTimeSpent": 23510297,
+				"numberOfVisits": 6,
 			},
 			"paymentPointerMap":{
 				"$spsp.coil.com/twitch/nasa":{
 					"paymentPointer":"$spsp.coil.com/twitch/nasa",
 					"sentAssetsMap":{
 						"XRP":{
-							"amount":5351,
+							"amount":2320012974,
 							"assetScale":9,
 							"assetCode":"XRP"
 						}
@@ -75,7 +71,7 @@
 					"paymentPointer":"$spsp.coil.com/twitch/xqcow",
 					"sentAssetsMap":{
 						"XRP":{
-							"amount":11442,
+							"amount":7721893719,
 							"assetScale":9,
 							"assetCode":"XRP"
 						}
@@ -84,22 +80,20 @@
 			}
 		},
 		{
-			"origin":"https://sdog.netlify.app",
-			"faviconSource": "https://sharonwang.netlify.app/favicon.ico",
+			"origin":"https://esse-dev.github.io/a-web-monetization-story/",
+			"faviconSource": "https://esse-dev.github.io/a-web-monetization-story/assets/auden.svg",
 			"originVisitData":{
-				"monetizedTimeSpent": 4567890218492,
+				"monetizedTimeSpent": 255237197,
 				"numberOfVisits": 300,
-				"dateOfFirstVisit": "2020-01-01",
-				"dateOfMostRecentVisit": "2020-06-02"
 			},
 			"paymentPointerMap":{
-				"$ilp.uphold.com/DWhyhLRG7E4Q":{
-					"paymentPointer":"$ilp.uphold.com/DWhyhLRG7E4Q",
+				"$$ilp.uphold.com/aEYQyH47UYPY":{
+					"paymentPointer":"$ilp.uphold.com/aEYQyH47UYPY",
 					"sentAssetsMap":{
-						"XRP":{
-							"amount":13502,
+						"CAD":{
+							"amount":32482892884,
 							"assetScale":9,
-							"assetCode":"XRP"
+							"assetCode":"CAD"
 						}
 					}
 				}
