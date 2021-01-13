@@ -3,7 +3,7 @@
 # Akita
 
 [![Software License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Assets License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Assets by Akita License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/).
 
@@ -11,7 +11,18 @@ Akita presents your top visited monetized sites, how much time you’re spending
 
 We've built this for the [Grant for the Web x DEV hackathon](https://dev.to/devteam/announcing-the-grant-for-the-web-hackathon-on-dev-3kd1)! We're so thrilled to have received a Runner Up Award for this project 🎉 - [Winners Announcement](https://dev.to/devteam/announcing-the-grant-for-the-web-x-dev-hackathon-winners-1nl4).
 
-Our license information can be found [here](docs/LicenseInfo.md) and our license/copyright notices can be found in [LICENSE](LICENSE).
+Our license information can be found [here](docs/LicenseInfo.md) and our license/copyright notices can be found in [LICENSE](LICENSE). Assets in the [assets/external](assets/external) directory are assets from another source or repository, which may not have been created by Akita contributors. Please refer to the per-asset/per-source license information in [assets/external](assets/external).
+
+<table>
+  <tr>
+      <td align="center"><a href="https://dev.to/devteam/announcing-the-grant-for-the-web-x-dev-hackathon-winners-1nl4"><img src="assets/external/devcommunity/GFTWRunnerUp.png" alt="Grant for the Web x DEV Community Hackathon Runner Up Badge" width="120px"></a></td>
+      <td><strong>Grant for the Web x DEV Community Hackathon Runner Up</strong> (June 2020)</td>
+  </tr>
+  <tr>
+      <td align="center"><a href="https://www.grantfortheweb.org/blog/2020-mid-grantees"><img src="assets/external/grantfortheweb/mid-level-grantees.png" alt="Grant for the Web Mid Level Grantee Image" width="200px"></a></td>
+      <td><strong>Grant for the Web Mid Level Grantee</strong> (October 2020)</td>
+  </tr>
+</table>
 
 ---
 
@@ -44,18 +55,18 @@ We'd love to have you be a part of Akita! Please feel free to open issues or cre
 ### Akita Extension Icon
 The Akita extension icon changes depending on the site you are visiting. If the site has monetization enabled, then the Akita icon will look something like this:
 
-<img src="assets/demo_mon.svg" alt="Monetization Enabled Akita Icon" height="100px">
+<img src="assets/tutorial/demo_mon.svg" alt="Monetization Enabled Akita Icon" height="100px">
 
 Otherwise, if the site does not have monetization enabled, then the icon will appear as:
 
-<img src="assets/demo_unmon.svg" alt="Monetization Not Enabled Akita Icon" height="100px">
+<img src="assets/tutorial/demo_unmon.svg" alt="Monetization Not Enabled Akita Icon" height="100px">
 
 ### Akita Main View
 Our browser extension helps you see the top monetized sites you visit and your engagement with Web Monetization at-a-glance.
 
 Here's a screenshot of what Akita looks like if you're using a Web Monetization provider:
 
-<img src="assets/documentation/mon_demo_screenshot1.png" alt="Monetization Enabled Akita Main View" height="450px"><img src="assets/documentation/mon_demo_screenshot2.png" alt="Monetization Enabled Akita Main View" height="450px">
+<img src="assets/documentation/mon_demo_screenshot_mainview.png" alt="Monetization Enabled Akita Main View" height="450px"><img src="assets/documentation/mon_demo_screenshot_hoverdetail.png" alt="Monetization Enabled Akita Main View" height="450px">
 
 You'll likely have some monetized sites that you visit often, but don't really spend much time on. Maybe you'd like to give them a little more love and spend a bit more time there, so that additional payment can be streamed to them. Check out the 'These monetized sites could use ♥️' section!
 
@@ -63,7 +74,7 @@ You'll likely have some monetized sites that you visit often, but don't really s
 
 Here's a screenshot of what Akita looks like if you don't have a Web Monetization provider installed:
 
-<img src="assets/documentation/nonmon_demo_screenshot1.png" alt="Monetization Not Enabled Akita Main View" height="450px"><img src="assets/documentation/nonmon_demo_screenshot2.png" alt="Monetization Not Enabled Akita Main View" height="450px">
+<img src="assets/documentation/nonmon_demo_screenshot_mainview.png" alt="Monetization Not Enabled Akita Main View" height="450px"><img src="assets/documentation/nonmon_demo_screenshot_hoverdetail.png" alt="Monetization Not Enabled Akita Main View" height="450px">
 
 ### Akita Demo Video
 Click to check out a video walkthrough of Akita:

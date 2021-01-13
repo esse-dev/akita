@@ -99,7 +99,7 @@ async function getStats() {
 			const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
 			if (estimatedPaymentSentInUSD > 0) {
 				document.getElementById('monetized-sent-text').innerHTML = `If you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
-				document.getElementById('monetized-sent-data').innerHTML = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>.`;
+				document.getElementById('monetized-sent-data').innerHTML = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>.`;
 			}
 		}
 
@@ -315,7 +315,7 @@ function createTopSiteDetailHTML(originData, originStats) {
 		const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(timeSpent);
 		if (estimatedPaymentSentInUSD > 0) {
 			paymentString = `You haven't sent payment here yet. In the time you've spent here, with Coil you could have sent `;
-			sentPayment = `$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span>`;
+			sentPayment = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>`;
 		}
 	}
 	if ((paymentString !== ``) && (sentPayment !== ``)) {
