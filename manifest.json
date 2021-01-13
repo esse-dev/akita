@@ -4,9 +4,9 @@
 	"manifest_version": 2,
 	"description":"Insight into your engagement with Web Monetization",
 	"icons": {
-		"16": "assets/icon_16x16.png",
-		"48": "assets/icon_48x48.png",
-		"128": "assets/icon_128x128.png"
+		"16": "assets/icons/icon_16x16.png",
+		"48": "assets/icons/icon_48x48.png",
+		"128": "assets/icons/icon_128x128.png"
 	},
 	"permissions":[
 		"storage"
@@ -40,7 +40,7 @@
 	],
 	"web_accessible_resources": ["src/page_inject_script.js"],
 	"browser_action": {
-		"default_icon": "assets/icon_unmonetized.png",
+		"default_icon": "assets/icons/icon_unmonetized.png",
 		"default_popup": "src/popup/popup.html",
 		"default_title": "Akita"
 	}
