@@ -10,6 +10,6 @@ The following list contains attribution information for any assets included in t
 - **Copyright**: © 2021 DEV Community
 - **License**: [DEV Community Trademarks and Logos Policy](https://dev.to/terms#dev-trademarks-and-logo-policy)
     - Permission from DEV Community has been granted to the Akita project to include this image in the [README.md](/README.md) file for the Akita repository.
-    - A copy of this license is provided in the Akita repository [here](docs/licenses/DEV_COMMUNITY_TRADEMARKS_AND_LOGOS_POLICY).
+    - A copy of this license is provided in the Akita repository [here](/docs/licenses/DEV_COMMUNITY_TRADEMARKS_AND_LOGOS_POLICY).
 - **Link**: [https://dev.to/badge/grant-for-the-web-hackathon-runner-up](https://dev.to/badge/grant-for-the-web-hackathon-runner-up)
 - **Modifications**: We have not made any modifications to this asset.
