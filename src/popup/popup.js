@@ -78,151 +78,149 @@ async function getStats() {
 		document.getElementById('circle-empty-illustration').style.display = 'block';
 		circleContainer.style.display = 'none';
 		document.getElementById('info-container').innerHTML = `You haven't visited any monetized websites yet! What are you waiting for? Get out there and explore the wild wild web.<br>Not sure where to start? <a href="https://coil.com/explore" target="_blank">Discover some monetized sites!</a>`;
+	} else {
+		if (originStats && originStats.totalMonetizedTimeSpent > 0) {
+			// If the user has visisted at least 1 monetized site, display monetization data
+			document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
 
-		return;
-	}
+			const totalSentAssetsMap = originStats.getTotalSentAssets();
 
-	if (originStats && originStats.totalMonetizedTimeSpent > 0) {
-		// If the user has visisted at least 1 monetized site, display monetization data
-		document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
-
-		const totalSentAssetsMap = originStats.getTotalSentAssets();
-
-		if (totalSentAssetsMap) {
-			const sentAssetsString = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
-			if (sentAssetsString && sentAssetsString !== ``) {
-				document.getElementById('monetized-sent-text').innerHTML = `In total, you’ve streamed `;
-				document.getElementById('monetized-sent-data').innerHTML = `${sentAssetsString}.`;
+			if (totalSentAssetsMap) {
+				const sentAssetsString = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
+				if (sentAssetsString && sentAssetsString !== ``) {
+					document.getElementById('monetized-sent-text').innerHTML = `In total, you’ve streamed `;
+					document.getElementById('monetized-sent-data').innerHTML = `${sentAssetsString}.`;
+				}
+			} else {
+				// No payment has been streamed to the site -- present estimation based on Coil rate
+				const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
+				if (estimatedPaymentSentInUSD > 0) {
+					document.getElementById('monetized-sent-text').innerHTML = `If you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
+					document.getElementById('monetized-sent-data').innerHTML = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>.`;
+				}
 			}
-		} else {
-			// No payment has been streamed to the site -- present estimation based on Coil rate
-			const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
-			if (estimatedPaymentSentInUSD > 0) {
-				document.getElementById('monetized-sent-text').innerHTML = `If you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
-				document.getElementById('monetized-sent-data').innerHTML = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>.`;
+
+			const monetizedTimePercent = getMonetizedTimeSpentPercent(originStats);
+			if (monetizedTimePercent) {
+				document.getElementById('monetized-percent-data').innerHTML = monetizedTimePercent+'%';
+			} else {
+				// TODO: ADD A CHANGE OF TEXT!
+				document.getElementById('monetized-percent-data').innerHTML = '0%';
 			}
-		}
+			document.getElementById('circle-empty-illustration').style.display = 'none';
+			circleContainer.style.display = 'flex';
 
-		const monetizedTimePercent = getMonetizedTimeSpentPercent(originStats);
-		if (monetizedTimePercent) {
-			document.getElementById('monetized-percent-data').innerHTML = monetizedTimePercent+'%';
-		} else {
-			// TODO: ADD A CHANGE OF TEXT!
-			document.getElementById('monetized-percent-data').innerHTML = '0%';
-		}
-		document.getElementById('circle-empty-illustration').style.display = 'none';
-		circleContainer.style.display = 'flex';
+			const needsLoveContainer = document.getElementById('sites-need-love-container');
+			const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
+			if ((originStats)
+				&& (originStats.totalSentAssetsMap)
+				&& (Object.keys(originStats.totalSentAssetsMap).length !== 0)
+			) {
+				noProviderResourcesContainer.style.display = 'none';
+				needsLoveContainer.style.display = 'block';
 
-		const needsLoveContainer = document.getElementById('sites-need-love-container');
-		const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
-		if ((originStats)
-			&& (originStats.totalSentAssetsMap)
-			&& (Object.keys(originStats.totalSentAssetsMap).length !== 0)
-		) {
-			noProviderResourcesContainer.style.display = 'none';
-			needsLoveContainer.style.display = 'block';
+				const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
 
-			const needLoveOrigins = await getTopOriginsThatNeedSomeLove(3);
+				if (needLoveOrigins.length > 0) {
+					for (const originData of needLoveOrigins) {
+						if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+							const faviconEl = createFaviconImgElement(originData.faviconSource);
+							faviconEl.addEventListener("click", () => {
+								webBrowser.tabs.create({ url: originData.origin });
+							}, false);
 
-			if (needLoveOrigins.length > 0) {
-				for (const originData of needLoveOrigins) {
-					if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-						const faviconEl = createFaviconImgElement(originData.faviconSource);
-						faviconEl.addEventListener("click", () => {
-							webBrowser.tabs.create({ url: originData.origin });
-						}, false);
+							needsLoveContainer.appendChild(faviconEl);
+						}
 
-						needsLoveContainer.appendChild(faviconEl);
+						const linkEl = document.createElement('a');
+						linkEl.href = originData.origin;
+
+						// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
+						linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
+
+						needsLoveContainer.appendChild(linkEl);
+						const brEl = document.createElement('br');
+						needsLoveContainer.appendChild(brEl);
 					}
+				} else {
+					const el = document.createElement('span');
+					el.innerHTML = 'No sites visited yet!';
 
-					const linkEl = document.createElement('a');
-					linkEl.href = originData.origin;
-
-					// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-					linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
-
-					needsLoveContainer.appendChild(linkEl);
-					const brEl = document.createElement('br');
-					needsLoveContainer.appendChild(brEl);
+					needsLoveContainer.appendChild(el);
 				}
 			} else {
-				const el = document.createElement('span');
-				el.innerHTML = 'No sites visited yet!';
-
-				needsLoveContainer.appendChild(el);
-			}
-		} else {
-			noProviderResourcesContainer.style.display = 'grid';
-			needsLoveContainer.style.display = 'none';
-		}
-
-		// Top sites visualization with circles
-		const topOrigins = await getTopOriginsByTimeSpent(5);
-		let circleWeights = [];
-		for (const originData of topOrigins) {
-			const timeSpent = originData?.originVisitData.monetizedTimeSpent;
-			circleWeights.push(timeSpent);
-		}
-
-		// Circles
-		const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
-
-		const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
-		const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
-		const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
-		const square = {
-			height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
-			width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
-		};
-
-		const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
-
-		// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
-		const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
-		circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
-
-		for (let i = 0; i < circleWeights.length; i++) {
-			const circleEl = document.createElement('div');
-			const circleWeight = circleWeights[i];
-			const color = CIRCLE_COLORS[i];
-
-			circleEl.className = 'circle';
-			circleEl.style.background = color;
-			circleEl.style.height = circleWeight + 'px';
-			circleEl.style.width = circleWeight + 'px';
-
-			const originData = topOrigins[i];
-
-			if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-				const faviconEl = createFaviconImgElement(originData.faviconSource);
-				circleEl.appendChild(faviconEl);
-			} else {
-				// If no favicon is available, use the first character of site origin
-				// to represent the origin in its circle, capitalized and bolded
-				const characterEl = document.createElement('p');
-				characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
-				circleEl.appendChild(characterEl);
+				noProviderResourcesContainer.style.display = 'grid';
+				needsLoveContainer.style.display = 'none';
 			}
 
-			if (circleWeight > 40) {
-				let circleFontSize = Math.round(circleWeight / 6);
-				// Font size should be no smaller than 11, otherwise it's not legible
-				if (circleFontSize > 11) {
-					const div = document.createElement('div');
-					div.innerHTML = createTopSiteCircleHTML(originData);
-					circleEl.appendChild(div);
-					circleEl.style.fontSize = circleFontSize + 'px';
+			// Top sites visualization with circles
+			const topOrigins = await getTopOriginsByTimeSpent(5);
+			let circleWeights = [];
+			for (const originData of topOrigins) {
+				const timeSpent = originData?.originVisitData.monetizedTimeSpent;
+				circleWeights.push(timeSpent);
+			}
+
+			// Circles
+			const CIRCLE_COLORS = ['#F96060', '#42D2B8', '#92DEFF', '#FFF27B', '#9F88FC'];
+
+			const CIRCLE_MARGIN_SIZE = 10; // This is 2 * .circle margin
+			const CIRCLE_PADDING_SIZE = 24; // This is 2 * .circle padding
+			const CIRCLE_BORDER_SIZE = 6; // This is 2 * .circle:hover border
+			const square = {
+				height: circleContainer.clientHeight - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) - CIRCLE_BORDER_SIZE - 1,
+				width: circleContainer.clientWidth - (CIRCLE_MARGIN_SIZE + CIRCLE_PADDING_SIZE) * circleWeights.length - CIRCLE_BORDER_SIZE - 1
+			};
+
+			const circleWeightsSum = circleWeights.reduce((prev, cur) => prev + cur, 0);
+
+			// Ensure that the circles are as big as possible, but not so big they overflow, and in scale with each other.
+			const areaNormalizationFactor = Math.min(square.width / circleWeightsSum, square.height / circleWeights[0]);
+			circleWeights = circleWeights.map(weight => weight * areaNormalizationFactor);
+
+			for (let i = 0; i < circleWeights.length; i++) {
+				const circleEl = document.createElement('div');
+				const circleWeight = circleWeights[i];
+				const color = CIRCLE_COLORS[i];
+
+				circleEl.className = 'circle';
+				circleEl.style.background = color;
+				circleEl.style.height = circleWeight + 'px';
+				circleEl.style.width = circleWeight + 'px';
+
+				const originData = topOrigins[i];
+
+				if ((originData.faviconSource) && (originData.faviconSource !== "")) {
+					const faviconEl = createFaviconImgElement(originData.faviconSource);
+					circleEl.appendChild(faviconEl);
+				} else {
+					// If no favicon is available, use the first character of site origin
+					// to represent the origin in its circle, capitalized and bolded
+					const characterEl = document.createElement('p');
+					characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
+					circleEl.appendChild(characterEl);
 				}
+
+				if (circleWeight > 40) {
+					let circleFontSize = Math.round(circleWeight / 6);
+					// Font size should be no smaller than 11, otherwise it's not legible
+					if (circleFontSize > 11) {
+						const div = document.createElement('div');
+						div.innerHTML = createTopSiteCircleHTML(originData);
+						circleEl.appendChild(div);
+						circleEl.style.fontSize = circleFontSize + 'px';
+					}
+				}
+
+				const detailHTML = createTopSiteDetailHTML(originData, originStats);
+				circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
+				circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
+				circleEl.addEventListener("click", () => {
+					webBrowser.tabs.create({ url: originData.origin });
+				}, false);
+
+				circleContainer.appendChild(circleEl);
 			}
-
-			const detailHTML = createTopSiteDetailHTML(originData, originStats);
-			circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
-			circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
-			circleEl.addEventListener("click", () => {
-				webBrowser.tabs.create({ url: originData.origin });
-			}, false);
-
-			circleContainer.appendChild(circleEl);
 		}
 	}
 
