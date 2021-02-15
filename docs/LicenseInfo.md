@@ -2,7 +2,11 @@
 
 We want to make it easy for anyone to get involved with Akita, so we've licensed our project under two permissive licenses.
 
-We've chosen the MIT License for our software (i.e. code/documentation) and the Creative Commons Attribution 4.0 International Public License (CC BY 4.0) for any of the assets we create (generally found in [assets](../assets) and any subdirectories).
+We've chosen the MIT License for our software (i.e. code/documentation) and the Creative Commons Attribution 4.0 International Public License (CC BY 4.0) for any of the assets we create (generally found in [assets](../assets) and any subdirectories, other than those found in the [assets/external](../assets/external) directory).
+
+Assets in the [assets/external](../assets/external) directory are assets from another source or repository, which may not have been created by us. Please refer to the per-asset/per-source license information in [assets/external](../assets/external) for more details.
+
+---
 
 Licenses can be a bit intimidating, but we've chosen the ones we think make it easiest for you to leverage Akita.
 
@@ -15,4 +19,4 @@ _The short explanations below are meant to make the licenses more understandable
 
 For our copyright and license notices, please refer to our [LICENSE](../LICENSE) file.
 
-Essentially, just include our [LICENSE](../LICENSE) file and link to this repo if you end up using our code, documentation or assets. :)
+Essentially, just include our [LICENSE](../LICENSE) file and link to this repo if you end up using our code, documentation or assets. :) If you want to use any assets in the [assets/external](../assets/external) directory, you should do a bit more reading on the per-asset/per-source license information, as they likely have different licensing from the rest of our project.
