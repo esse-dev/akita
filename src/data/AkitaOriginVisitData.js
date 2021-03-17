@@ -8,8 +8,12 @@
  *   - number of visits recorded in Akita
  */
 class AkitaOriginVisitData {
-	monetizedTimeSpent = 0; // time in milliseconds
-	numberOfVisits = 0;
+	constructor() {
+		// time in milliseconds
+		this.monetizedTimeSpent = 0;
+
+		this.numberOfVisits = 0;
+	}
 
 	/**
 	 * This function takes an object with the same properties as AkitaOriginVisitData,

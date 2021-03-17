@@ -9,18 +9,13 @@
  * See ./example_data.json to see example instances of AkitaOriginData.
  */
 class AkitaOriginData {
-	origin = null;
-	faviconSource = null;
-
-	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
-	paymentPointerMap = {};
-
-	// The type of originVisitData is: AkitaOriginVisitData
-	originVisitData = null;
-
-	constructor(origin) {
-		this.origin = origin;
+	constructor(originString) {
+		this.origin = originString;
 		this.originVisitData = new AkitaOriginVisitData();
+		this.faviconSource = null;
+
+		// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
+		this.paymentPointerMap = {};
 	}
 
 	/**

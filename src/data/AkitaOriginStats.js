@@ -11,12 +11,14 @@
  *   - map of totalSentAssets, with an entry for each currency
  */
 class AkitaOriginStats {
-	totalTimeSpent = 0;
-	totalMonetizedTimeSpent = 0;
-	totalVisits = 0;
+	constructor() {
+		this.totalTimeSpent = 0;
+		this.totalMonetizedTimeSpent = 0;
+		this.totalVisits = 0;
 
-	// The type of each entry in totalSentAssetsMap is: WebMonetizationAsset
-	totalSentAssetsMap = {};
+		// The type of each entry in totalSentAssetsMap is: WebMonetizationAsset
+		this.totalSentAssetsMap = {};
+	}
 
 	/**
 	 * This function takes an object with the same properties as AkitaOriginStats,

@@ -3,17 +3,15 @@
  * sent to that payment pointer. An asset is some amount of a currencies like USD, CAD or XRP.
  */
 class AkitaPaymentPointerData {
-	paymentPointer = null;
+	constructor(paymentPointerString) {
+		this.paymentPointer = paymentPointerString;
 
-	// The most recent time (UTC timestamp) when Akita validated the payment pointer
-	// For more info on payment pointer validation: see ../content_origin.js, function isPaymentPointerValid
-	validationTimestamp = null;
+		// The most recent time (UTC timestamp) when Akita validated the payment pointer
+		// For more info on payment pointer validation: see ../content_origin.js, function isPaymentPointerValid
+		this.validationTimestamp = null;
 
-	// The type of each entry in sentAssetsMap is: WebMonetizationAsset
-	sentAssetsMap = {};
-
-	constructor(paymentPointer) {
-		this.paymentPointer = paymentPointer;
+		// The type of each entry in sentAssetsMap is: WebMonetizationAsset
+		this.sentAssetsMap = {};
 	}
 
 	/**

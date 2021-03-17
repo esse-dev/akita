@@ -11,12 +11,10 @@
  *	 235 * 10**(-2) = 2.35
  */
 class WebMonetizationAsset {
-	amount = 0;
-	assetScale = 0;
-	assetCode = null;
-
 	constructor(assetCode) {
 		this.assetCode = assetCode;
+		this.amount = 0;
+		this.assetCode = null;
 	}
 
 	/**
