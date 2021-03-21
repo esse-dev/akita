@@ -3,6 +3,15 @@
 // The number of decimal points to use when displaying an amount of payment
 const GENERAL_CURRENCY_PRECISION = 2;
 
+// Set the icon illustration in the tutorial based on browser (defaults in HTML are for Chromium)
+if (getBrowser() === "Firefox") {
+	const monetizedIconObject = document.getElementById('akita-icon-monetized-object');
+	const unmonetizedIconObject = document.getElementById('akita-icon-unmonetized-object');
+
+	monetizedIconObject.data = "../../assets/tutorial/demo_mon_firefox.svg";
+	unmonetizedIconObject.data = "../../assets/tutorial/demo_unmon_firefox.svg";
+}
+
 // Section navigation
 let otherSection = document.getElementById('intro-carousel');
 let currentSection = document.getElementById('data-story');
