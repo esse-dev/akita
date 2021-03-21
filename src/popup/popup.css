@@ -131,6 +131,17 @@ section {
 	z-index: 1;
 }
 
+#top-site-detail a {
+	display: block;
+	color: black;
+	text-decoration: underline;
+	margin-bottom: 20px;
+}
+
+#top-site-detail p {
+	margin-bottom: 20px;
+}
+
 #circle-container {
 	height: 180px;
 	width: 100%;

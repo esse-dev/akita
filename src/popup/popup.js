@@ -92,38 +92,53 @@ async function getStats() {
 	const circleContainer = document.getElementById('circle-container');
 
 	if (!originStats || originStats.totalMonetizedTimeSpent === 0) {
-		// The user has not visisted a monetized site yet
+		// The user has not visited a monetized site yet
 		document.getElementById('circle-empty-illustration').style.display = 'block';
 		circleContainer.style.display = 'none';
-		document.getElementById('info-container').innerHTML = `You haven't visited any monetized websites yet! What are you waiting for? Get out there and explore the wild wild web.<br>Not sure where to start? <a href="https://coil.com/explore" target="_blank">Discover some monetized sites!</a>`;
+		setContentOfEl(document.getElementById('info-container'), [
+			textEl(`You haven't visited any monetized websites yet! What are you waiting for? Get out there and explore the wild wild web.`),
+			linebreakEl(),
+			textEl(`Not sure where to start? `),
+			linkEl(`https://coil.com/explore`, `Discover some monetized sites!`)
+		]);
 	} else {
 		if (originStats && originStats.totalMonetizedTimeSpent > 0) {
 			// If the user has visisted at least 1 monetized site, display monetization data
-			document.getElementById('monetized-time-data').innerHTML = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
+			document.getElementById('monetized-time-data').innerText = convertMSToNiceTimeString(originStats.totalMonetizedTimeSpent);
 
 			const totalSentAssetsMap = originStats.getTotalSentAssets();
 
 			if (totalSentAssetsMap) {
-				const sentAssetsString = getSentAssetsMapAsString(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
-				if (sentAssetsString && sentAssetsString !== ``) {
-					document.getElementById('monetized-sent-text').innerHTML = `In total, you’ve streamed `;
-					document.getElementById('monetized-sent-data').innerHTML = `${sentAssetsString}.`;
+				const sentAssetsEls = getSentAssetsMapAsEls(totalSentAssetsMap, GENERAL_CURRENCY_PRECISION);
+				if (sentAssetsEls.length > 0) {
+					document.getElementById('monetized-sent-text').innerText = `In total, you’ve streamed `;
+					setContentOfEl(document.getElementById('monetized-sent-data'), sentAssetsEls);
 				}
 			} else {
 				// No payment has been streamed to the site -- present estimation based on Coil rate
 				const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(originStats.totalMonetizedTimeSpent);
 				if (estimatedPaymentSentInUSD > 0) {
-					document.getElementById('monetized-sent-text').innerHTML = `If you were using <a href="https://www.coil.com/">Coil</a> you would have sent `;
-					document.getElementById('monetized-sent-data').innerHTML = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>.`;
+					setContentOfEl(document.getElementById('monetized-sent-text'), [
+						textEl(`If you were using `),
+						linkEl(`https://www.coil.com/`, `Coil`),
+						textEl(` you would have sent `),
+					]);
+					setContentOfEl(document.getElementById('monetized-sent-data'), [
+						setContentOfEl(strongEl(), [
+							textEl(`$${estimatedPaymentSentInUSD}`),
+							smallTextEl(`USD`)
+						]),
+						textEl(`.`),
+					]);
 				}
 			}
 
 			const monetizedTimePercent = getMonetizedTimeSpentPercent(originStats);
 			if (monetizedTimePercent) {
-				document.getElementById('monetized-percent-data').innerHTML = monetizedTimePercent+'%';
+				document.getElementById('monetized-percent-data').innerText = `${monetizedTimePercent}%`;
 			} else {
 				// TODO: ADD A CHANGE OF TEXT!
-				document.getElementById('monetized-percent-data').innerHTML = '0%';
+				document.getElementById('monetized-percent-data').innerText = `0%`;
 			}
 			document.getElementById('circle-empty-illustration').style.display = 'none';
 			circleContainer.style.display = 'flex';
@@ -154,7 +169,7 @@ async function getStats() {
 						linkEl.href = originData.origin;
 
 						// strip 'https://' or 'http://' and 'www.' from the beginning of the origin
-						linkEl.innerHTML = originData.origin.replace(URL_PREFIX_REGEX, "");
+						linkEl.innerText = originData.origin.replace(URL_PREFIX_REGEX, "");
 
 						needsLoveContainer.appendChild(linkEl);
 						const brEl = document.createElement('br');
@@ -162,7 +177,7 @@ async function getStats() {
 					}
 				} else {
 					const el = document.createElement('span');
-					el.innerHTML = 'No sites visited yet!';
+					el.innerText = `No sites visited yet!`;
 
 					needsLoveContainer.appendChild(el);
 				}
@@ -209,29 +224,30 @@ async function getStats() {
 				const originData = topOrigins[i];
 
 				if ((originData.faviconSource) && (originData.faviconSource !== "")) {
-					const faviconEl = createFaviconImgElement(originData.faviconSource);
-					circleEl.appendChild(faviconEl);
+					setContentOfEl(circleEl, [createFaviconImgElement(originData.faviconSource)]);
 				} else {
 					// If no favicon is available, use the first character of site origin
 					// to represent the origin in its circle, capitalized and bolded
-					const characterEl = document.createElement('p');
-					characterEl.innerHTML = `<strong>${originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase()}</strong>`;
-					circleEl.appendChild(characterEl);
+					setContentOfEl(circleEl, [
+						setContentOfEl(paragraphEl(), [
+							strongEl(originData.origin.replace(URL_PREFIX_REGEX, "").charAt(0).toUpperCase())
+						])
+					]);
 				}
 
 				if (circleWeight > 40) {
 					let circleFontSize = Math.round(circleWeight / 6);
 					// Font size should be no smaller than 11, otherwise it's not legible
 					if (circleFontSize > 11) {
-						const div = document.createElement('div');
-						div.innerHTML = createTopSiteCircleHTML(originData);
-						circleEl.appendChild(div);
+						circleEl.append(
+							setContentOfEl(document.createElement('div'), createTopSiteCircleEls(originData))
+						);
 						circleEl.style.fontSize = circleFontSize + 'px';
 					}
 				}
 
-				const detailHTML = createTopSiteDetailHTML(originData, originStats);
-				circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailHTML, color));
+				const detailEls = createTopSiteDetailEls(originData, originStats);
+				circleEl.addEventListener('mouseover', () => showTopSiteDetail(detailEls, color));
 				circleEl.addEventListener('mouseleave', () => hideElement(topSiteDetailEl));
 				circleEl.addEventListener("click", () => {
 					webBrowser.tabs.create({ url: originData.origin });
@@ -272,28 +288,40 @@ function createFaviconImgElement(faviconSource) {
 	return faviconEl;
 }
 
-function createTopSiteCircleHTML(originData) {
+function createTopSiteCircleEls(originData) {
 	if (originData) {
 		const visitData = originData.originVisitData;
 		const visitText = (visitData.numberOfVisits === 1) ? 'visit' : 'visits';
 
-		return `${convertMSToNiceTimeString(visitData.monetizedTimeSpent)}<br>${visitData.numberOfVisits} ` + visitText;
+		return [
+			textEl(convertMSToNiceTimeString(visitData.monetizedTimeSpent)),
+			linebreakEl(),
+			textEl(`${visitData.numberOfVisits} ${visitText}`)
+		];
 	}
 }
 
-function createTopSiteDetailHTML(originData, originStats) {
-	if (!originData || !originStats) return ``;
+function createTopSiteDetailEls(originData, originStats) {
+	if (!originData || !originStats) return [];
 
 	const timeSpent = originData.originVisitData.monetizedTimeSpent;
 
 	// Set time spent text
-	let timeSpentString = ``;
+	let timeSpentEl = paragraphEl();
 	if (timeSpent > 0) {
 		const percentTimeSpent = getPercentTimeSpentAtOriginOutOfTotal(originData, originStats);
 		if (percentTimeSpent > 0) {
-			timeSpentString = `You've spent <strong>${convertMSToNiceTimeString(timeSpent)}</strong> of monetized time here, which is <strong>${percentTimeSpent}%</strong> of your time online.<br><br>`;
+			setContentOfEl(timeSpentEl, [
+				textEl(`You've spent `),
+				strongEl(convertMSToNiceTimeString(timeSpent)),
+				textEl(` of monetized time here, which is `),
+				strongEl(`${percentTimeSpent}%`),
+				textEl(` of your time online.`)
+			]);
 		} else {
-			timeSpentString = `Crunching time spent numbers...<br><br>`
+			setContentOfEl(timeSpentEl, [
+				textEl(`Crunching time spent numbers...`)
+			]);
 		}
 	}
 
@@ -307,53 +335,130 @@ function createTopSiteDetailHTML(originData, originStats) {
 	} else {
 		visitCountText = `${visitCount} times`;
 	}
-	let visitCountString = ``;
+	let visitCountEl = paragraphEl();
 	if (visitCountText !== ``) {
 		const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
 		if (percentVisits > 0) {
-			visitCountString = `You've visited <strong>${visitCountText}</strong>, which is <strong>${percentVisits}%</strong> of your total website visits.<br><br>`;
+			setContentOfEl(visitCountEl, [
+				textEl(`You've visited `),
+				strongEl(visitCountText),
+				textEl(`, which is `),
+				strongEl(`${percentVisits}%`),
+				textEl(` of your total website visits.`)
+			]);
 		} else {
-			visitCountString = `Counting up visits...<br><br>`;
+			setContentOfEl(visitCountEl, [
+				textEl(`Counting up visits...`)
+			]);
 		}
 	}
 
 	// Set payment data text
-	let paymentString = ``;
-	let sentPayment = ``;
+	const paymentEl = paragraphEl();
 	const sentAssetsMap = originData.getTotalSentAssets();
 	if (sentAssetsMap) {
-		sentPayment = getSentAssetsMapAsString(sentAssetsMap, GENERAL_CURRENCY_PRECISION);
-		if ((sentPayment) && (sentPayment !== ``)) {
-			paymentString = `So far, you've sent `;
+		const sentPaymentEls = getSentAssetsMapAsEls(sentAssetsMap, GENERAL_CURRENCY_PRECISION);
+		if (sentPaymentEls.length > 0) {
+			setContentOfEl(paymentEl, [
+				textEl(`So far, you've sent `),
+				...sentPaymentEls,
+				textEl(` to this site.`)
+			]);
+		} else {
+			setContentOfEl(paymentEl, [
+				textEl(`You'll have to spend some more time here before there's payment data to show you!`),
+			]);
 		}
 	} else {
 		// No payment has been streamed to the site -- present estimation based on Coil rate
 		const estimatedPaymentSentInUSD = getEstimatedPaymentForTimeInUSD(timeSpent);
 		if (estimatedPaymentSentInUSD > 0) {
-			paymentString = `You haven't sent payment here yet. In the time you've spent here, with Coil you could have sent `;
-			sentPayment = `<strong>$${estimatedPaymentSentInUSD}<span style="font-size: 12px;">USD</span></strong>`;
+			setContentOfEl(paymentEl, [
+				textEl(`You haven't sent payment here yet. In the time you've spent here, with Coil you would have sent `),
+				setContentOfEl(strongEl(), [
+					textEl(`$${estimatedPaymentSentInUSD}`),
+					smallTextEl(`USD`)
+				]),
+				textEl(` to this site.`)
+			]);
+		} else {
+			setContentOfEl(paymentEl, [
+				textEl(`You'll have to spend some more time here before there's payment data to show you!`),
+			]);
 		}
-	}
-	if ((paymentString !== ``) && (sentPayment !== ``)) {
-		paymentString += `${sentPayment} to this site.`;
-	} else {
-		paymentString = `You'll have to spend some more time here before there's payment data to show you!`;
 	}
 
 	const origin = originData.origin;
 
-	return `<a href="${origin}" style="color: black; text-decoration: underline;">${origin}</a><br><br>
-		${timeSpentString}
-		${visitCountString}
-		${paymentString}`;
+	return [linkEl(origin, origin), timeSpentEl, visitCountEl, paymentEl];
 }
 
 const topSiteDetailEl = document.getElementById('top-site-detail');
-function showTopSiteDetail(innerHTML, color) {
+function showTopSiteDetail(els, color) {
 	topSiteDetailEl.style.zIndex = 1;
 	topSiteDetailEl.style.opacity = 1;
 	topSiteDetailEl.style.background = color;
-	topSiteDetailEl.innerHTML = innerHTML;
+	setContentOfEl(topSiteDetailEl, els);
+}
+
+/**
+ * Convert the provided sentAssetsMap to list of HTML elements.
+ * Example output: [
+ * 	<strong>20.20<span style="font-size: 12px;">CAD</span></strong>,
+ *	<strong>0.67<span style="font-size: 12px;">XRP</span></strong>,
+ *	 and ,
+ *	<strong>123.45<span style="font-size: 12px;">USD</span></strong>
+ * ]
+ *
+ * @param {Map<String, Number>} sentAssetsMap A map containing the sent asset amounts,
+ * with the currency as the key (String) and the sent amount as the value (Number).
+ * @param {Number} decimalPoints The AkitaOriginData to calculate sent assets for.
+ * @return {HTMLElement[]} The sent assets formatted as a string.
+ */
+ function getSentAssetsMapAsEls(sentAssetsMap, decimalPoints) {
+	let sentAssetsEls = [];
+
+	if (sentAssetsMap) {
+		let entriesToStringify = sentAssetsMap.size;
+
+		for (const [currency, amount] of sentAssetsMap.entries()) {
+			let amountSent = amount.toFixed(decimalPoints);
+
+			// No need to display the amount if it's effectively zero
+			if (parseFloat(amountSent) === 0) {
+				continue;
+			}
+
+			let amountSentEl = setContentOfEl(
+				strongEl(), [
+					textEl(amountSent),
+					smallTextEl(currency)
+				]
+			);
+
+			// There's only one entry in the map
+			if (sentAssetsMap.size === 1) {
+				sentAssetsEls = [amountSentEl];
+				break;
+			}
+
+			// There's more than one entry in the map
+			if (entriesToStringify >= 3) {
+				// There are at least 3 entries to stringify, so we'll use a comma to separate the entries
+				sentAssetsEls.push(amountSentEl, textEl(`, `));
+			} else if ((sentAssetsMap.size > 1) && (entriesToStringify === 1)) {
+				// This is the entry left to stringify, so use 'and'
+				sentAssetsEls.push(textEl(` and `), amountSentEl);
+			} else {
+				// There's a single entry remaining in the map
+				sentAssetsEls.push(amountSentEl);
+			}
+
+			entriesToStringify -= 1;
+		}
+	}
+
+	return sentAssetsEls;
 }
 
 function hideElement(element) {
@@ -436,12 +541,12 @@ function onSlideChange() {
 	if (currentSlide === carouselElements.length - 1) {
 		rightButtonEl.classList.add('disabled-button');
 
-		document.getElementById('intro-exit').innerHTML = 'done';
+		document.getElementById('intro-exit').innerText = `done`;
 		document.getElementById('intro-exit').style.color = '#C31354';
 	} else {
 		rightButtonEl.classList.remove('disabled-button');
 
-		document.getElementById('intro-exit').innerHTML = 'skip';
+		document.getElementById('intro-exit').innerText = `skip`;
 		document.getElementById('intro-exit').style.color = '#000000';
 	}
 	if (currentSlide === 0) {
@@ -469,3 +574,47 @@ function carouselAnimationLoop() {
 	carouselEl.style.transform = `translateX(${currentTranslateX}px)`;
 }
 requestAnimationFrame(carouselAnimationLoop);
+
+/********************************************************
+ * html element creation helper functions
+ ********************************************************/
+function setContentOfEl(el, els) {
+	el.textContent = ''; // Clear the element's contents
+	el.append(...els);
+	return el;
+}
+
+function linkEl(href, content) {
+	const el = document.createElement('a');
+	el.href = href;
+	el.target = '_blank';
+	el.innerText = content;
+	return el;
+}
+
+function strongEl(content) {
+	const el = document.createElement('strong');
+	el.innerText = content;
+	return el;
+}
+
+function textEl(content) {
+	return document.createTextNode(content);
+}
+
+function smallTextEl(content) {
+	const el = document.createElement('span');
+	el.style.fontSize = '12px';
+	el.innerText = content;
+	return el;
+}
+
+function linebreakEl() {
+	return document.createElement('br');
+}
+
+function paragraphEl(content) {
+	const el = document.createElement('p');
+	el.innerText = content;
+	return el;
+}
