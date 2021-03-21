@@ -153,60 +153,6 @@ function getEstimatedPaymentForTimeInUSD(timeSpent) {
 }
 
 /***********************************************************
- * Amount of Payment Streamed (Sent Assets)
- ***********************************************************/
-
-/**
- * Convert the provided sentAssetsMap to a string.
- * Example output: "20.20CAD, 0.67XRP and 123.45 USD"
- *
- * @param {Map<String, Number>} sentAssetsMap A map containing the sent asset amounts,
- * with the currency as the key (String) and the sent amount as the value (Number).
- * @param {Number} decimalPoints The AkitaOriginData to calculate sent assets for.
- * @return {String} The sent assets formatted as a string.
- */
-function getSentAssetsMapAsString(sentAssetsMap, decimalPoints) {
-	let sentAssetsString = ``;
-
-	if (sentAssetsMap) {
-		let entriesToStringify = sentAssetsMap.size;
-
-		for (const [currency, amount] of sentAssetsMap.entries()) {
-			let amountSent = amount.toFixed(decimalPoints);
-
-			// No need to display the amount if it's effectively zero
-			if (parseFloat(amountSent) === 0) {
-				continue;
-			}
-
-			let amountSentString = `<strong>${amountSent}<span style="font-size: 12px;">${currency}</span></strong>`;
-
-			// There's only one entry in the map
-			if (sentAssetsMap.size === 1) {
-				sentAssetsString = amountSentString;
-				break;
-			}
-
-			// There's more than one entry in the map
-			if (entriesToStringify >= 3) {
-				// There are at least 3 entries to stringify, so we'll use a comma to separate the entries
-				sentAssetsString += `${amountSentString}, `;
-			} else if ((sentAssetsMap.size > 1) && (entriesToStringify === 1)) {
-				// This is the entry left to stringify, so use 'and'
-				sentAssetsString += ` and ${amountSentString}`;
-			} else {
-				// There's a single entry remaining in the map
-				sentAssetsString += `${amountSentString}`;
-			}
-
-			entriesToStringify -= 1;
-		}
-	}
-
-	return sentAssetsString;
-}
-
-/***********************************************************
  * Various data retrieval functions
  ***********************************************************/
 
