@@ -9,18 +9,13 @@
  * See ./example_data.json to see example instances of AkitaOriginData.
  */
 class AkitaOriginData {
-	origin = null;
-	faviconSource = null;
+	constructor(originString, faviconSourceString = null, originVisitData = new AkitaOriginVisitData()) {
+		this.origin = originString;
+		this.faviconSource = faviconSourceString;
+		this.originVisitData = originVisitData;
 
-	// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
-	paymentPointerMap = {};
-
-	// The type of originVisitData is: AkitaOriginVisitData
-	originVisitData = null;
-
-	constructor(origin) {
-		this.origin = origin;
-		this.originVisitData = new AkitaOriginVisitData();
+		// The type of each entry in paymentPointerMap is: AkitaPaymentPointerData
+		this.paymentPointerMap = {};
 	}
 
 	/**
@@ -32,19 +27,16 @@ class AkitaOriginData {
 	 * @return {AkitaOriginData} the input object as an instance of the AkitaOriginData class.
 	 */
 	static fromObject(akitaOriginDataObject) {
-		const newOriginData = new AkitaOriginData(akitaOriginDataObject.origin);
-		newOriginData.faviconSource = akitaOriginDataObject.faviconSource;
+		const newOriginData = new AkitaOriginData(
+			akitaOriginDataObject.origin,
+			akitaOriginDataObject.faviconSource,
+			AkitaOriginVisitData.fromObject(akitaOriginDataObject.originVisitData)
+		);
 
 		for (const paymentPointer in akitaOriginDataObject.paymentPointerMap) {
 			newOriginData.paymentPointerMap[paymentPointer] = AkitaPaymentPointerData.fromObject(
 				akitaOriginDataObject.paymentPointerMap[paymentPointer]
 			);
-		}
-
-		// Add deserialization for originVisitData
-		const originVisitDataDeserialized = AkitaOriginVisitData.fromObject(akitaOriginDataObject.originVisitData);
-		if (originVisitDataDeserialized) {
-			newOriginData.originVisitData = originVisitDataDeserialized;
 		}
 
 		return newOriginData;

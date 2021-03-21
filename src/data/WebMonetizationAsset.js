@@ -11,12 +11,10 @@
  *	 235 * 10**(-2) = 2.35
  */
 class WebMonetizationAsset {
-	amount = 0;
-	assetScale = 0;
-	assetCode = null;
-
-	constructor(assetCode) {
-		this.assetCode = assetCode;
+	constructor(assetCodeString, amountNumber = 0, assetScaleNumber = 0) {
+		this.assetCode = assetCodeString;
+		this.amount = amountNumber;
+		this.assetScale = assetScaleNumber;
 	}
 
 	/**
@@ -28,10 +26,11 @@ class WebMonetizationAsset {
 	 * @return {WebMonetizationAsset} the input object as an instance of the WebMonetizationAsset class.
 	 */
 	static fromObject(webMonetizationAsset) {
-		const newWebMonetizationAsset = new WebMonetizationAsset(webMonetizationAsset.assetCode);
-
-		newWebMonetizationAsset.amount = webMonetizationAsset.amount;
-		newWebMonetizationAsset.assetScale = webMonetizationAsset.assetScale;
+		const newWebMonetizationAsset = new WebMonetizationAsset(
+			webMonetizationAsset.assetCode,
+			webMonetizationAsset.amount,
+			webMonetizationAsset.assetScale
+		);
 
 		return newWebMonetizationAsset;
 	}
