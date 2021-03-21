@@ -3,6 +3,24 @@
 // The number of decimal points to use when displaying an amount of payment
 const GENERAL_CURRENCY_PRECISION = 2;
 
+// Browser type constants
+const BROWSER_TYPE_FIREFOX = "Firefox";
+const BROWSER_TYPE_CHROME = "Chrome";
+const BROWSER_TYPE_EDGE = "Edge";
+const browserType = getBrowser();
+
+// Set the icon illustration in the tutorial based on browser (defaults in HTML are for Chrome/Brave)
+const monetizedIconObject = document.getElementById('akita-icon-monetized-object');
+const unmonetizedIconObject = document.getElementById('akita-icon-unmonetized-object');
+
+if (browserType === BROWSER_TYPE_FIREFOX) {
+	monetizedIconObject.data = "../../assets/tutorial/demo_mon_firefox.svg";
+	unmonetizedIconObject.data = "../../assets/tutorial/demo_unmon_firefox.svg";
+} else if (browserType === BROWSER_TYPE_EDGE) {
+	monetizedIconObject.data = "../../assets/tutorial/demo_mon_edge.svg";
+	unmonetizedIconObject.data = "../../assets/tutorial/demo_unmon_edge.svg";
+}
+
 // Section navigation
 let otherSection = document.getElementById('intro-carousel');
 let currentSection = document.getElementById('data-story');
@@ -16,7 +34,7 @@ function switchSection() {
 	});
 
 	// Hacky thing to get past buggy Firefox scrollIntoView smooth problem
-	if (getBrowser() === "Firefox") {
+	if (browserType === BROWSER_TYPE_FIREFOX) {
 		if (currentSection === document.getElementById('data-story')) {
 			setTimeout(() => {
 				currentSection.scrollIntoView();
@@ -345,17 +363,37 @@ function hideElement(element) {
 	element.style.zIndex = -1;
 }
 
-// source: https://stackoverflow.com/a/45985333/5425899
+/**
+ * Retrieves the browser type based on user agent.
+ *
+ * This function is based on the code provided at this source: https://stackoverflow.com/a/56361977,
+ * which is licensed under Attribution-ShareAlike 4.0 International (CC BY-SA 4.0). A copy of this
+ * license can be found at https://creativecommons.org/licenses/by-sa/4.0/.
+ *
+ * The code in this function uses the source's idea of leveraging indexOf to check the user agent
+ * string to identify the browser.
+ *
+ * As per the license, this function is hereby licensed under CC BY-SA 4.0.
+ *
+ * @returns {String} The browser type.
+ */
 function getBrowser() {
-	if (typeof chrome !== "undefined") {
-		if (typeof browser !== "undefined") {
-			return "Firefox";
-		} else {
-			return "Chrome";
-		}
-	} else {
-		return "Edge";
+	const userAgentString = window.navigator.userAgent.toLowerCase();
+
+	// Chromium Edge (does not match old Edge)
+	if (userAgentString.indexOf("edg/") > -1) {
+		return BROWSER_TYPE_EDGE;
 	}
+	// Chrome and Brave
+	if ((userAgentString.indexOf("chrome") > -1) && (!!window.chrome)) {
+		return BROWSER_TYPE_CHROME;
+	}
+	// Firefox
+	if (userAgentString.indexOf("firefox") > -1){
+		return BROWSER_TYPE_FIREFOX;
+	}
+
+	return "other";
 }
 
 // Carousel code
