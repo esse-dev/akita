@@ -8,11 +8,11 @@
  *   - number of visits recorded in Akita
  */
 class AkitaOriginVisitData {
-	constructor() {
+	constructor(monetizedTimeSpentNumber = 0, numberOfVisitsNumber = 0) {
 		// time in milliseconds
-		this.monetizedTimeSpent = 0;
+		this.monetizedTimeSpent = monetizedTimeSpentNumber;
 
-		this.numberOfVisits = 0;
+		this.numberOfVisits = numberOfVisitsNumber;
 	}
 
 	/**
@@ -24,13 +24,10 @@ class AkitaOriginVisitData {
 	 * @return {AkitaOriginVisitData} the input object as an instance of the AkitaOriginVisitData class.
 	 */
 	static fromObject(akitaOriginVisitDataObject) {
-		let newOriginVisitData = null;
-
-		if (akitaOriginVisitDataObject) {
-			newOriginVisitData = new AkitaOriginVisitData();
-			newOriginVisitData.monetizedTimeSpent = akitaOriginVisitDataObject.monetizedTimeSpent;
-			newOriginVisitData.numberOfVisits = akitaOriginVisitDataObject.numberOfVisits;
-		}
+		const newOriginVisitData = new AkitaOriginVisitData(
+			akitaOriginVisitDataObject.monetizedTimeSpent,
+			akitaOriginVisitDataObject.numberOfVisits
+		);
 
 		return newOriginVisitData;
 	}

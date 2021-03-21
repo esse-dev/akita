@@ -3,12 +3,13 @@
  * sent to that payment pointer. An asset is some amount of a currencies like USD, CAD or XRP.
  */
 class AkitaPaymentPointerData {
-	constructor(paymentPointerString) {
+	constructor(paymentPointerString, validationTimestampNumber = null) {
 		this.paymentPointer = paymentPointerString;
 
 		// The most recent time (UTC timestamp) when Akita validated the payment pointer
 		// For more info on payment pointer validation: see ../content_origin.js, function isPaymentPointerValid
-		this.validationTimestamp = null;
+		// This is a Number, but is initialized to null to signify that the payment pointer has not yet been validated
+		this.validationTimestamp = validationTimestampNumber;
 
 		// The type of each entry in sentAssetsMap is: WebMonetizationAsset
 		this.sentAssetsMap = {};
@@ -23,14 +24,17 @@ class AkitaPaymentPointerData {
 	 * @return {AkitaPaymentPointerData} the input object as an instance of the AkitaPaymentPointerData class.
 	 */
 	static fromObject(akitaPaymentPointerDataObject) {
-		const newPaymentPointerData = new AkitaPaymentPointerData(akitaPaymentPointerDataObject.paymentPointer);
-		newPaymentPointerData.validationTimestamp = akitaPaymentPointerDataObject.validationTimestamp;
+		const newPaymentPointerData = new AkitaPaymentPointerData(
+			akitaPaymentPointerDataObject.paymentPointer,
+			akitaPaymentPointerDataObject.validationTimestamp
+		);
 
 		for (const assetCode in akitaPaymentPointerDataObject.sentAssetsMap) {
 			newPaymentPointerData.sentAssetsMap[assetCode] = WebMonetizationAsset.fromObject(
 				akitaPaymentPointerDataObject.sentAssetsMap[assetCode]
 			);
 		}
+
 		return newPaymentPointerData;
 	}
 

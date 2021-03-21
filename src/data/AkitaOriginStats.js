@@ -11,10 +11,10 @@
  *   - map of totalSentAssets, with an entry for each currency
  */
 class AkitaOriginStats {
-	constructor() {
-		this.totalTimeSpent = 0;
-		this.totalMonetizedTimeSpent = 0;
-		this.totalVisits = 0;
+	constructor(totalTimeSpentNumber = 0, totalMonetizedTimeSpentNumber = 0, totalVisitsNumber = 0) {
+		this.totalTimeSpent = totalTimeSpentNumber;
+		this.totalMonetizedTimeSpent = totalMonetizedTimeSpentNumber;
+		this.totalVisits = totalVisitsNumber;
 
 		// The type of each entry in totalSentAssetsMap is: WebMonetizationAsset
 		this.totalSentAssetsMap = {};
@@ -29,11 +29,11 @@ class AkitaOriginStats {
 	 * @return {AkitaOriginStats} the input object as an instance of the AkitaOriginStats class.
 	 */
 	static fromObject(akitaOriginStats) {
-		const newAkitaOriginStats = new AkitaOriginStats();
-
-		newAkitaOriginStats.totalTimeSpent = akitaOriginStats.totalTimeSpent;
-		newAkitaOriginStats.totalMonetizedTimeSpent = akitaOriginStats.totalMonetizedTimeSpent;
-		newAkitaOriginStats.totalVisits = akitaOriginStats.totalVisits;
+		const newAkitaOriginStats = new AkitaOriginStats(
+			akitaOriginStats.totalTimeSpent,
+			akitaOriginStats.totalMonetizedTimeSpent,
+			akitaOriginStats.totalVisits
+		);
 
 		for (const assetCode in akitaOriginStats.totalSentAssetsMap) {
 			newAkitaOriginStats.totalSentAssetsMap[assetCode] = WebMonetizationAsset.fromObject(
