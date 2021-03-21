@@ -9,7 +9,8 @@
 		"128": "assets/icons/icon_128x128.png"
 	},
 	"permissions":[
-		"storage"
+		"storage",
+		"https://*/*"
 	],
 	"background": {
 		"scripts": ["src/background_script.js"]
