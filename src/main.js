@@ -112,6 +112,21 @@ async function getTopOriginsThatNeedSomeLove(nTopOrigins) {
 	return topOriginsList;
 }
 
+/**
+ * Check if the user has used a Web Monetization Provider to stream payment to WM
+ * content since installing Akita.
+ *
+ * @param {AkitaOriginStats} originStats The origin stats data.
+ * @returns true if the user has used a Web Monetization Provider, false otherwise.
+ */
+function hasUsedWebMonetizationProvider(originStats) {
+	// If the totalSentAssetsMap exists and has at least one entry, then the
+	// user has streamed payment to WM content through a WM Provider
+	return ((originStats)
+		&& (originStats.totalSentAssetsMap)
+		&& (Object.keys(originStats.totalSentAssetsMap).length !== 0));
+}
+
 /***********************************************************
  * Payment Prediction
  ***********************************************************/

@@ -8,6 +8,22 @@
 	<meta charset="UTF-8">
 </head>
 <body>
+	<!-- FEEDBACK POPUP -->
+	<div class="feedback-popup" id="feedback-popup-div">
+		<button class="plain-content-button exit-button close-popup">
+			<img src="../../assets/x.svg">
+		</button>
+		<img src="../../assets/icons/icon.svg" id="feedback-popup-akita-img">
+		<img src="../../assets/woof_text.svg" id="feedback-popup-woof-img">
+		<div class="feedback-popup-text">
+			<h3>We're looking for feedback!</h3>
+			<button id="feedback-popup-survey-button">fill out survey</button>
+			<br>
+			<button class="plain-content-button close-popup" id="feedback-popup-nothanks-button">no thanks/maybe later</button>
+		</div>
+		<div id="feedback-popup-border"></div>
+	</div>
+
 	<!-- DATA VIS AREA -->
 	<section id="data-story">
 		<header>
@@ -23,7 +39,7 @@
 					data="../../assets/friends_of_akita.svg">
 				</object>Project
 			</a>
-			<a>
+			<a id="goto-survey">
 				<object
 					type="image/svg+xml"
 					data="../../assets/speech_bubble.svg">
