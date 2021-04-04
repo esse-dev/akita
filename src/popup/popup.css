@@ -19,6 +19,11 @@ body {
 	border: 5px solid black;
 }
 
+h1 {
+	margin-top: 30px;
+	margin-bottom: 4px;
+}
+
 h2 {
 	font-size: 40px;
 	line-height: 40px;
@@ -29,6 +34,10 @@ p {
 	font-size: 18px;
 	line-height: 22px;
 	margin-bottom: 10px;
+}
+
+button {
+	cursor: pointer;
 }
 
 a {
@@ -49,11 +58,6 @@ ul {
 	margin-top: 0;
 	font-size: 18px;
 	line-height: 26px;
-}
-
-h1 {
-	margin-top: 30px;
-	margin-bottom: 4px;
 }
 
 .tutorial-list-ul {
@@ -321,4 +325,86 @@ header a {
 }
 header a:hover {
 	color: #F2A8C3;
+}
+
+/****************************************
+ * Feedback Popup
+ ****************************************/
+
+.feedback-popup {
+	background: #E6E3D2;
+	height: 510px;
+	opacity: 0;
+	padding: 15px;
+	position: fixed;
+	transition: 0.2s opacity;
+	width: 360px;
+}
+.feedback-popup p {
+	font-size: 14px;
+}
+.feedback-popup h3 {
+	font-size: 20px;
+}
+
+.exit-button {
+	position: absolute;
+	right: 5px;
+}
+.exit-button img {
+	height: 35px;
+}
+
+#feedback-popup-akita-img {
+	left: -45px;
+	height: 250px;
+	position: absolute;
+	top: 30px;
+	transform: rotate(23deg);
+}
+
+#feedback-popup-woof-img {
+	height: 50px;
+	position: absolute;
+	right: 45px;
+	top: 220px;
+}
+
+.feedback-popup-text {
+	color: #A84900;
+	margin-top: 300px;
+	text-align: center;
+}
+
+#feedback-popup-survey-button {
+	background: #A84900;
+	border: none;
+	color: #E6E3D2;
+	font-size: 18px;
+	font-weight: bold;
+	height: 50px;
+	letter-spacing: 0.5px;
+	margin-top: 20px;
+	margin-bottom: 40px;
+	width: 170px;
+}
+
+#feedback-popup-nothanks-button {
+	text-decoration: underline;
+}
+
+#feedback-popup-border {
+	border: 5px solid black;
+	left: -5px;
+	height: 100%;
+	pointer-events: none;
+	position: absolute;
+	top: -5px;
+	width: 100%;
+}
+
+.plain-content-button {
+	background-color: inherit;
+	border: none;
+	color: #A84900;
 }

@@ -21,6 +21,59 @@ if (browserType === BROWSER_TYPE_FIREFOX) {
 	unmonetizedIconObject.data = "../../assets/tutorial/demo_unmon_edge.svg";
 }
 
+// Setting click listeners and selecting the correct survey url for the user
+const feedbackPopupDiv = document.getElementById('feedback-popup-div');
+
+function setClickListenersForCloseFeedbackEls() {
+	const closePopupEls = Array.from(document.getElementsByClassName('close-popup'));
+	for (const el of closePopupEls) {
+		el.addEventListener('click', () => {
+			hideElement(feedbackPopupDiv);
+		}, false);
+	}
+}
+
+const WM_PROVIDER_USER_SURVEY_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSfipkYgCY9aNjmtWaBandNptYxuGEamDGV3BU672iybMBW7wg/viewform';
+const NON_WM_PROVIDER_USER_SURVEY_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSd5qFPZTW2Lcla1CSxyfXdVy3LR6Ls3_4MW-gPcDh9I91huuQ/viewform';
+let surveyUrl = "";
+
+function setSurveyUrl(originStats) {
+	const isWMProviderUser = hasUsedWebMonetizationProvider(originStats);
+	surveyUrl = isWMProviderUser ? WM_PROVIDER_USER_SURVEY_LINK : NON_WM_PROVIDER_USER_SURVEY_LINK;
+}
+
+function setClickListenerForFeedbackPopupSurveyEl() {
+	const surveyButtonEl = document.getElementById('feedback-popup-survey-button');
+	surveyButtonEl.addEventListener('click', () =>
+		window.open(surveyUrl, '_blank')
+	, false);
+}
+
+function setClickListenerForHeaderFeedbackEl() {
+	const headerFeedbackLinkEl = document.getElementById('goto-survey');
+	headerFeedbackLinkEl.addEventListener('click', () =>
+		window.open(surveyUrl, '_blank')
+	, false);
+}
+
+const browsingTimeThresholdMs = 24 * 60 * 60 * 1000; // 24 hours
+function handleFeedbackPopup(originStats) {
+	if (!originStats) return;
+
+	// Only show the popup after some amount of browsing time: 24 hours
+	if (originStats.totalTimeSpent < browsingTimeThresholdMs) return;
+
+	// Only show the feedback popup once
+	webBrowser.storage.local.get('seenFeedbackPopup', ({ seenFeedbackPopup }) => {
+		if (!seenFeedbackPopup) {
+			setClickListenersForCloseFeedbackEls();
+			setClickListenerForFeedbackPopupSurveyEl();
+			showElement(feedbackPopupDiv);
+			webBrowser.storage.local.set({ seenFeedbackPopup:true });
+		}
+	});
+}
+
 // Section navigation
 let otherSection = document.getElementById('intro-carousel');
 let currentSection = document.getElementById('data-story');
@@ -84,11 +137,22 @@ function convertMSToNiceTimeString(ms) {
 	return isSingularUnit ? niceTimeString.slice(0, -1) : niceTimeString;
 }
 
-const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
-
-getStats();
-async function getStats() {
+main();
+async function main() {
 	const originStats = await loadOriginStats();
+	setSurveyUrl(originStats);
+	setClickListenerForHeaderFeedbackEl();
+	handleFeedbackPopup(originStats);
+	await renderStats(originStats);
+}
+
+/**
+ * Render all of the data/stats presented in the Akita extension.
+ *
+ * @param {AkitaOriginStats} originStats Akita origin stats data loaded from storage.
+ */
+async function renderStats(originStats) {
+	const URL_PREFIX_REGEX = /^(https?:\/\/)(www\.)?/;
 	const circleContainer = document.getElementById('circle-container');
 
 	if (!originStats || originStats.totalMonetizedTimeSpent === 0) {
@@ -145,10 +209,7 @@ async function getStats() {
 
 			const needsLoveContainer = document.getElementById('sites-need-love-container');
 			const noProviderResourcesContainer = document.getElementById('no-provider-resources-container');
-			if ((originStats)
-				&& (originStats.totalSentAssetsMap)
-				&& (Object.keys(originStats.totalSentAssetsMap).length !== 0)
-			) {
+			if (hasUsedWebMonetizationProvider(originStats)) {
 				noProviderResourcesContainer.style.display = 'none';
 				needsLoveContainer.style.display = 'block';
 
@@ -158,9 +219,9 @@ async function getStats() {
 					for (const originData of needLoveOrigins) {
 						if ((originData.faviconSource) && (originData.faviconSource !== "")) {
 							const faviconEl = createFaviconImgElement(originData.faviconSource);
-							faviconEl.addEventListener("click", () => {
-								webBrowser.tabs.create({ url: originData.origin });
-							}, false);
+							faviconEl.addEventListener('click', () =>
+								webBrowser.tabs.create({ url: originData.origin })
+							, false);
 
 							needsLoveContainer.appendChild(faviconEl);
 						}
@@ -462,10 +523,17 @@ function showTopSiteDetail(els, color) {
 }
 
 function hideElement(element) {
-	// Make element invisible.
+	// Make element invisible
 	element.style.opacity = 0;
-	// Place element "behind" all other elements so it does not intercept mouse interactions.
+	// Place element "behind" all other elements so it does not intercept mouse interactions
 	element.style.zIndex = -1;
+}
+
+function showElement(element) {
+	// Make element visible
+	element.style.opacity = 1;
+	// Place element "in front of" all other elements so it can intercept mouse interactions
+	element.style.zIndex = 100;
 }
 
 /**
