@@ -2,10 +2,22 @@
 
 # Akita
 
+<!-- License Badges -->
 [![Software License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Assets by Akita License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/).
+<!-- Social Badges -->
+[![Follow esse dev on Twitter](https://img.shields.io/twitter/follow/esse_dev?style=social&logo=twitter)](https://twitter.com/intent/follow?screen_name=esse_dev)
+[![Chat with us on Discord](https://img.shields.io/discord/721434886669467679?logo=discord)](https://discord.gg/psyNbWW)
+
+<!-- Installation Badges -->
+<!--
+  Note, at the time of adding the Edge badge below, there is no officially documented API for retrieving the add on details, so the method from https://github.com/badges/shields/issues/4690#issuecomment-647573617 has been used.
+-->
+[![Available on Chrome Web Store](https://img.shields.io/chrome-web-store/v/phcipgphomfgkenfmjnbmajdiejnlmgg?color=brightgreen)](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg)
+[![Available on Microsoft Edge Add-ons](https://img.shields.io/badge/dynamic/json?label=edge%20add-ons&prefix=v&query=%24.version&url=https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/halamaefcdjalhjgkbefalmhpnboncoc)](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
+
+A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/), part of [The Akita Project](https://akitaproject.site/).
 
 Akita presents your top visited monetized sites, how much time you’re spending on them, and how much you're contributing (or could contribute) to them.
 
@@ -41,7 +53,11 @@ Our license information can be found [here](docs/LicenseInfo.md) and our license
 ---
 
 ## Installing
-Check out the instructions to install from source or package [here](docs/InstallAkita.md). We are working on making Akita available in browser extension/add-on stores - please stay tuned. :)
+Check out the instructions to install from source or package [here](docs/InstallAkita.md).
+
+You can also install Akita from Browser Extension/Add-On Stores:
+
+[Chrome Web Store](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg) | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
 ---
 
@@ -107,9 +123,12 @@ Overall, our goal with Akita is to increase Web Monetization exposure and awaren
 ### Blog posts on our process
 1. [Kickstarting a project idea: going from 0 to...0 - Part 1](https://dev.to/esse-dev/kickstarting-a-project-idea-going-from-0-to-0-part-1-3o2e)
 2. [Kickstarting a project idea: going from 0 to...0 - Part 2](https://dev.to/esse-dev/kickstarting-a-project-idea-going-from-0-to-0-part-2-3bph)
-3. [How can you support websites without having to deal with annoying ads?](https://dev.to/esse-dev/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb) 
+3. [How can you support websites without having to deal with annoying ads?](https://dev.to/esse-dev/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb)
 4. [Hackathon Update: Breaking Our Idea Down Into Dog-Treat-Sized Tasks](https://dev.to/esse-dev/hackathon-update-breaking-our-idea-down-into-dog-treat-sized-tasks-50e3)
-5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/esse-dev/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post)
+5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/esse-dev/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post
+6. [Akita — Grant Report #1](https://community.webmonetization.org/akita/akita-grant-report-1-3c1n)
+7. [Support us by taking the Akita Beta Release Survey](https://community.webmonetization.org/akita/support-us-by-taking-the-akita-beta-release-survey-2fk4)
+
 
 ### Why 'Akita'?
 Naming projects can be pretty challenging. We spent a good chunk of time coming up with various names before deciding to stay true to our "brand" at the time of the hackathon, which was _dog-s_, and selecting "Akita" as our project name.
@@ -137,6 +156,10 @@ For more info, check out [Akita's Privacy Policy](docs/PrivacyPolicy.md).
 ## Connect with Us
 - Email
   - [AkitaFeedback@gmail.com](mailto:AkitaFeedback@gmail.com)
+- Web Monetization Community Forem
+  - [Akita](https://community.webmonetization.org/akita)
+  - [Elliot](https://community.webmonetization.org/elliot)
+  - [Sharon](https://community.webmonetization.org/sharon)
 - DEV
   - [esse-dev](https://dev.to/esse-dev)
   - [Elliot](https://dev.to/elliot)
@@ -144,5 +167,6 @@ For more info, check out [Akita's Privacy Policy](docs/PrivacyPolicy.md).
 - Discord
   - [Akita Discord Server](https://discord.gg/psyNbWW)
 - Twitter
+  - [esse_dev](https://twitter.com/esse_dev)
   - [Elliot](https://twitter.com/elliotokay)
   - [Sharon](https://twitter.com/_sharonwang)

@@ -8,7 +8,7 @@ Our license information can be found [here](LicenseInfo.md) and our license/copy
 
 - ### **Chrome Web Store**: [https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg)
 - ### **Firefox Browser Add-ons**: _Coming soon..._
-- ### **Microsoft Edge Add-ons**: _Coming soon..._
+- ### **Microsoft Edge Add-ons**: [https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
 ## Installing Akita Manually (From Source or Package)
 
