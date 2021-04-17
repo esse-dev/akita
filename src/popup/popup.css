@@ -245,7 +245,7 @@ section {
 .tooltip-bubble-right {
 	margin-right: -10px;
 	margin-left: 5px;
-	right: 0;
+	right: 10px;
 }
 
 .tooltip:hover + .tooltip-bubble-left, .tooltip:hover + .tooltip-bubble-right {
