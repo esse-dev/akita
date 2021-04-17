@@ -470,12 +470,16 @@ webBrowser.runtime.onMessage.addListener((message) => {
 	if (message.iframeReceivedUuid) {
 		const { iframeUuid } = message.iframeReceivedUuid;
 		const iframe = iframeUuidMap.get(iframeUuid);
-		iframesWithUuids.add(iframe);
+		if (iframe) {
+			iframesWithUuids.add(iframe);
+		}
 	}
 	if (message.iframePaymentPointerChange) {
 		const { iframeUuid, paymentPointer } = message.iframePaymentPointerChange;
 		const iframe = iframeUuidMap.get(iframeUuid);
-		paymentPointerIframeMap.set(iframe, paymentPointer);
+		if (iframe) {
+			paymentPointerIframeMap.set(iframe, paymentPointer);
+		}
 	}
 });
 
