@@ -170,3 +170,5 @@ For more info, check out [Akita's Privacy Policy](docs/PrivacyPolicy.md).
   - [esse_dev](https://twitter.com/esse_dev)
   - [Elliot](https://twitter.com/elliotokay)
   - [Sharon](https://twitter.com/_sharonwang)
+- LinkedIn
+  - [esse dev](https://www.linkedin.com/company/esse-dev)
