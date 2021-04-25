@@ -384,25 +384,26 @@ function createTopSiteDetailEls(originData, originStats) {
 				textEl(`Crunching time spent numbers...`)
 			]);
 		}
+	} else {
+		setContentOfEl(timeSpentEl, [textEl(`Crunching time spent numbers...`)]);
 	}
 
-	// Set visit count text
-	let visitCountText = ``;
 	const visitCount = originData.originVisitData.numberOfVisits;
-	if (visitCount === 0) {
-		// Don't set the visit count text
-	} else if (visitCount === 1) {
-		visitCountText = `${visitCount} time`;
-	} else {
-		visitCountText = `${visitCount} times`;
-	}
+
+	// Set visit count text
 	let visitCountEl = paragraphEl();
-	if (visitCountText !== ``) {
+	if (visitCount > 0) {
 		const percentVisits = getPercentVisitsToOriginOutOfTotal(originData, originStats);
 		if (percentVisits > 0) {
+			let timeText;
+			if (visitCount > 1) {
+				timeText = `times`;
+			} else {
+				timeText = `time`;
+			}
 			setContentOfEl(visitCountEl, [
 				textEl(`You've visited `),
-				strongEl(visitCountText),
+				strongEl(`${visitCount} ${timeText}`),
 				textEl(`, which is `),
 				strongEl(`${percentVisits}%`),
 				textEl(` of your total website visits.`)
@@ -412,6 +413,10 @@ function createTopSiteDetailEls(originData, originStats) {
 				textEl(`Counting up visits...`)
 			]);
 		}
+	} else {
+		setContentOfEl(visitCountEl, [
+			textEl(`Counting up visits...`)
+		]);
 	}
 
 	// Set payment data text

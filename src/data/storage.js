@@ -107,7 +107,7 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 			updateTimeSpent(originData, originStats, data, isMonetizedData);
 			break;
 		case AKITA_DATA_TYPE.ORIGIN_FAVICON: // Only for a monetized origin
-			await updateOriginFavicon(originData, data);
+			updateOriginFavicon(originData, data);
 			break;
 		default:
 			// console.log("invalid data type provided");
