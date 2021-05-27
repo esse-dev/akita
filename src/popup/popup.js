@@ -44,9 +44,16 @@ function setSurveyUrl(originStats) {
 
 function setClickListenerForFeedbackPopupSurveyEl() {
 	const surveyButtonEl = document.getElementById('feedback-popup-survey-button');
-	surveyButtonEl.addEventListener('click', () =>
-		window.open(surveyUrl, '_blank')
-	, false);
+	surveyButtonEl.addEventListener('click', () => {
+		window.open(surveyUrl, '_blank');
+
+		// In Firefox, the popup doesn't close after the survey tab is opened, so
+		// we manually close the popup window
+		if (browserType === BROWSER_TYPE_FIREFOX) {
+			// Note: `window` in the popup.js file always refers to the popup window
+			window.close();
+		}
+	}, false);
 }
 
 function setClickListenerForHeaderFeedbackEl() {
@@ -69,7 +76,7 @@ function handleFeedbackPopup(originStats) {
 			setClickListenersForCloseFeedbackEls();
 			setClickListenerForFeedbackPopupSurveyEl();
 			showElement(feedbackPopupDiv);
-			webBrowser.storage.local.set({ seenFeedbackPopup:true });
+			webBrowser.storage.local.set({ seenFeedbackPopup: true });
 		}
 	});
 }
