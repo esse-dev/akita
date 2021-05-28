@@ -83,7 +83,9 @@ async function storeDataIntoAkitaFormatNonMonetized(data, typeOfData) {
  * @param {Boolean} isMonetizedData Whether or not the data being stored is for a monetized origin.
  */
 async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
-	// TODO: ensure typeOfData is one of AKITA_DATA_TYPE
+	if (!Object.values(AKITA_DATA_TYPE).includes(typeOfData)) {
+		throw "invalid typeOfData passed to updateAkitaData";
+	}
 
 	// Get existing originStats or create it if it doesn't already exist
 	let originStats = await loadOriginStats();
@@ -107,14 +109,46 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 			updateTimeSpent(originData, originStats, data, isMonetizedData);
 			break;
 		case AKITA_DATA_TYPE.ORIGIN_FAVICON: // Only for a monetized origin
-			updateOriginFavicon(originData, data);
+			storeOriginFavicon(originData.origin, data);
 			break;
-		default:
-			// console.log("invalid data type provided");
 	}
 
 	// Overwrite or create origin stats in storage
 	await storeOriginStats(originStats);
+}
+
+/**
+ * Given an origin and an absolute or relative path to a favicon, this function:
+ *   - fetches the favicon to check if it is a valid favicon,
+ *     - if the fetch is successful, the favicon is valid, so the origin's orginData favicon is set
+ *     to the given favicon path,
+ *     - if the fetch is unsuccessful the origin's originData favicon is set to "",
+ *   - finally, the updated originData is stored.
+ *
+ * Note: this function's implementation assumes that this origin's data has been created
+ * and stored prior to the critical section.
+ *
+ * @param {String} origin The origin which should have its corresponding originData favicon set.
+ * @param {String} faviconPath The absolute or relative path to the origin's favicon.
+ */
+ async function storeOriginFavicon(origin, faviconPath) {
+	const absoluteFaviconPath = pathToAbsolutePath(faviconPath, origin);
+	const isFaviconValid = await isFetchStatusOk(absoluteFaviconPath);
+
+	// Once/If the favicon resolves, store the originData with the favicon included:
+	const resolveLock = await acquireStoreLock();
+
+	// Get and update existing data for this origin.
+	let originData = await loadOriginData(origin);
+	if (isFaviconValid) {
+		originData.setOriginFavicon(absoluteFaviconPath);
+	} else {
+		originData.setOriginFavicon("");
+	}
+
+	// Update the data for this origin in storage
+	await storeOriginData(origin, originData);
+	resolveLock();
 }
 
 
@@ -197,44 +231,48 @@ function updateTimeSpent(originData, originStats, recentTimeSpent, isMonetizedTi
 }
 
 /**
- * Store the path to the origin's favicon in the origin data. If a relative path
- * is provided, construct the absolute path. Attempt to fetch the favicon to check
- * if it is a valid path. If fetch response is 200 OK, the path is valid, so store
- * the url of the favicon.
+ * Makes an absolute path from an input path which is either relative or absolute. If the input path
+ * is absolute, the input path is returned unchanged. If the input path is relative, an absolute
+ * path on the given origin is made with the input path.
  *
- * @param {AkitaOriginData} originData The origin data to update.
- * @param {String} faviconData The absolute or relative path to the site's favicon.
+ * @param {String} path A path which you want as an absolute path.
+ * @param {String} origin If the path is relative, This param is he origin which the path is
+ * relative to. Not used if the path is absolute.
+ * @returns {String} The input path as an absolute path.
  */
-async function updateOriginFavicon(originData, faviconData) {
-	let faviconPath = null;
-	let origin = originData.origin;
-
+function pathToAbsolutePath(path, origin) {
 	// Regex pattern for the start of the path
 	const pathStartPattern = /^(https?:\/\/)(www\.)?/i; // i = ignore case (case insensitive)
 
-	if (pathStartPattern.test(faviconData)) {
+	if (pathStartPattern.test(path)) {
 		// The favicon path is an absolute path
-		faviconPath = faviconData;
+		return path;
 	} else {
 		// The favicon path is relative to the origin
 		if ((origin.charAt(origin.length) !== '/')
-			&& (faviconData.charAt(0) !== '/')
+			&& (path.charAt(0) !== '/')
 		) {
-			faviconPath = origin + "/" + faviconData;
+			return origin + "/" + path;
 		} else {
-			faviconPath = origin + faviconData;
+			return origin + path;
 		}
 	}
+}
 
-	if (faviconPath) {
-		let response = await fetch(faviconPath);
+/**
+ * Fetches a url and resolves to true if the response has status 200 OK.
+ *
+ * @param {String} url The url to be requested by the browser.
+ * @returns {Promise<Boolean>} true if the request response has status 200 OK, false otherwise.
+ */
+async function isFetchStatusOk(url) {
+	let response = await fetch(url);
 
-		if (response) {
-			if (200 === response.status) {
-				originData.storeOriginFavicon(faviconPath);
-			} else {
-				originData.storeOriginFavicon("");
-			}
+	if (response) {
+		if (200 === response.status) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }
