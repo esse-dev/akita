@@ -136,10 +136,10 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
 	const absoluteFaviconPath = pathToAbsolutePath(faviconPath, origin);
 	const isFaviconValid = await isFetchStatusOk(absoluteFaviconPath);
 
-	// Once/If the favicon resolves, store the originData with the favicon included:
+	// Once/If the favicon resolves, store the originData with the favicon included
 	const resolveLock = await acquireStoreLock();
 
-	// Get and update existing data for this origin.
+	// Get and update existing data for this origin
 	let originData = await loadOriginData(origin);
 	if (isFaviconValid) {
 		originData.setOriginFavicon(absoluteFaviconPath);
