@@ -122,7 +122,7 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
  *   - fetches the favicon to check if it is a valid favicon,
  *     - if the fetch is successful, the favicon is valid, so the origin's orginData favicon is set
  *     to the given favicon path,
- *     - if the fetch is unsuccessful the origin's originData favicon is set to "",
+ *     - if the fetch is unsuccessful, the origin's originData favicon is set to "",
  *   - finally, the updated originData is stored.
  *
  * Note: this function's implementation assumes that this origin's data has been created
