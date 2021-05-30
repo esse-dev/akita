@@ -110,11 +110,11 @@ class AkitaOriginData {
 	}
 
 	/**
-	 * Store the favicon source.
+	 * Set the favicon source.
 	 *
 	 * @param {String} faviconPath The url of the origin's favicon.
 	 */
-	storeOriginFavicon(faviconPath) {
+	setOriginFavicon(faviconPath) {
 		this.faviconSource = faviconPath;
 	}
 
