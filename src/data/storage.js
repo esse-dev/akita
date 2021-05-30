@@ -236,7 +236,7 @@ function updateTimeSpent(originData, originStats, recentTimeSpent, isMonetizedTi
  * path on the given origin is made with the input path.
  *
  * @param {String} path A path to convert to an absolute path, or check that it is already an absolute path.
- * @param {String} origin If the path is relative, This param is he origin which the path is
+ * @param {String} origin If the path is relative, this param is he origin which the path is
  * relative to. Not used if the path is absolute.
  * @returns {String} The input path as an absolute path.
  */
