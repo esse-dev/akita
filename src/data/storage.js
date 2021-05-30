@@ -125,7 +125,7 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
  *     - if the fetch is unsuccessful, the origin's originData favicon is set to "",
  *   - finally, the updated originData is stored.
  *
- * Note: this function's implementation assumes that this origin's data has been created
+ * Note: this function's implementation assumes that the specified origin's data has been created
  * and stored prior to the critical section.
  *
  * @param {String} origin The origin which should have its corresponding originData favicon set.
