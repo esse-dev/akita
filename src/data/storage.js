@@ -8,6 +8,7 @@ const AKITA_DATA_TYPE = {
 	'TIME_SPENT': 2,
 	'ORIGIN_FAVICON': 3
 };
+const VALID_AKITA_DATA_TYPE_VALUES = Object.values(AKITA_DATA_TYPE);
 
 const ORIGIN_NAME_LIST_KEY = 'originList';
 const ORIGIN_STATS_KEY = 'originStats';
@@ -83,7 +84,7 @@ async function storeDataIntoAkitaFormatNonMonetized(data, typeOfData) {
  * @param {Boolean} isMonetizedData Whether or not the data being stored is for a monetized origin.
  */
 async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
-	if (!Object.values(AKITA_DATA_TYPE).includes(typeOfData)) {
+	if (!VALID_AKITA_DATA_TYPE_VALUES.includes(typeOfData)) {
 		throw "invalid typeOfData passed to updateAkitaData";
 	}
 
@@ -268,10 +269,7 @@ function pathToAbsolutePath(path, origin) {
 async function isFetchStatusOk(url) {
 	let response = await fetch(url);
 
-	if (response) {
-		return (200 === response.status);
-		}
-	}
+	return (200 === response?.status);
 }
 
 /***********************************************************
