@@ -128,7 +128,7 @@ async function updateAkitaData(originData, data, typeOfData, isMonetizedData) {
  * Note: this function's implementation assumes that the specified origin's data has been created
  * and stored prior to the critical section.
  *
- * @param {String} origin The origin which should have its corresponding originData favicon set.
+ * @param {String} origin The origin to set a favicon for.
  * @param {String} faviconPath The absolute or relative path to the origin's favicon.
  */
  async function storeOriginFavicon(origin, faviconPath) {
