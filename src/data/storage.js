@@ -269,10 +269,7 @@ async function isFetchStatusOk(url) {
 	let response = await fetch(url);
 
 	if (response) {
-		if (200 === response.status) {
-			return true;
-		} else {
-			return false;
+		return (200 === response.status);
 		}
 	}
 }
