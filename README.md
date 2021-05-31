@@ -57,7 +57,8 @@ Check out the instructions to install from source or package [here](docs/Install
 
 You can also install Akita from Browser Extension/Add-On Stores:
 
-[Chrome Web Store](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg) | [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
+- [Chrome Web Store](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg)
+- [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
 ---
 
