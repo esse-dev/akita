@@ -15,6 +15,7 @@
   Note, at the time of adding the Edge badge below, there is no officially documented API for retrieving the add on details, so the method from https://github.com/badges/shields/issues/4690#issuecomment-647573617 has been used.
 -->
 [![Available on Chrome Web Store](https://img.shields.io/chrome-web-store/v/phcipgphomfgkenfmjnbmajdiejnlmgg?color=brightgreen)](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg)
+[![Available on Firefox Browser Add-ons](https://img.shields.io/amo/v/akita?color=blueviolet)](https://addons.mozilla.org/en-US/firefox/addon/akita/)
 [![Available on Microsoft Edge Add-ons](https://img.shields.io/badge/dynamic/json?label=edge%20add-ons&prefix=v&query=%24.version&url=https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/halamaefcdjalhjgkbefalmhpnboncoc)](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
 A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/), part of [The Akita Project](https://akitaproject.site/).
@@ -58,6 +59,7 @@ Check out the instructions to install from source or package [here](docs/Install
 You can also install Akita from Browser Extension/Add-On Stores:
 
 - [Chrome Web Store](https://chrome.google.com/webstore/detail/akita/phcipgphomfgkenfmjnbmajdiejnlmgg)
+- [Firefox Browser Add-ons](https://addons.mozilla.org/en-US/firefox/addon/akita/)
 - [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
 ---
