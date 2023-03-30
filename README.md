@@ -129,8 +129,8 @@ Overall, our goal with Akita is to increase Web Monetization exposure and awaren
 3. [How can you support websites without having to deal with annoying ads?](https://dev.to/esse-dev/how-can-you-support-websites-without-having-to-deal-with-annoying-ads-3lmb)
 4. [Hackathon Update: Breaking Our Idea Down Into Dog-Treat-Sized Tasks](https://dev.to/esse-dev/hackathon-update-breaking-our-idea-down-into-dog-treat-sized-tasks-50e3)
 5. [Akita: Get Involved in Web Monetization With or Without the Price Tag](https://dev.to/esse-dev/akita-get-involved-in-web-monetization-with-or-without-the-price-tag-cd8) (Hackathon Submission Post
-6. [Akita — Grant Report #1](https://community.webmonetization.org/akita/akita-grant-report-1-3c1n)
-7. [Support us by taking the Akita Beta Release Survey](https://community.webmonetization.org/akita/support-us-by-taking-the-akita-beta-release-survey-2fk4)
+6. [Akita — Grant Report #1](https://community.interledger.org/akita/akita-grant-report-1-3c1n)
+7. [Support us by taking the Akita Beta Release Survey](https://community.interledger.org/akita/support-us-by-taking-the-akita-beta-release-survey-2fk4)
 
 
 ### Why 'Akita'?
@@ -159,10 +159,10 @@ For more info, check out [Akita's Privacy Policy](docs/PrivacyPolicy.md).
 ## Connect with Us
 - Email
   - [AkitaFeedback@gmail.com](mailto:AkitaFeedback@gmail.com)
-- Web Monetization Community Forem
-  - [Akita](https://community.webmonetization.org/akita)
-  - [Elliot](https://community.webmonetization.org/elliot)
-  - [Sharon](https://community.webmonetization.org/sharon)
+- Interledger Community Forem (formerly Web Monetization Community Forem)
+  - [Akita](https://community.interledger.org/akita)
+  - [Elliot](https://community.interledger.org/elliot)
+  - [Sharon](https://community.interledger.org/sharon)
 - DEV
   - [esse-dev](https://dev.to/esse-dev)
   - [Elliot](https://dev.to/elliot)
