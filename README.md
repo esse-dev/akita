@@ -18,7 +18,7 @@
 [![Available on Firefox Browser Add-ons](https://img.shields.io/amo/v/akita?color=blueviolet)](https://addons.mozilla.org/en-US/firefox/addon/akita/)
 [![Available on Microsoft Edge Add-ons](https://img.shields.io/badge/dynamic/json?label=edge%20add-ons&prefix=v&query=%24.version&url=https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/halamaefcdjalhjgkbefalmhpnboncoc)](https://microsoftedge.microsoft.com/addons/detail/akita/halamaefcdjalhjgkbefalmhpnboncoc)
 
-A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/), part of [The Akita Project](https://akitaproject.site/).
+A browser extension that gives you insight into your engagement with [Web Monetization](https://webmonetization.org/), part of [The Akita Project](https://esse-dev.github.io/akita-project-site).
 
 Akita presents your top visited monetized sites, how much time you’re spending on them, and how much you're contributing (or could contribute) to them.
 
